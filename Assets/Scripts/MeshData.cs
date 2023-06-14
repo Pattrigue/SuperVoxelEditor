@@ -1,41 +1,44 @@
 ﻿using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 
-public struct MeshData
+namespace SemagGames.VoxelEditor
 {
-    private static readonly AllocatorManager.AllocatorHandle AllocatorHandle = Allocator.Persistent;
-
-    [NativeDisableContainerSafetyRestriction]
-    public NativeList<Vertex> Vertices;
-
-    [NativeDisableContainerSafetyRestriction]
-    public NativeList<ushort> Indices;
-
-    public static MeshData Allocate()
+    public struct MeshData
     {
-        NativeList<Vertex> vertices = new(AllocatorHandle);
-        NativeList<ushort> indices = new(AllocatorHandle);
+        private static readonly AllocatorManager.AllocatorHandle AllocatorHandle = Allocator.Persistent;
 
-        return new MeshData(ref vertices, ref indices);
-    }
+        [NativeDisableContainerSafetyRestriction]
+        public NativeList<Vertex> Vertices;
 
-    private MeshData(ref NativeList<Vertex> vertices, ref NativeList<ushort> indices)
-    {
-        Vertices = vertices;
-        Indices = indices;
-    }
+        [NativeDisableContainerSafetyRestriction]
+        public NativeList<ushort> Indices;
 
-    public void Clear()
-    {
-        if (Vertices.IsCreated) Vertices.Clear();
+        public static MeshData Allocate()
+        {
+            NativeList<Vertex> vertices = new(AllocatorHandle);
+            NativeList<ushort> indices = new(AllocatorHandle);
 
-        if (Indices.IsCreated) Indices.Clear();
-    }
+            return new MeshData(ref vertices, ref indices);
+        }
 
-    public void Dispose()
-    {
-        if (Vertices.IsCreated) Vertices.Dispose();
+        private MeshData(ref NativeList<Vertex> vertices, ref NativeList<ushort> indices)
+        {
+            Vertices = vertices;
+            Indices = indices;
+        }
 
-        if (Indices.IsCreated) Indices.Dispose();
+        public void Clear()
+        {
+            if (Vertices.IsCreated) Vertices.Clear();
+
+            if (Indices.IsCreated) Indices.Clear();
+        }
+
+        public void Dispose()
+        {
+            if (Vertices.IsCreated) Vertices.Dispose();
+
+            if (Indices.IsCreated) Indices.Dispose();
+        }
     }
 }

@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
 
-[CreateAssetMenu(menuName = "Voxel")]
-public sealed class VoxelAsset : ScriptableObject
+namespace SemagGames.VoxelEditor
 {
-    [field: SerializeField] public uint ID { get; private set; }
+    [CreateAssetMenu(menuName = "Voxel")]
+    public sealed class VoxelAsset : ScriptableObject
+    {
+        [field: SerializeField] public uint ID { get; private set; }
+    }
 }

@@ -1,60 +1,63 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteAlways]
-public sealed class World : Singleton<World>
+namespace SemagGames.VoxelEditor
 {
-    [SerializeField] private Chunk chunkPrefab;
-    [SerializeField] private ColorPicker colorPicker;
-    
-    public ColorPicker ColorPicker => colorPicker;
-
-    private readonly Dictionary<ChunkPosition, Chunk> chunks = new();
-    
-    private void OnEnable()
+    [ExecuteAlways]
+    public sealed class World : Singleton<World>
     {
-        chunks.Clear();
+        [SerializeField] private Chunk chunkPrefab;
+        [SerializeField] private ColorPicker.ColorPicker colorPicker;
+    
+        public ColorPicker.ColorPicker ColorPicker => colorPicker;
 
-        foreach (Chunk chunk in GetComponentsInChildren<Chunk>())
+        private readonly Dictionary<ChunkPosition, Chunk> chunks = new();
+    
+        private void OnEnable()
         {
-            chunks.Add(chunk.ChunkPosition, chunk);
-        }
-    }
+            chunks.Clear();
 
-    public static void Clear()
-    {
-        while (Instance.transform.childCount > 0)
-        {
-            DestroyImmediate(Instance.transform.GetChild(0).gameObject);
+            foreach (Chunk chunk in GetComponentsInChildren<Chunk>())
+            {
+                chunks.Add(chunk.ChunkPosition, chunk);
+            }
         }
 
-        Instance.chunks.Clear();
-    }
+        public static void Clear()
+        {
+            while (Instance.transform.childCount > 0)
+            {
+                DestroyImmediate(Instance.transform.GetChild(0).gameObject);
+            }
 
-    public static void SetVoxel(Vector3 position, uint voxelId)
-    {
-        ChunkPosition chunkPosition = ChunkPosition.FromWorldPosition(position);
+            Instance.chunks.Clear();
+        }
+
+        public static void SetVoxel(Vector3 position, uint voxelId)
+        {
+            ChunkPosition chunkPosition = ChunkPosition.FromWorldPosition(position);
         
-        if (!Instance.chunks.TryGetValue(chunkPosition, out Chunk chunk))
-        {
-            chunk = Instantiate(Instance.chunkPrefab, chunkPosition.WorldPosition, Quaternion.identity, Instance.transform);
-            chunk.name = $"Chunk {chunkPosition}";
+            if (!Instance.chunks.TryGetValue(chunkPosition, out Chunk chunk))
+            {
+                chunk = Instantiate(Instance.chunkPrefab, chunkPosition.WorldPosition, Quaternion.identity, Instance.transform);
+                chunk.name = $"Chunk {chunkPosition}";
 
-            Instance.chunks.Add(chunkPosition, chunk);
+                Instance.chunks.Add(chunkPosition, chunk);
+            }
+
+            chunk.SetVoxel(position, new Voxel(voxelId, Instance.colorPicker.SelectedColor));
         }
 
-        chunk.SetVoxel(position, new Voxel(voxelId, Instance.colorPicker.SelectedColor));
-    }
+        public static bool TryGetChunk(Vector3 position, out Chunk chunk)
+        {
+            ChunkPosition chunkPosition = ChunkPosition.FromWorldPosition(position);
 
-    public static bool TryGetChunk(Vector3 position, out Chunk chunk)
-    {
-        ChunkPosition chunkPosition = ChunkPosition.FromWorldPosition(position);
+            return Instance.chunks.TryGetValue(chunkPosition, out chunk);
+        }
 
-        return Instance.chunks.TryGetValue(chunkPosition, out chunk);
-    }
-
-    public static bool TryGetChunk(ChunkPosition chunkPosition, out Chunk chunk)
-    {
-        return Instance.chunks.TryGetValue(chunkPosition, out chunk);
+        public static bool TryGetChunk(ChunkPosition chunkPosition, out Chunk chunk)
+        {
+            return Instance.chunks.TryGetValue(chunkPosition, out chunk);
+        }
     }
 }

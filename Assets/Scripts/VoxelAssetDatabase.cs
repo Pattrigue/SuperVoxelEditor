@@ -3,24 +3,27 @@ using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 
-public sealed class VoxelAssetDatabase : Singleton<VoxelAssetDatabase>
+namespace SemagGames.VoxelEditor
 {
-    [SerializeField] private VoxelAsset[] voxelAssets;
-
-    private static VoxelAsset[] VoxelAssets => Instance.voxelAssets;
-
-    [Button]
-    private void GetVoxelAssetsInProject()
+    public sealed class VoxelAssetDatabase : Singleton<VoxelAssetDatabase>
     {
-        voxelAssets = AssetDatabase.FindAssets("t:VoxelAsset")
-            .Select(AssetDatabase.GUIDToAssetPath)
-            .Select(AssetDatabase.LoadAssetAtPath<VoxelAsset>)
-            .OrderBy(asset => asset.ID)
-            .ToArray();
-    }
+        [SerializeField] private VoxelAsset[] voxelAssets;
 
-    public static VoxelAsset GetVoxelAsset(uint id)
-    {
-        return VoxelAssets[id - 1];
+        private static VoxelAsset[] VoxelAssets => Instance.voxelAssets;
+
+        [Button]
+        private void GetVoxelAssetsInProject()
+        {
+            voxelAssets = AssetDatabase.FindAssets("t:VoxelAsset")
+                .Select(AssetDatabase.GUIDToAssetPath)
+                .Select(AssetDatabase.LoadAssetAtPath<VoxelAsset>)
+                .OrderBy(asset => asset.ID)
+                .ToArray();
+        }
+
+        public static VoxelAsset GetVoxelAsset(uint id)
+        {
+            return VoxelAssets[id - 1];
+        }
     }
 }
