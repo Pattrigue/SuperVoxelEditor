@@ -24,7 +24,7 @@ namespace SemagGames.VoxelEditor
 
         public static bool operator ==(Voxel a, Voxel b)
         {
-            return a.ID == b.ID;
+            return a.ID == b.ID && a.Color.r == b.Color.r && a.Color.g == b.Color.g && a.Color.b == b.Color.b && a.Color.a == b.Color.a;
         }
 
         public static bool operator !=(Voxel a, Voxel b)

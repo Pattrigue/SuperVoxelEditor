@@ -20,7 +20,7 @@ namespace SemagGames.VoxelEditor
             Rebuild();
         }
 
-        private void Rebuild()
+        public void Rebuild()
         {
             World.Clear();
 
@@ -49,9 +49,13 @@ namespace SemagGames.VoxelEditor
                     uint voxelId;
 
                     if (y <= height)
+                    {
                         voxelId = y == height ? grassVoxel.ID : stoneVoxel.ID;
+                    }
                     else
+                    {
                         voxelId = Voxel.AirId;
+                    }
 
                     World.SetVoxel(new Vector3(x, y, z), voxelId);
                 }

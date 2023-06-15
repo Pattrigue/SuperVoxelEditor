@@ -85,7 +85,7 @@ namespace SemagGames.VoxelEditor.Editor
 
                 UpdatePreviewCube(voxelHitPoint);
             }
-
+            
             sceneView.Repaint();
         }
 

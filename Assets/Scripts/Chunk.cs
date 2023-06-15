@@ -90,6 +90,24 @@ namespace SemagGames.VoxelEditor
             }
         }
 
+        public Voxel GetVoxel(Vector3 worldPosition)
+        {
+            Vector3Int chunkVoxelPosition = ChunkPosition.VoxelPosition;
+            
+            int x = Mathf.FloorToInt(worldPosition.x) - chunkVoxelPosition.x;
+            int y = Mathf.FloorToInt(worldPosition.y) - chunkVoxelPosition.y;
+            int z = Mathf.FloorToInt(worldPosition.z) - chunkVoxelPosition.z;
+            
+            // check if the position is inside the chunk
+            
+            if (x < 0 || x >= Width || y < 0 || y >= Height || z < 0 || z >= Depth)
+            {
+                return Voxel.Air;
+            }
+            
+            return voxels[GetVoxelIndex(x, y, z)];
+        }
+
         public bool HasVoxel(Vector3 worldPosition)
         {
             Vector3Int chunkVoxelPosition = ChunkPosition.VoxelPosition;

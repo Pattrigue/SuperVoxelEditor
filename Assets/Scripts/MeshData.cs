@@ -1,44 +1,16 @@
-﻿using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
-
-namespace SemagGames.VoxelEditor
+﻿namespace SemagGames.VoxelEditor
 {
-    public struct MeshData
-    {
-        private static readonly AllocatorManager.AllocatorHandle AllocatorHandle = Allocator.Persistent;
+    using UnityEngine;
 
-        [NativeDisableContainerSafetyRestriction]
-        public NativeList<Vertex> Vertices;
+    public class MeshData {
+        public Vector3[] Vertices { get; }
+        public int[] Triangles { get; }
+        public Color32[] Colors { get; }
 
-        [NativeDisableContainerSafetyRestriction]
-        public NativeList<ushort> Indices;
-
-        public static MeshData Allocate()
-        {
-            NativeList<Vertex> vertices = new(AllocatorHandle);
-            NativeList<ushort> indices = new(AllocatorHandle);
-
-            return new MeshData(ref vertices, ref indices);
-        }
-
-        private MeshData(ref NativeList<Vertex> vertices, ref NativeList<ushort> indices)
-        {
+        public MeshData(Vector3[] vertices, int[] triangles, Color32[] colors) {
             Vertices = vertices;
-            Indices = indices;
-        }
-
-        public void Clear()
-        {
-            if (Vertices.IsCreated) Vertices.Clear();
-
-            if (Indices.IsCreated) Indices.Clear();
-        }
-
-        public void Dispose()
-        {
-            if (Vertices.IsCreated) Vertices.Dispose();
-
-            if (Indices.IsCreated) Indices.Dispose();
+            Triangles = triangles;
+            Colors = colors;
         }
     }
 }
