@@ -54,6 +54,7 @@ namespace SemagGames.VoxelEditor
 
         private void OnDestroy()
         {
+            meshData.Dispose();
         }
 
         public void Build(IReadOnlyList<Voxel> voxels)
@@ -61,33 +62,37 @@ namespace SemagGames.VoxelEditor
             Debug.Log($"Building chunk mesh at {chunk.ChunkPosition}");
 
             ResetMesh();
+            GenerateMeshData();
             
-            MeshData generatedMeshData = GenerateMesh();
+            mesh.SetVertexBufferParams(meshData.Vertices.Length, VertexAttributeDescriptors);
+            mesh.SetVertexBufferData(meshData.Vertices.AsArray(), 0, 0, meshData.Vertices.Length, 0, MeshUpdateFlags);
             
-            mesh.SetVertexBufferParams(generatedMeshData.Vertices.Length, VertexAttributeDescriptors);
-            mesh.SetVertexBufferData(generatedMeshData.Vertices, 0, 0, generatedMeshData.Vertices.Length, 0, MeshUpdateFlags);
+            mesh.SetIndexBufferParams(meshData.Triangles.Length, IndexFormat.UInt16);
+            mesh.SetIndexBufferData(meshData.Triangles.AsArray(), 0, 0, meshData.Triangles.Length, MeshUpdateFlags);
             
-            mesh.SetIndexBufferParams(generatedMeshData.Triangles.Length, IndexFormat.UInt16);
-            mesh.SetIndexBufferData(generatedMeshData.Triangles, 0, 0, generatedMeshData.Triangles.Length, MeshUpdateFlags);
+            mesh.SetSubMesh(0, new SubMeshDescriptor(0, meshData.Triangles.Length), MeshUpdateFlags);
+            mesh.RecalculateBounds();
             
-            mesh.SetSubMesh(0, new SubMeshDescriptor(0, generatedMeshData.Triangles.Length), MeshUpdateFlags);
-
-            // mesh.triangles = generatedMeshData.Triangles;
-            mesh.RecalculateNormals();
+            if (mesh.vertices.Length == 0)
+            {
+                DestroyImmediate(gameObject);
+                return;
+            }
 
             meshFilter.mesh = mesh;
             meshCollider.sharedMesh = mesh;
 
-            // meshData.Dispose();
+            meshData.Dispose();
         }
 
         private void ResetMesh()
         {
-            // meshData.Dispose(); // ensure to dispose old one to avoid memory leak
-            // meshData = MeshData.Allocate();
-
+            meshData.Dispose(); // ensure to dispose old one to avoid memory leak
+            meshData = MeshData.Allocate();
+            
             meshCollider.sharedMesh = null;
             meshFilter.sharedMesh = null;
+            vertexCount = 0;
 
             if (mesh == null)
             {
@@ -100,9 +105,21 @@ namespace SemagGames.VoxelEditor
             }
         }
 
-        public MeshData GenerateMesh()
+        private int vertexCount;
+        
+        public void Allocate()
         {
-            MeshBuilder builder = new MeshBuilder();
+            meshData = MeshData.Allocate();
+        }
+                
+        public void Dispose() 
+        {
+            vertexCount = 0;
+            meshData.Dispose();
+        }
+
+        private void GenerateMeshData()
+        {
             bool[,] merged;
 
             Vector3Int startPos, currPos, quadSize, m, n, offsetPos;
@@ -180,11 +197,13 @@ namespace SemagGames.VoxelEditor
                             Vector3 normal = Vector3.zero;
                             normal[direction] = isBackFace ? -1 : 1;
 
-                            builder.AddSquareFace(a, b, c, d, normal, startVoxel.Color, isBackFace);
+                            AddSquareFace(a, b, c, d, normal, startVoxel.Color, isBackFace);
 
                             // Mark it merged
-                            for (int f = 0; f < quadSize[workAxis1]; f++) {
-                                for (int g = 0; g < quadSize[workAxis2]; g++) {
+                            for (int f = 0; f < quadSize[workAxis1]; f++) 
+                            {
+                                for (int g = 0; g < quadSize[workAxis2]; g++) 
+                                {
                                     merged[startPos[workAxis1] + f, startPos[workAxis2] + g] = true;
                                 }
                             }
@@ -192,8 +211,37 @@ namespace SemagGames.VoxelEditor
                     }
                 }
             }
+        }
 
-            return builder.ToMeshData();
+        private void AddSquareFace(Vector3 a, Vector3 b, Vector3 c, Vector3 d, Vector3 normal, Color32 color, bool isBackFace)
+        {
+            // Add the 4 vertices, and color for each vertex.
+            meshData.Vertices.Add(new Vertex(a, normal, color));
+            meshData.Vertices.Add(new Vertex(b, normal, color));
+            meshData.Vertices.Add(new Vertex(c, normal, color));
+            meshData.Vertices.Add(new Vertex(d, normal, color));
+
+            int i = vertexCount;
+            vertexCount += 4;
+
+            if (!isBackFace)
+            {
+                meshData.Triangles.Add((ushort)i);
+                meshData.Triangles.Add((ushort)(i + 1));
+                meshData.Triangles.Add((ushort)(i + 2));
+                meshData.Triangles.Add((ushort)i);
+                meshData.Triangles.Add((ushort)(i + 2));
+                meshData.Triangles.Add((ushort)(i + 3));
+            }
+            else
+            {
+                meshData.Triangles.Add((ushort)(i + 2));
+                meshData.Triangles.Add((ushort)(i + 1));
+                meshData.Triangles.Add((ushort)i);
+                meshData.Triangles.Add((ushort)(i + 3));
+                meshData.Triangles.Add((ushort)(i + 2));
+                meshData.Triangles.Add((ushort)i);
+            }
         }
 
         private bool IsVoxelFaceVisible(Vector3Int voxelPosition, int axis, bool backFace) 
