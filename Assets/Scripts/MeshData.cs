@@ -1,18 +1,14 @@
-﻿using UnityEngine;
-    
-namespace SemagGames.VoxelEditor
+﻿namespace SemagGames.VoxelEditor
 {
     public sealed class MeshData
     {
-        public Vector3[] Vertices { get; }
+        public Vertex[] Vertices { get; }
         public int[] Triangles { get; }
-        public Color32[] Colors { get; }
 
-        public MeshData(Vector3[] vertices, int[] triangles, Color32[] colors)
+        public MeshData(Vertex[] vertices, int[] triangles)
         {
             Vertices = vertices;
             Triangles = triangles;
-            Colors = colors;
         }
     }
 }

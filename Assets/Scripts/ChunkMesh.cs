@@ -82,8 +82,6 @@ namespace SemagGames.VoxelEditor
             //     AddQuad(ref voxel, color, ref voxelPosition, Vector3Int.down, 7, 6, 5, 4);
             // }
 
-            // mesh.SetVertexBufferParams(test.Vertices.Count, VertexAttributeDescriptors);
-            // mesh.SetVertexBufferData(test.Vertices.ToArray(), 0, 0, test.Vertices.Count, 0, MeshUpdateFlags);
             //
             // mesh.SetIndexBufferParams(test.Indices.Count, IndexFormat.UInt16);
             // mesh.SetIndexBufferData(test.Indices.ToArray(), 0, 0, test.Indices.Count, MeshUpdateFlags);
@@ -91,10 +89,12 @@ namespace SemagGames.VoxelEditor
             // mesh.SetSubMesh(0, new SubMeshDescriptor(0, test.Indices.Count), MeshUpdateFlags);
 
             MeshData generatedMeshData = GenerateMesh();
+            
+            mesh.SetVertexBufferParams(generatedMeshData.Vertices.Length, VertexAttributeDescriptors);
+            mesh.SetVertexBufferData(generatedMeshData.Vertices, 0, 0, generatedMeshData.Vertices.Length, 0, MeshUpdateFlags);
 
-            mesh.vertices = generatedMeshData.Vertices;
+            // mesh.vertices = generatedMeshData.Vertices;
             mesh.triangles = generatedMeshData.Triangles;
-            mesh.SetColors(generatedMeshData.Colors);
             mesh.RecalculateNormals();
 
             meshFilter.mesh = mesh;
@@ -193,13 +193,16 @@ namespace SemagGames.VoxelEditor
                             offsetPos[direction] += isBackFace ? 0 : 1;
 
                             //Draw the face to the mesh
-                            vertices = new Vector3[] {
-                                offsetPos,
-                                offsetPos + m,
-                                offsetPos + m + n,
-                                offsetPos + n
-                            };
-                            builder.AddSquareFace(vertices, startVoxel.Color, isBackFace);
+                            
+                            Vector3 a = offsetPos;
+                            Vector3 b = offsetPos + m;
+                            Vector3 c = offsetPos + m + n;
+                            Vector3 d = offsetPos + n;
+                            
+                            Vector3 normal = Vector3.zero;
+                            normal[direction] = isBackFace ? -1 : 1;
+
+                            builder.AddSquareFace(a, b, c, d, normal, startVoxel.Color, isBackFace);
 
                             // Mark it merged
                             for (int f = 0; f < quadSize[workAxis1]; f++) {

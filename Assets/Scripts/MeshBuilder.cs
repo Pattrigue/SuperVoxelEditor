@@ -1,60 +1,50 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace SemagGames.VoxelEditor
 {
     public sealed class MeshBuilder 
     {
-        private readonly List<Vector3> vertices;
+        private readonly List<Vertex> vertices;
         private readonly List<int> triangles;
-        private readonly List<Color32> colors;
 
         private int vertexCount;
     
         public MeshBuilder() 
         {
-            vertices = new List<Vector3>();
+            vertices = new List<Vertex>();
             triangles = new List<int>();
-            colors = new List<Color32>();
         }
     
-        public void AddSquareFace(Vector3[] vertices, Color32 color, bool isBackFace)
+        public void AddSquareFace(Vector3 a, Vector3 b, Vector3 c, Vector3 d, Vector3 normal, Color32 color, bool isBackFace)
         {
-            if (vertices.Length != 4) 
-            {
-                throw new ArgumentException("A square face requires 4 vertices");
-            }
-    
             // Add the 4 vertices, and color for each vertex.
-            for (int i = 0; i < vertices.Length; i++) 
-            {
-                this.vertices.Add(vertices[i]);
-                colors.Add(color);
-            }
+            vertices.Add(new Vertex(a, normal, color));
+            vertices.Add(new Vertex(b, normal, color));
+            vertices.Add(new Vertex(c, normal, color));
+            vertices.Add(new Vertex(d, normal, color));
 
-            int triangleIndex = vertexCount;
-            
+            int i = vertexCount;
             vertexCount += 4;
 
             if (!isBackFace) 
             {
-                triangles.Add(triangleIndex);                
-                triangles.Add(triangleIndex + 1);
-                triangles.Add(triangleIndex + 2);
+                triangles.Add(i);                
+                triangles.Add(i + 1);
+                triangles.Add(i + 2);
             
-                triangles.Add(triangleIndex);               
-                triangles.Add(triangleIndex + 2);
-                triangles.Add(triangleIndex + 3);
+                triangles.Add(i);               
+                triangles.Add(i + 2);
+                triangles.Add(i + 3);
             } 
             else 
             {
-                triangles.Add(triangleIndex + 2);
-                triangles.Add(triangleIndex + 1);
-                triangles.Add(triangleIndex);            
-                triangles.Add(triangleIndex + 3);
-                triangles.Add(triangleIndex + 2);
-                triangles.Add(triangleIndex);            
+                triangles.Add(i + 2);
+                triangles.Add(i + 1);
+                triangles.Add(i);            
+                triangles.Add(i + 3);
+                triangles.Add(i + 2);
+                triangles.Add(i);            
             }
         }
     
@@ -62,14 +52,12 @@ namespace SemagGames.VoxelEditor
         {
             MeshData data = new MeshData(
                 vertices.ToArray(),
-                triangles.ToArray(),
-                colors.ToArray()
+                triangles.ToArray()
             );
     
             vertices.Clear();
             triangles.Clear();
-            colors.Clear();
-    
+            
             return data;
         }
     }
