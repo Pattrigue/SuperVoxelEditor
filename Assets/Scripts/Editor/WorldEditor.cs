@@ -6,8 +6,6 @@ namespace SemagGames.VoxelEditor.Editor
     [CustomEditor(typeof(World))]
     public sealed class WorldEditor : UnityEditor.Editor
     {
-        private const float Range = 40f;
-
         private World World => (World)target;
 
         private GameObject previewCube;
@@ -67,7 +65,7 @@ namespace SemagGames.VoxelEditor.Editor
             Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
             deleteMode = Event.current.shift;
 
-            if (Physics.Raycast(ray, out RaycastHit hit, Range))
+            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
             {
                 Vector3 voxelHitPoint = CalculateVoxelHitPoint(hit);
 
