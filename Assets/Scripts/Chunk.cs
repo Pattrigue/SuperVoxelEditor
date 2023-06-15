@@ -33,20 +33,20 @@ namespace SemagGames.VoxelEditor
         private void OnEnable()
         {
 #if UNITY_EDITOR
-            UnityEditor.EditorApplication.update += LateUpdate;
+            UnityEditor.EditorApplication.update += Update;
 #endif
         }
         
         private void OnDisable()
         {
 #if UNITY_EDITOR
-            UnityEditor.EditorApplication.update -= LateUpdate;
+            UnityEditor.EditorApplication.update -= Update;
 #endif
         }
 
         public void Rebuild() => mesh.Build(Voxels);
 
-        private void LateUpdate()
+        private void Update()
         {
             if (isDirty)
             {
