@@ -135,13 +135,11 @@ namespace SemagGames.VoxelEditor.Editor
                 for (int y = min.y; y <= max.y; y++)
                 {
                     for (int z = min.z; z <= max.z; z++)
-                    {
+                    {                
                         World.SetVoxel(new Vector3(x, y, z), voxelId);
                     }
                 }
             }
-        
-            Undo.RecordObject(World, "Edit World");
         }
 
         private void UpdatePreviewCube(Vector3 voxelHitPoint)
