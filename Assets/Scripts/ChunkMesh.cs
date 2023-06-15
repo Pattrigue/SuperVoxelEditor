@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using Unity.Mathematics;
-using UnityEngine;
-using UnityEngine.Rendering;
-using Random = UnityEngine.Random;
+﻿using UnityEngine.Rendering;
 
 namespace SemagGames.VoxelEditor
 {
@@ -16,19 +12,7 @@ namespace SemagGames.VoxelEditor
                                                         | UnityEngine.Rendering.MeshUpdateFlags.DontNotifyMeshUsers
                                                         | UnityEngine.Rendering.MeshUpdateFlags.DontResetBoneBounds;
 
-        private static readonly Vector3[] VertexPositions =
-        {
-            new(-0.5f, 0.5f, -0.5f),
-            new(-0.5f, 0.5f, 0.5f),
-            new(0.5f, 0.5f, 0.5f),
-            new(0.5f, 0.5f, -0.5f),
-            new(-0.5f, -0.5f, -0.5f),
-            new(-0.5f, -0.5f, 0.5f),
-            new(0.5f, -0.5f, 0.5f),
-            new(0.5f, -0.5f, -0.5f)
-        };
-
-        public static readonly Vector3Int Dimensions = new Vector3Int(16, 16, 16);
+        private static readonly Vector3Int Dimensions = new Vector3Int(16, 16, 16);
         
         private static readonly VertexAttributeDescriptor[] VertexAttributeDescriptors =
         {
