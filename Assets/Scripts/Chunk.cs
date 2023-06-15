@@ -44,7 +44,7 @@ namespace SemagGames.VoxelEditor
 #endif
         }
 
-        public void Rebuild() => mesh.Build(Voxels);
+        public void Rebuild() => mesh.Build();
 
         private void Update()
         {

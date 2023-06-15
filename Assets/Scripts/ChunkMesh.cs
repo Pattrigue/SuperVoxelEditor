@@ -6,7 +6,6 @@ using Random = UnityEngine.Random;
 
 namespace SemagGames.VoxelEditor
 {
-    using System.Collections.Generic;
     using UnityEngine;
 
     [ExecuteAlways]
@@ -44,6 +43,8 @@ namespace SemagGames.VoxelEditor
         private MeshFilter meshFilter;
 
         private MeshData meshData;
+        
+        private int vertexCount;
 
         private void Awake()
         {
@@ -57,7 +58,7 @@ namespace SemagGames.VoxelEditor
             meshData.Dispose();
         }
 
-        public void Build(IReadOnlyList<Voxel> voxels)
+        public void Build()
         {
             Debug.Log($"Building chunk mesh at {chunk.ChunkPosition}");
 
@@ -103,19 +104,6 @@ namespace SemagGames.VoxelEditor
             {
                 mesh.Clear();
             }
-        }
-
-        private int vertexCount;
-        
-        public void Allocate()
-        {
-            meshData = MeshData.Allocate();
-        }
-                
-        public void Dispose() 
-        {
-            vertexCount = 0;
-            meshData.Dispose();
         }
 
         private void GenerateMeshData()
