@@ -3,9 +3,9 @@
     public sealed class MeshData
     {
         public Vertex[] Vertices { get; }
-        public int[] Triangles { get; }
+        public ushort[] Triangles { get; }
 
-        public MeshData(Vertex[] vertices, int[] triangles)
+        public MeshData(Vertex[] vertices, ushort[] triangles)
         {
             Vertices = vertices;
             Triangles = triangles;

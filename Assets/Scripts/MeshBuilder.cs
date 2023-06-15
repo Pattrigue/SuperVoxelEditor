@@ -6,14 +6,14 @@ namespace SemagGames.VoxelEditor
     public sealed class MeshBuilder 
     {
         private readonly List<Vertex> vertices;
-        private readonly List<int> triangles;
+        private readonly List<ushort> triangles;
 
         private int vertexCount;
     
         public MeshBuilder() 
         {
             vertices = new List<Vertex>();
-            triangles = new List<int>();
+            triangles = new List<ushort>();
         }
     
         public void AddSquareFace(Vector3 a, Vector3 b, Vector3 c, Vector3 d, Vector3 normal, Color32 color, bool isBackFace)
@@ -29,22 +29,22 @@ namespace SemagGames.VoxelEditor
 
             if (!isBackFace) 
             {
-                triangles.Add(i);                
-                triangles.Add(i + 1);
-                triangles.Add(i + 2);
-            
-                triangles.Add(i);               
-                triangles.Add(i + 2);
-                triangles.Add(i + 3);
+                triangles.Add((ushort)i);                
+                triangles.Add((ushort)(i + 1));
+                triangles.Add((ushort)(i + 2));
+                
+                triangles.Add((ushort)i);              
+                triangles.Add((ushort)(i + 2));
+                triangles.Add((ushort)(i + 3));
             } 
             else 
             {
-                triangles.Add(i + 2);
-                triangles.Add(i + 1);
-                triangles.Add(i);            
-                triangles.Add(i + 3);
-                triangles.Add(i + 2);
-                triangles.Add(i);            
+                triangles.Add((ushort)(i + 2));
+                triangles.Add((ushort)(i + 1));
+                triangles.Add((ushort)i);
+                triangles.Add((ushort)(i + 3));
+                triangles.Add((ushort)(i + 2));
+                triangles.Add((ushort)i);
             }
         }
     

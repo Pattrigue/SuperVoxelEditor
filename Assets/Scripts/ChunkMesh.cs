@@ -61,40 +61,18 @@ namespace SemagGames.VoxelEditor
             Debug.Log($"Building chunk mesh at {chunk.ChunkPosition}");
 
             ResetMesh();
-
-            Vector3 chunkWorldPosition = chunk.ChunkPosition.WorldPosition;
-
-            // for (int i = 0; i < Chunk.Size3D; i++)
-            // {
-            //     Voxel voxel = voxels[i];
-            //
-            //     if (voxel.ID == Voxel.AirId) continue;
-            //
-            //     Vector3Int voxelPosition = Chunk.ToVoxelPosition(i);
-            //     Color color = voxel.Color;
-            //     // Color32 baseColor = CalculateVoxelBaseColor(ref chunkWorldPosition, voxel.Asset.PrimaryColor, voxel.Asset.SecondaryColor, ref voxelPosition);
-            //
-            //     AddQuad(ref voxel, color, ref voxelPosition, Vector3Int.up, 0, 1, 2, 3);
-            //     AddQuad(ref voxel, color, ref voxelPosition, Vector3Int.left, 1, 0, 4, 5);
-            //     AddQuad(ref voxel, color, ref voxelPosition, Vector3Int.back, 0, 3, 7, 4);
-            //     AddQuad(ref voxel, color, ref voxelPosition, Vector3Int.right, 3, 2, 6, 7);
-            //     AddQuad(ref voxel, color, ref voxelPosition, Vector3Int.forward, 2, 1, 5, 6);
-            //     AddQuad(ref voxel, color, ref voxelPosition, Vector3Int.down, 7, 6, 5, 4);
-            // }
-
-            //
-            // mesh.SetIndexBufferParams(test.Indices.Count, IndexFormat.UInt16);
-            // mesh.SetIndexBufferData(test.Indices.ToArray(), 0, 0, test.Indices.Count, MeshUpdateFlags);
-            //
-            // mesh.SetSubMesh(0, new SubMeshDescriptor(0, test.Indices.Count), MeshUpdateFlags);
-
+            
             MeshData generatedMeshData = GenerateMesh();
             
             mesh.SetVertexBufferParams(generatedMeshData.Vertices.Length, VertexAttributeDescriptors);
             mesh.SetVertexBufferData(generatedMeshData.Vertices, 0, 0, generatedMeshData.Vertices.Length, 0, MeshUpdateFlags);
+            
+            mesh.SetIndexBufferParams(generatedMeshData.Triangles.Length, IndexFormat.UInt16);
+            mesh.SetIndexBufferData(generatedMeshData.Triangles, 0, 0, generatedMeshData.Triangles.Length, MeshUpdateFlags);
+            
+            mesh.SetSubMesh(0, new SubMeshDescriptor(0, generatedMeshData.Triangles.Length), MeshUpdateFlags);
 
-            // mesh.vertices = generatedMeshData.Vertices;
-            mesh.triangles = generatedMeshData.Triangles;
+            // mesh.triangles = generatedMeshData.Triangles;
             mesh.RecalculateNormals();
 
             meshFilter.mesh = mesh;
