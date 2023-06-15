@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 
@@ -35,8 +34,7 @@ namespace SemagGames.VoxelEditor
             mesh = GetComponent<ChunkMesh>();
         }
 
-        [Button]
-        private void Rebuild()
+        public void Rebuild()
         {
             mesh.Build(Voxels);
         }

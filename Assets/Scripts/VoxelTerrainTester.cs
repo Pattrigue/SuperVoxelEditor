@@ -1,4 +1,3 @@
-using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace SemagGames.VoxelEditor
@@ -21,7 +20,6 @@ namespace SemagGames.VoxelEditor
             Rebuild();
         }
 
-        [Button]
         private void Rebuild()
         {
             World.Clear();

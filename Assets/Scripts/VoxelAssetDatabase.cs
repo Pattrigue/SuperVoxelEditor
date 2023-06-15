@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 
@@ -11,8 +10,7 @@ namespace SemagGames.VoxelEditor
 
         private static VoxelAsset[] VoxelAssets => Instance.voxelAssets;
 
-        [Button]
-        private void GetVoxelAssetsInProject()
+        public void GetVoxelAssetsInProject()
         {
             voxelAssets = AssetDatabase.FindAssets("t:VoxelAsset")
                 .Select(AssetDatabase.GUIDToAssetPath)
