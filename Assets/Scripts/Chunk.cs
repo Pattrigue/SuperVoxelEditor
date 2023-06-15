@@ -29,6 +29,20 @@ namespace SemagGames.VoxelEditor
         private bool isDirty;
 
         private void Awake() => mesh = GetComponent<ChunkMesh>();
+        
+        private void OnEnable()
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.update += LateUpdate;
+#endif
+        }
+        
+        private void OnDisable()
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.update -= LateUpdate;
+#endif
+        }
 
         public void Rebuild() => mesh.Build(Voxels);
 
