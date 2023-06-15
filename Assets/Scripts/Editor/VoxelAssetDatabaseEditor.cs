@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace SemagGames.VoxelEditor
+namespace SemagGames.VoxelEditor.Editor
 {
     [CustomEditor(typeof(VoxelAssetDatabase))]
     public sealed class VoxelAssetDatabaseEditor : UnityEditor.Editor

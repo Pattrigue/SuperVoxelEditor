@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using SemagGames.VoxelEditor.ColorPicking;
 using UnityEngine;
 
 namespace SemagGames.VoxelEditor
@@ -7,9 +8,9 @@ namespace SemagGames.VoxelEditor
     public sealed class World : Singleton<World>
     {
         [SerializeField] private Chunk chunkPrefab;
-        [SerializeField] private ColorPicker.ColorPicker colorPicker;
+        [SerializeField] private ColorPicker colorPicker;
     
-        public ColorPicker.ColorPicker ColorPicker => colorPicker;
+        public ColorPicker ColorPicker => colorPicker;
 
         private readonly Dictionary<ChunkPosition, Chunk> chunks = new();
     

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 namespace SemagGames.VoxelEditor
@@ -9,129 +8,79 @@ namespace SemagGames.VoxelEditor
     public sealed class Chunk : MonoBehaviour
     {
         [SerializeField] private Voxel[] voxels = new Voxel[Size3D];
-
+        
         public const int Width = 16;
         public const int Height = 16;
         public const int Depth = 16;
+        
+        private const int Size3D = Width * Height * Depth;
 
-        public const int Size3D = Width * Height * Depth;
+        public IReadOnlyList<Voxel> Voxels => voxels;
+
+        public ChunkPosition ChunkPosition => ChunkPosition.FromWorldPosition(transform.position);
 
         private static readonly Vector3[] NeighborDirections =
         {
             Vector3.up, Vector3.down, Vector3.left, Vector3.right, Vector3.forward, Vector3.back
         };
 
-        public ChunkPosition ChunkPosition => ChunkPosition.FromWorldPosition(transform.position);
-
-        public IReadOnlyList<Voxel> Voxels => voxels;
-
         private ChunkMesh mesh;
-
+        
         private bool isDirty;
 
-        private void Awake()
-        {
-            mesh = GetComponent<ChunkMesh>();
-        }
+        private void Awake() => mesh = GetComponent<ChunkMesh>();
 
-        public void Rebuild()
-        {
-            mesh.Build(Voxels);
-        }
-
-        private void OnEnable()
-        {
-#if UNITY_EDITOR
-            EditorApplication.update += LateUpdate;
-#endif
-        }
-
-        private void OnDisable()
-        {
-#if UNITY_EDITOR
-            EditorApplication.update -= LateUpdate;
-#endif
-        }
+        public void Rebuild() => mesh.Build(Voxels);
 
         private void LateUpdate()
         {
             if (isDirty)
             {
-                mesh.Build(Voxels);
+                Rebuild();
                 isDirty = false;
             }
         }
 
         public void SetVoxel(Vector3 worldPosition, Voxel voxel)
         {
-            Vector3Int chunkVoxelPosition = ChunkPosition.VoxelPosition;
-
-            int x = Mathf.FloorToInt(worldPosition.x) - chunkVoxelPosition.x;
-            int y = Mathf.FloorToInt(worldPosition.y) - chunkVoxelPosition.y;
-            int z = Mathf.FloorToInt(worldPosition.z) - chunkVoxelPosition.z;
-
-            int voxelIndex = GetVoxelIndex(x, y, z);
-
-            voxels[voxelIndex] = voxel;
-            isDirty = true;
-        
-            // check if the voxel is on the edge of the chunk
-            if (x == 0 || x == Width - 1 || y == 0 || y == Height - 1 || z == 0 || z == Depth - 1)
-            {
-                // Iterate over the six possible neighbor directions
-                for (int i = 0; i < NeighborDirections.Length; i++)
-                {
-                    // Check if the voxel is on the edge of the chunk in the current direction
-                    if (World.TryGetChunk(worldPosition + NeighborDirections[i], out Chunk chunk))
-                    {
-                        chunk.isDirty = true;
-                    }
-                }
-            }
+            Vector3Int localPosition = ToLocalVoxelPosition(worldPosition);
+            
+            SetVoxel(localPosition.x, localPosition.y, localPosition.z, voxel);
         }
 
         public Voxel GetVoxel(Vector3 worldPosition)
         {
-            Vector3Int chunkVoxelPosition = ChunkPosition.VoxelPosition;
+            Vector3Int localPosition = ToLocalVoxelPosition(worldPosition);
             
-            int x = Mathf.FloorToInt(worldPosition.x) - chunkVoxelPosition.x;
-            int y = Mathf.FloorToInt(worldPosition.y) - chunkVoxelPosition.y;
-            int z = Mathf.FloorToInt(worldPosition.z) - chunkVoxelPosition.z;
-            
-            // check if the position is inside the chunk
-            
-            if (x < 0 || x >= Width || y < 0 || y >= Height || z < 0 || z >= Depth)
-            {
-                return Voxel.Air;
-            }
-            
-            return voxels[GetVoxelIndex(x, y, z)];
+            return GetVoxel(localPosition.x, localPosition.y, localPosition.z);
         }
 
         public bool HasVoxel(Vector3 worldPosition)
         {
-            Vector3Int chunkVoxelPosition = ChunkPosition.VoxelPosition;
+            Vector3Int localPosition = ToLocalVoxelPosition(worldPosition);
+            
+            return HasVoxel(localPosition.x, localPosition.y, localPosition.z);
+        }
 
-            int x = Mathf.FloorToInt(worldPosition.x) - chunkVoxelPosition.x;
-            int y = Mathf.FloorToInt(worldPosition.y) - chunkVoxelPosition.y;
-            int z = Mathf.FloorToInt(worldPosition.z) - chunkVoxelPosition.z;
+        public void SetVoxel(int x, int y, int z, Voxel voxel)
+        {
+            int voxelIndex = GetVoxelIndex(x, y, z);
+            
+            voxels[voxelIndex] = voxel;
+            isDirty = true;
+            
+            MarkNeighborsDirtyIfOnEdge(x, y, z);
+        }
 
-            return HasVoxel(x, y, z);
+        public Voxel GetVoxel(int x, int y, int z)
+        {
+            if (!InChunkBounds(x, y, z)) return Voxel.Air;
+            return voxels[GetVoxelIndex(x, y, z)];
         }
 
         public bool HasVoxel(int x, int y, int z)
         {
-            return voxels[GetVoxelIndex(x, y, z)].ID != Voxel.AirId;
-        }
-
-        public static int GetVoxelIndex(int x, int y, int z)
-        {
-            return x + Width * (y + Height * z);
-        }
-
-        public static Vector3Int ToVoxelPosition(int voxelIndex)
-        {
-            return new Vector3Int(voxelIndex % Width, voxelIndex / Width % Height, voxelIndex / (Width * Height));
+            return GetVoxel(x, y, z).ID != Voxel.AirId;
         }
 
         public static bool InChunkBounds(int x, int y, int z)
@@ -143,5 +92,34 @@ namespace SemagGames.VoxelEditor
         {
             return InChunkBounds(voxelPosition.x, voxelPosition.y, voxelPosition.z);
         }
+
+        private Vector3Int ToLocalVoxelPosition(Vector3 worldPosition)
+        {
+            Vector3Int chunkVoxelPosition = ChunkPosition.VoxelPosition;
+            
+            return new Vector3Int(
+                Mathf.FloorToInt(worldPosition.x) - chunkVoxelPosition.x,
+                Mathf.FloorToInt(worldPosition.y) - chunkVoxelPosition.y,
+                Mathf.FloorToInt(worldPosition.z) - chunkVoxelPosition.z
+            );
+        }
+
+        private void MarkNeighborsDirtyIfOnEdge(int x, int y, int z)
+        {
+            // Check if the voxel is on the edge of the chunk
+            if (x == 0 || x == Width - 1 || y == 0 || y == Height - 1 || z == 0 || z == Depth - 1)
+            {
+                for (int i = 0; i < NeighborDirections.Length; i++)
+                {
+                    // Check if the voxel is on the edge of the chunk in the current direction
+                    if (World.TryGetChunk(transform.position + NeighborDirections[i], out Chunk chunk))
+                    {
+                        chunk.isDirty = true;
+                    }
+                }
+            }
+        }
+
+        private static int GetVoxelIndex(int x, int y, int z) => x + Width * (y + Height * z);
     }
 }
