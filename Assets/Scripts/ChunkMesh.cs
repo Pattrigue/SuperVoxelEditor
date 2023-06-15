@@ -45,8 +45,6 @@ namespace SemagGames.VoxelEditor
 
         private MeshData meshData;
 
-        private int vertexCount;
-
         private void Awake()
         {
             chunk = GetComponent<Chunk>();
@@ -92,7 +90,7 @@ namespace SemagGames.VoxelEditor
             //
             // mesh.SetSubMesh(0, new SubMeshDescriptor(0, test.Indices.Count), MeshUpdateFlags);
 
-            var generatedMeshData = GenerateMesh();
+            MeshData generatedMeshData = GenerateMesh();
 
             mesh.vertices = generatedMeshData.Vertices;
             mesh.triangles = generatedMeshData.Triangles;
@@ -112,7 +110,6 @@ namespace SemagGames.VoxelEditor
 
             meshCollider.sharedMesh = null;
             meshFilter.sharedMesh = null;
-            vertexCount = 0;
 
             if (mesh == null)
             {
@@ -133,10 +130,10 @@ namespace SemagGames.VoxelEditor
             Vector3Int startPos, currPos, quadSize, m, n, offsetPos;
             Vector3[] vertices;
 
-            Voxel startBlock;
+            Voxel startVoxel;
             int direction, workAxis1, workAxis2;
 
-            // Iterate over each face of the blocks.
+            // Iterate over each face of the voxels.
             for (int face = 0; face < 6; face++) 
             {
                 bool isBackFace = face % 2 == 1;
@@ -157,10 +154,10 @@ namespace SemagGames.VoxelEditor
                     {
                         for (startPos[workAxis2] = 0; startPos[workAxis2] < Dimensions[workAxis2]; startPos[workAxis2]++)
                         {
-                            startBlock = chunk.GetVoxel(startPos + chunk.ChunkPosition.VoxelPosition);
+                            startVoxel = chunk.GetVoxel(startPos + chunk.ChunkPosition.VoxelPosition);
 
-                            // If this block has already been merged, is air, or not visible skip it.
-                            if (merged[startPos[workAxis1], startPos[workAxis2]] || startBlock.ID == 0 || !IsBlockFaceVisible(startPos, direction, isBackFace)) {
+                            // If this voxel has already been merged, is air, or not visible skip it.
+                            if (merged[startPos[workAxis1], startPos[workAxis2]] || startVoxel.ID == Voxel.AirId || !IsVoxelFaceVisible(startPos, direction, isBackFace)) {
                                 continue;
                             }
 
@@ -178,9 +175,9 @@ namespace SemagGames.VoxelEditor
                                 // If we didn't reach the end then its not a good add.
                                 if (currPos[workAxis2] - startPos[workAxis2] < quadSize[workAxis2]) {
                                     break;
-                                } else {
-                                    currPos[workAxis2] = startPos[workAxis2];
                                 }
+
+                                currPos[workAxis2] = startPos[workAxis2];
                             }
                             quadSize[workAxis1] = currPos[workAxis1] - startPos[workAxis1];
 
@@ -202,7 +199,7 @@ namespace SemagGames.VoxelEditor
                                 offsetPos + m + n,
                                 offsetPos + n
                             };
-                            builder.AddSquareFace(vertices, startBlock.Color, isBackFace);
+                            builder.AddSquareFace(vertices, startVoxel.Color, isBackFace);
 
                             // Mark it merged
                             for (int f = 0; f < quadSize[workAxis1]; f++) {
@@ -218,12 +215,12 @@ namespace SemagGames.VoxelEditor
             return builder.ToMeshData();
         }
 
-        private bool IsBlockFaceVisible(Vector3Int blockPosition, int axis, bool backFace) 
+        private bool IsVoxelFaceVisible(Vector3Int voxelPosition, int axis, bool backFace) 
         {
-            blockPosition[axis] += backFace ? -1 : 1;
-            blockPosition += chunk.ChunkPosition.VoxelPosition;
+            voxelPosition[axis] += backFace ? -1 : 1;
+            voxelPosition += chunk.ChunkPosition.VoxelPosition;
 
-            return chunk.GetVoxel(blockPosition).ID == 0;
+            return chunk.GetVoxel(voxelPosition).ID == 0;
         }
 
         private bool CompareStep(Vector3Int a, Vector3Int b, int direction, bool backFace) 
@@ -231,11 +228,10 @@ namespace SemagGames.VoxelEditor
             a += chunk.ChunkPosition.VoxelPosition;
             b += chunk.ChunkPosition.VoxelPosition;
 
-            Voxel blockA = chunk.GetVoxel(a);
-            Voxel blockB = chunk.GetVoxel(b);
+            Voxel voxel1 = chunk.GetVoxel(a);
+            Voxel voxel2 = chunk.GetVoxel(b);
 
-            return blockA == blockB && blockB.ID != 0 && IsBlockFaceVisible(b, direction, backFace);
+            return voxel1 == voxel2 && voxel2.ID != 0 && IsVoxelFaceVisible(b, direction, backFace);
         }
-
     }
 }

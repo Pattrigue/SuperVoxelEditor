@@ -4,11 +4,13 @@ using UnityEngine;
 
 namespace SemagGames.VoxelEditor
 {
-    public class MeshBuilder 
+    public sealed class MeshBuilder 
     {
         private readonly List<Vector3> vertices;
         private readonly List<int> triangles;
         private readonly List<Color32> colors;
+
+        private int vertexCount;
     
         public MeshBuilder() 
         {
@@ -31,25 +33,28 @@ namespace SemagGames.VoxelEditor
                 colors.Add(color);
             }
 
+            int triangleIndex = vertexCount;
+            
+            vertexCount += 4;
+
             if (!isBackFace) 
             {
-                triangles.Add(this.vertices.Count - 4);
-                triangles.Add(this.vertices.Count - 3);
-                triangles.Add(this.vertices.Count - 2);
+                triangles.Add(triangleIndex);                
+                triangles.Add(triangleIndex + 1);
+                triangles.Add(triangleIndex + 2);
             
-                triangles.Add(this.vertices.Count - 4);
-                triangles.Add(this.vertices.Count - 2);
-                triangles.Add(this.vertices.Count - 1);
+                triangles.Add(triangleIndex);               
+                triangles.Add(triangleIndex + 2);
+                triangles.Add(triangleIndex + 3);
             } 
             else 
             {
-                triangles.Add(this.vertices.Count - 2);
-                triangles.Add(this.vertices.Count - 3);
-                triangles.Add(this.vertices.Count - 4);
-            
-                triangles.Add(this.vertices.Count - 1);
-                triangles.Add(this.vertices.Count - 2);
-                triangles.Add(this.vertices.Count - 4);
+                triangles.Add(triangleIndex + 2);
+                triangles.Add(triangleIndex + 1);
+                triangles.Add(triangleIndex);            
+                triangles.Add(triangleIndex + 3);
+                triangles.Add(triangleIndex + 2);
+                triangles.Add(triangleIndex);            
             }
         }
     
