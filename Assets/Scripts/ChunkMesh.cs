@@ -1,4 +1,5 @@
-﻿using UnityEngine.Rendering;
+﻿using System.Collections.Generic;
+using UnityEngine.Rendering;
 
 namespace SemagGames.VoxelEditor
 {
@@ -20,7 +21,7 @@ namespace SemagGames.VoxelEditor
             new(VertexAttribute.Normal),
             new(VertexAttribute.Color, VertexAttributeFormat.UNorm8, 4)
         };
-
+        
         private Chunk chunk;
         private Mesh mesh;
         private MeshCollider meshCollider;
@@ -92,97 +93,102 @@ namespace SemagGames.VoxelEditor
 
         private void GenerateMeshData()
         {
-            bool[,] merged;
-
-            Vector3Int startPos, currPos, quadSize, m, n, offsetPos;
-            Vector3[] vertices;
-
-            Voxel startVoxel;
-            int direction, workAxis1, workAxis2;
-
-            // Iterate over each face of the voxels.
-            for (int face = 0; face < 6; face++) 
+            // This loop goes through each face of a voxel cube (6 faces)
+            for (int faceIndex = 0; faceIndex < 6; faceIndex++)
             {
-                bool isBackFace = face % 2 == 1;
-                direction = face % 3;
-                workAxis1 = (direction + 1) % 3;
-                workAxis2 = (direction + 2) % 3;
+                bool isBackFace = faceIndex % 2 == 1;
+                int primaryAxis = faceIndex % 3;
+                int secondaryAxis = (primaryAxis + 1) % 3;
+                int tertiaryAxis = (primaryAxis + 2) % 3;
 
-                startPos = new Vector3Int();
-                currPos = new Vector3Int();
+                Vector3Int startPos = new Vector3Int();
+                Vector3Int currentPos = new Vector3Int();
 
-                // Iterate over the chunk layer by layer.
-                for (startPos[direction] = 0; startPos[direction] < Dimensions[direction]; startPos[direction]++) 
+                // This loop iterates over each layer of the voxel chunk
+                for (startPos[primaryAxis] = 0; startPos[primaryAxis] < Dimensions[primaryAxis]; startPos[primaryAxis]++)
                 {
-                    merged = new bool[Dimensions[workAxis1], Dimensions[workAxis2]];
+                    bool[,] hasMerged = new bool[Dimensions[secondaryAxis], Dimensions[tertiaryAxis]];
 
                     // Build the slices of the mesh.
-                    for (startPos[workAxis1] = 0; startPos[workAxis1] < Dimensions[workAxis1]; startPos[workAxis1]++) 
+                    for (startPos[secondaryAxis] = 0; startPos[secondaryAxis] < Dimensions[secondaryAxis]; startPos[secondaryAxis]++)
                     {
-                        for (startPos[workAxis2] = 0; startPos[workAxis2] < Dimensions[workAxis2]; startPos[workAxis2]++)
+                        for (startPos[tertiaryAxis] = 0; startPos[tertiaryAxis] < Dimensions[tertiaryAxis]; startPos[tertiaryAxis]++)
                         {
-                            startVoxel = chunk.GetVoxel(startPos + chunk.ChunkPosition.VoxelPosition);
+                            Voxel currentVoxel = chunk.GetVoxel(startPos + chunk.ChunkPosition.VoxelPosition);
 
-                            // If this voxel has already been merged, is air, or not visible skip it.
-                            if (merged[startPos[workAxis1], startPos[workAxis2]] || startVoxel.ID == Voxel.AirId || !IsVoxelFaceVisible(startPos, direction, isBackFace)) {
+                            // If this voxel has already been merged, is air, or not visible, skip it.
+                            if (hasMerged[startPos[secondaryAxis], startPos[tertiaryAxis]] || currentVoxel.ID == Voxel.AirId || !IsVoxelFaceVisible(startPos, primaryAxis, isBackFace))
+                            {
                                 continue;
                             }
 
-                            // Reset the work var
-                            quadSize = new Vector3Int();
+                            // Determine the size of the quad to be added
+                            Vector3Int quadSize = CalculateQuadSize(startPos, primaryAxis, secondaryAxis, tertiaryAxis, isBackFace, hasMerged);
 
-                            // Figure out the width, then save it
-                            for (currPos = startPos, currPos[workAxis2]++; currPos[workAxis2] < Dimensions[workAxis2] && CompareStep(startPos, currPos, direction, isBackFace) && !merged[currPos[workAxis1], currPos[workAxis2]]; currPos[workAxis2]++) { }
-                            quadSize[workAxis2] = currPos[workAxis2] - startPos[workAxis2];
+                            // Add the quad to the mesh
+                            AddQuadToMesh(startPos, quadSize, primaryAxis, secondaryAxis, tertiaryAxis, isBackFace, currentVoxel);
 
-                            // Figure out the height, then save it
-                            for (currPos = startPos, currPos[workAxis1]++; currPos[workAxis1] < Dimensions[workAxis1] && CompareStep(startPos, currPos, direction, isBackFace) && !merged[currPos[workAxis1], currPos[workAxis2]]; currPos[workAxis1]++) {
-                                for (currPos[workAxis2] = startPos[workAxis2]; currPos[workAxis2] < Dimensions[workAxis2] && CompareStep(startPos, currPos, direction, isBackFace) && !merged[currPos[workAxis1], currPos[workAxis2]]; currPos[workAxis2]++) { }
-
-                                // If we didn't reach the end then its not a good add.
-                                if (currPos[workAxis2] - startPos[workAxis2] < quadSize[workAxis2]) {
-                                    break;
-                                }
-
-                                currPos[workAxis2] = startPos[workAxis2];
-                            }
-                            quadSize[workAxis1] = currPos[workAxis1] - startPos[workAxis1];
-
-                            // Now we add the quad to the mesh
-                            m = new Vector3Int();
-                            m[workAxis1] = quadSize[workAxis1];
-
-                            n = new Vector3Int();
-                            n[workAxis2] = quadSize[workAxis2];
-
-                            // We need to add a slight offset when working with front faces.
-                            offsetPos = startPos;
-                            offsetPos[direction] += isBackFace ? 0 : 1;
-
-                            //Draw the face to the mesh
-                            
-                            Vector3 a = offsetPos;
-                            Vector3 b = offsetPos + m;
-                            Vector3 c = offsetPos + m + n;
-                            Vector3 d = offsetPos + n;
-                            
-                            Vector3 normal = Vector3.zero;
-                            normal[direction] = isBackFace ? -1 : 1;
-
-                            AddSquareFace(a, b, c, d, normal, startVoxel.Color, isBackFace);
-
-                            // Mark it merged
-                            for (int f = 0; f < quadSize[workAxis1]; f++) 
-                            {
-                                for (int g = 0; g < quadSize[workAxis2]; g++) 
-                                {
-                                    merged[startPos[workAxis1] + f, startPos[workAxis2] + g] = true;
-                                }
-                            }
+                            // Mark the voxels as merged
+                            MarkVoxelsAsMerged(startPos, quadSize, hasMerged, secondaryAxis, tertiaryAxis);
                         }
                     }
                 }
             }
+        }
+
+        private Vector3Int CalculateQuadSize(Vector3Int startPos, int primaryAxis, int secondaryAxis, int tertiaryAxis, bool isBackFace, bool[,] hasMerged)
+        {
+            // Initialize variables
+            Vector3Int quadSize = new Vector3Int();
+            Vector3Int currentPos = new Vector3Int();
+
+            // Calculate the width of the quad
+            for (currentPos = startPos, currentPos[tertiaryAxis]++; currentPos[tertiaryAxis] < Dimensions[tertiaryAxis] && CompareStep(startPos, currentPos, primaryAxis, isBackFace) && !hasMerged[currentPos[secondaryAxis], currentPos[tertiaryAxis]]; currentPos[tertiaryAxis]++) { }
+            quadSize[tertiaryAxis] = currentPos[tertiaryAxis] - startPos[tertiaryAxis];
+
+            // Calculate the height of the quad
+            for (currentPos = startPos, currentPos[secondaryAxis]++; currentPos[secondaryAxis] < Dimensions[secondaryAxis] && CompareStep(startPos, currentPos, primaryAxis, isBackFace) && !hasMerged[currentPos[secondaryAxis], currentPos[tertiaryAxis]]; currentPos[secondaryAxis]++)
+            {
+                for (currentPos[tertiaryAxis] = startPos[tertiaryAxis]; currentPos[tertiaryAxis] < Dimensions[tertiaryAxis] && CompareStep(startPos, currentPos, primaryAxis, isBackFace) && !hasMerged[currentPos[secondaryAxis], currentPos[tertiaryAxis]]; currentPos[tertiaryAxis]++) { }
+
+                // If the quad doesn't span the full width, it's not a good add.
+                if (currentPos[tertiaryAxis] - startPos[tertiaryAxis] < quadSize[tertiaryAxis])
+                {
+                    break;
+                }
+
+                currentPos[tertiaryAxis] = startPos[tertiaryAxis];
+            }
+            quadSize[secondaryAxis] = currentPos[secondaryAxis] - startPos[secondaryAxis];
+
+            return quadSize;
+        }
+
+        private void AddQuadToMesh(Vector3Int startPos, Vector3Int quadSize, int primaryAxis, int secondaryAxis, int tertiaryAxis, bool isBackFace, Voxel currentVoxel)
+        {
+            // Create the vectors for the corners of the quad
+            Vector3Int horizontalVector = new Vector3Int();
+            horizontalVector[secondaryAxis] = quadSize[secondaryAxis];
+
+            Vector3Int verticalVector = new Vector3Int();
+            verticalVector[tertiaryAxis] = quadSize[tertiaryAxis];
+
+            // Offset the position if we're dealing with a front face
+            Vector3Int offsetPosition = startPos;
+            offsetPosition[primaryAxis] += isBackFace ? 0 : 1;
+
+            // Create the vertices of the face
+            Vector3 a = offsetPosition;
+            Vector3 b = offsetPosition + horizontalVector;
+            Vector3 c = offsetPosition + horizontalVector + verticalVector;
+            Vector3 d = offsetPosition + verticalVector;
+
+            // Calculate the normal for the face
+            Vector3 normal = Vector3.zero;
+            normal[primaryAxis] = isBackFace ? -1 : 1;
+
+            // Add the square face to the mesh
+            AddSquareFace(a, b, c, d, normal, currentVoxel.Color, isBackFace);
         }
 
         private void AddSquareFace(Vector3 a, Vector3 b, Vector3 c, Vector3 d, Vector3 normal, Color32 color, bool isBackFace)
@@ -233,6 +239,17 @@ namespace SemagGames.VoxelEditor
             Voxel voxel2 = chunk.GetVoxel(b);
 
             return voxel1 == voxel2 && voxel2.ID != 0 && IsVoxelFaceVisible(b, direction, backFace);
+        }
+        
+        private static void MarkVoxelsAsMerged(Vector3Int startPos, Vector3Int quadSize, bool[,] hasMerged, int secondaryAxis, int tertiaryAxis)
+        {
+            for (int i = 0; i < quadSize[secondaryAxis]; i++)
+            {
+                for (int j = 0; j < quadSize[tertiaryAxis]; j++)
+                {
+                    hasMerged[startPos[secondaryAxis] + i, startPos[tertiaryAxis] + j] = true;
+                }
+            }
         }
     }
 }
