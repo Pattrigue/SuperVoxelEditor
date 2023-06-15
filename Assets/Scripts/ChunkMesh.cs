@@ -29,6 +29,8 @@ namespace SemagGames.VoxelEditor
             new(0.5f, -0.5f, -0.5f)
         };
 
+        public static readonly Vector3Int Dimensions = new Vector3Int(16, 16, 16);
+        
         private static readonly VertexAttributeDescriptor[] VertexAttributeDescriptors =
         {
             new(VertexAttribute.Position),
@@ -123,40 +125,6 @@ namespace SemagGames.VoxelEditor
             }
         }
 
-        private bool ShowFace(ref Vector3Int position, ref Vector3Int direction)
-        {
-            Vector3Int neighborPosition = position + direction;
-
-            if (!Chunk.InChunkBounds(neighborPosition))
-            {
-                Vector3 worldPosition = this.chunk.ChunkPosition.WorldPosition + neighborPosition;
-
-                if (World.TryGetChunk(worldPosition, out Chunk chunk) && chunk.HasVoxel(worldPosition)) return false;
-
-                return true;
-            }
-
-            int neighborIndex = Chunk.GetVoxelIndex(neighborPosition.x, neighborPosition.y, neighborPosition.z);
-
-            Voxel neighbor = chunk.Voxels[neighborIndex];
-
-            return neighbor.ID == 0;
-        }
-
-        private static Color32 CalculateVoxelBaseColor(ref Vector3 chunkWorldPosition, Color32 primaryColor, Color32 secondaryColor, ref Vector3Int voxelPosition)
-        {
-            if (primaryColor.r == secondaryColor.r && primaryColor.g == secondaryColor.g && primaryColor.b == secondaryColor.b) return primaryColor;
-
-            const float maxColorChange = 0.5f;
-            const float gradientScale = 0.025f;
-
-            float t = (1 + noise.snoise(new float3((chunkWorldPosition.x + voxelPosition.x) * gradientScale, (chunkWorldPosition.y + voxelPosition.y) * gradientScale, (chunkWorldPosition.z + voxelPosition.z) * gradientScale))) * maxColorChange;
-
-            return Color32.Lerp(primaryColor, secondaryColor, t);
-        }
-        
-        public static readonly Vector3Int Dimensions = new Vector3Int(16, 16, 16);
-        
         public MeshData GenerateMesh()
         {
             MeshBuilder builder = new MeshBuilder();
@@ -189,7 +157,7 @@ namespace SemagGames.VoxelEditor
                     {
                         for (startPos[workAxis2] = 0; startPos[workAxis2] < Dimensions[workAxis2]; startPos[workAxis2]++)
                         {
-                            startBlock = chunk.GetVoxel(startPos);
+                            startBlock = chunk.GetVoxel(startPos + chunk.ChunkPosition.VoxelPosition);
 
                             // If this block has already been merged, is air, or not visible skip it.
                             if (merged[startPos[workAxis1], startPos[workAxis2]] || startBlock.ID == 0 || !IsBlockFaceVisible(startPos, direction, isBackFace)) {
@@ -253,16 +221,21 @@ namespace SemagGames.VoxelEditor
         private bool IsBlockFaceVisible(Vector3Int blockPosition, int axis, bool backFace) 
         {
             blockPosition[axis] += backFace ? -1 : 1;
+            blockPosition += chunk.ChunkPosition.VoxelPosition;
 
             return chunk.GetVoxel(blockPosition).ID == 0;
         }
 
         private bool CompareStep(Vector3Int a, Vector3Int b, int direction, bool backFace) 
         {
+            a += chunk.ChunkPosition.VoxelPosition;
+            b += chunk.ChunkPosition.VoxelPosition;
+
             Voxel blockA = chunk.GetVoxel(a);
             Voxel blockB = chunk.GetVoxel(b);
 
             return blockA == blockB && blockB.ID != 0 && IsBlockFaceVisible(b, direction, backFace);
         }
+
     }
 }
