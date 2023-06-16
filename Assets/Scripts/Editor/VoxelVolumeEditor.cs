@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using SemagGames.VoxelEditor.ColorPicking;
+using UnityEditor;
 using UnityEngine;
 
 namespace SemagGames.VoxelEditor.Editor
@@ -12,18 +13,21 @@ namespace SemagGames.VoxelEditor.Editor
         private Renderer previewCubeRenderer;
         private Material previewCubeMaterial;
 
+        private VoxelProperty voxelProperty;
+        
         private Vector3 clickedVoxelPosition;
 
         private float controlledVoxelDistance = 10f;
 
-        private bool isEditingActive;
+        private bool isEditingActive = true;
         private bool isDragging;
+        private bool foldout;
         private bool deleteMode;
 
         private void OnEnable()
         {
             SceneView.duringSceneGui += OnSceneGUI;
-
+            
             if (previewCube == null)
             {
                 previewCube = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -51,6 +55,17 @@ namespace SemagGames.VoxelEditor.Editor
 
         public override void OnInspectorGUI()
         {
+            voxelProperty = (VoxelProperty)EditorGUILayout.ObjectField("Voxel Property", voxelProperty, typeof(VoxelProperty), false);
+            
+            if (voxelProperty == null)
+            {
+                EditorGUILayout.HelpBox("You have not assigned a Voxel Property - placing a voxel will default to using a Voxel Property with ID 1!", MessageType.Warning);
+            }
+    
+            serializedObject.Update(); // need to update the serialized object before changing its properties
+
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("colorPicker"));
+
             if (!isEditingActive && GUILayout.Button("Edit"))
             {
                 isEditingActive = true;
@@ -59,13 +74,20 @@ namespace SemagGames.VoxelEditor.Editor
             {
                 isEditingActive = false;
             }
-            
-            DrawDefaultInspector();
-            
-            if (GUILayout.Button("Clear World"))
+
+            if (GUILayout.Button("Clear Volume") && EditorUtility.DisplayDialog("Clear Volume", "Are you sure you want to clear the volume?", "Yes", "No"))
             {
                 Volume.Clear();
             }
+
+            foldout = EditorGUILayout.Foldout(foldout, "References");
+            
+            if (foldout)
+            {
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("chunkPrefab"));
+            }
+
+            serializedObject.ApplyModifiedProperties(); // Apply changes after all fields have been drawn
         }
 
         private void OnSceneGUI(SceneView sceneView)
@@ -186,13 +208,15 @@ namespace SemagGames.VoxelEditor.Editor
             Vector3Int min = Vector3Int.Min(start, end);
             Vector3Int max = Vector3Int.Max(start, end);
 
+            uint voxelPropertyId = voxelProperty != null ? voxelProperty.ID : 1;
+
             for (int x = min.x; x <= max.x; x++)
             {
                 for (int y = min.y; y <= max.y; y++)
                 {
                     for (int z = min.z; z <= max.z; z++)
                     {
-                        Volume.SetVoxel(new Vector3(x, y, z), Volume.ColorPicker.SelectedColor);
+                        Volume.SetVoxel(new Vector3(x, y, z), Volume.ColorPicker.SelectedColor, voxelPropertyId);
                     }
                 }
             }
