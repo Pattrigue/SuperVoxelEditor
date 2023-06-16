@@ -7,10 +7,12 @@ namespace SemagGames.VoxelEditor
     [ExecuteAlways]
     public sealed class VoxelVolume : MonoBehaviour
     {
-        [SerializeField] private Chunk chunkPrefab;
+        [SerializeField] private VoxelProperty voxelProperty;
         [SerializeField] private ColorPicker colorPicker;
+        [SerializeField] private Chunk chunkPrefab;
     
         public ColorPicker ColorPicker => colorPicker;
+        public VoxelProperty VoxelProperty => voxelProperty;
 
         private readonly Dictionary<ChunkPosition, Chunk> chunks = new();
     

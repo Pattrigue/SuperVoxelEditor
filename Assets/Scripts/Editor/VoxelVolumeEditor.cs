@@ -12,8 +12,6 @@ namespace SemagGames.VoxelEditor.Editor
         private Renderer previewCubeRenderer;
         private Material previewCubeMaterial;
 
-        private VoxelProperty voxelProperty;
-        
         private Vector3 clickedVoxelPosition;
 
         private float controlledVoxelDistance = 10f;
@@ -54,15 +52,13 @@ namespace SemagGames.VoxelEditor.Editor
 
         public override void OnInspectorGUI()
         {
-            voxelProperty = (VoxelProperty)EditorGUILayout.ObjectField("Voxel Property", voxelProperty, typeof(VoxelProperty), false);
-            
-            if (voxelProperty == null)
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("voxelProperty"));
+
+            if (Volume.VoxelProperty == null)
             {
                 EditorGUILayout.HelpBox("You have not assigned a Voxel Property - placing a voxel will default to using a Voxel Property with ID 1!", MessageType.Warning);
             }
-    
-            serializedObject.Update(); // need to update the serialized object before changing its properties
-
+            
             EditorGUILayout.PropertyField(serializedObject.FindProperty("colorPicker"));
 
             if (!isEditingActive && GUILayout.Button("Edit"))
@@ -207,7 +203,7 @@ namespace SemagGames.VoxelEditor.Editor
             Vector3Int min = Vector3Int.Min(start, end);
             Vector3Int max = Vector3Int.Max(start, end);
 
-            uint voxelPropertyId = voxelProperty != null ? voxelProperty.ID : 1;
+            uint voxelPropertyId = Volume.VoxelProperty != null ? Volume.VoxelProperty.ID : 1;
 
             for (int x = min.x; x <= max.x; x++)
             {
