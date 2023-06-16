@@ -22,6 +22,13 @@ namespace SemagGames.VoxelEditor
             {
                 chunks.Add(chunk.ChunkPosition, chunk);
             }
+            
+            Chunk.Destroyed += OnChunkDestroyed;
+        }
+
+        private void OnDisable()
+        {
+            Chunk.Destroyed -= OnChunkDestroyed;
         }
 
         public static void Clear()
@@ -71,6 +78,14 @@ namespace SemagGames.VoxelEditor
         public static bool TryGetChunk(ChunkPosition chunkPosition, out Chunk chunk)
         {
             return Instance.chunks.TryGetValue(chunkPosition, out chunk);
+        }
+        
+        private static void OnChunkDestroyed(Chunk destroyedChunk)
+        {
+            if (Instance.chunks.ContainsKey(destroyedChunk.ChunkPosition))
+            {
+                Instance.chunks.Remove(destroyedChunk.ChunkPosition);
+            }
         }
     }
 }

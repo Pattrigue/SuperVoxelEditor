@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SemagGames.VoxelEditor
@@ -14,6 +15,8 @@ namespace SemagGames.VoxelEditor
         public const int Depth = 16;
         
         private const int Size3D = Width * Height * Depth;
+
+        public static event Action<Chunk> Destroyed;
 
         public IReadOnlyList<Voxel> Voxels => voxels;
 
@@ -43,6 +46,8 @@ namespace SemagGames.VoxelEditor
             UnityEditor.EditorApplication.update -= Update;
 #endif
         }
+        
+        private void OnDestroy() => Destroyed?.Invoke(this);
 
         public void Rebuild() => mesh.Build();
 
