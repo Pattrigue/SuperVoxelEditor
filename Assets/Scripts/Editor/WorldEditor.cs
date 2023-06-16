@@ -217,8 +217,12 @@ namespace SemagGames.VoxelEditor.Editor
                 previewCube.transform.localScale = cubeSize;
                 previewCubeMaterial.color = deleteMode ? new Color(1, 0, 0, 0.25f) : World.ColorPicker.SelectedColor;
             }
-                    
-            Handles.DrawOutline(new[] { previewCubeRenderer }, deleteMode ? Color.red : Color.cyan);
+
+            Color originalColor = Handles.color;
+            
+            Handles.color = deleteMode ? Color.red : Color.cyan;
+            Handles.DrawWireCube(previewCube.transform.position, previewCube.transform.localScale);
+            Handles.color = originalColor;
         }
 
         private static void SnapToVoxelGrid(ref Vector3 position)
