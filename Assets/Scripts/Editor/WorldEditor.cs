@@ -9,6 +9,7 @@ namespace SemagGames.VoxelEditor.Editor
         private World World => (World)target;
 
         private GameObject previewCube;
+        private Renderer previewCubeRenderer;
         private Material previewCubeMaterial;
 
         private Vector3 clickedVoxelPosition;
@@ -28,7 +29,8 @@ namespace SemagGames.VoxelEditor.Editor
                 previewCube.hideFlags = HideFlags.HideAndDontSave;
             
                 previewCubeMaterial = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-                previewCube.GetComponent<Renderer>().material = previewCubeMaterial;
+                previewCubeRenderer = previewCube.GetComponent<Renderer>();
+                previewCubeRenderer.material = previewCubeMaterial;
             
                 DestroyImmediate(previewCube.GetComponent<Collider>());
             }
@@ -85,32 +87,39 @@ namespace SemagGames.VoxelEditor.Editor
             deleteMode = currentEvent.shift;
 
             // Get the voxel hit point using either control or raycast method.
-            Vector3 voxelHitPoint = CalculateVoxelHitPoint(currentEvent);
+            bool hitVoxel = CalculateVoxelHitPoint(currentEvent, out Vector3 voxelHitPoint);
 
             // Handle mouse click events.
-            HandleMouseClickEvents(currentEvent, voxelHitPoint);
+            if (hitVoxel)
+            {
+                HandleMouseClickEvents(currentEvent, voxelHitPoint);
+            }
 
             // Update the preview cube.
-            UpdatePreviewCube(voxelHitPoint);
+            UpdatePreviewCube(voxelHitPoint, hitVoxel);
 
             sceneView.Repaint();
         }
         
-        private Vector3 CalculateVoxelHitPoint(Event currentEvent)
+        private bool CalculateVoxelHitPoint(Event currentEvent, out Vector3 voxelHitPoint)
         {
             Ray ray = HandleUtility.GUIPointToWorldRay(currentEvent.mousePosition);
-            Vector3 voxelHitPoint = Vector3.zero;
-    
+
             if (currentEvent.control)
             {
                 voxelHitPoint = CalculateControlledVoxelHitPoint(ray);
-            }
-            else if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
-            {
-                voxelHitPoint = CalculateRaycastVoxelHitPoint(hit);
+                return true;
             }
 
-            return voxelHitPoint;
+            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
+            {
+                voxelHitPoint = CalculateRaycastVoxelHitPoint(hit);
+                return true;
+            }
+            
+            voxelHitPoint = Vector3.zero;
+
+            return false;
         }
 
         private Vector3 CalculateControlledVoxelHitPoint(Ray ray)
@@ -179,10 +188,18 @@ namespace SemagGames.VoxelEditor.Editor
             }
         }
 
-        private void UpdatePreviewCube(Vector3 voxelHitPoint)
+        private void UpdatePreviewCube(Vector3 voxelHitPoint, bool hitVoxel)
         {
             const float offset = 1.01f;
+
+            if (!hitVoxel)
+            {
+                previewCubeRenderer.enabled = false;
+                return;
+            }
         
+            previewCubeRenderer.enabled = true;
+            
             if (isDragging)
             {
                 previewCube.transform.position = (voxelHitPoint + clickedVoxelPosition) * 0.5f;
