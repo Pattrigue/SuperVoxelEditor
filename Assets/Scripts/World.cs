@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SemagGames.VoxelEditor
 {
     [ExecuteAlways]
-    public sealed class World : Singleton<World>
+    public sealed class World : MonoBehaviour
     {
         [SerializeField] private Chunk chunkPrefab;
         [SerializeField] private ColorPicker colorPicker;
@@ -31,36 +31,36 @@ namespace SemagGames.VoxelEditor
             Chunk.Destroyed -= OnChunkDestroyed;
         }
 
-        public static void Clear()
+        public void Clear()
         {
-            while (Instance.transform.childCount > 0)
+            while (transform.childCount > 0)
             {
-                DestroyImmediate(Instance.transform.GetChild(0).gameObject);
+                DestroyImmediate(transform.GetChild(0).gameObject);
             }
 
-            Instance.chunks.Clear();
+            chunks.Clear();
         }
 
-        public static void SetVoxel(Vector3 worldPosition, uint voxelId)
+        public void SetVoxel(Vector3 worldPosition, uint voxelId)
         {
             ChunkPosition chunkPosition = ChunkPosition.FromWorldPosition(worldPosition);
         
-            if (!Instance.chunks.TryGetValue(chunkPosition, out Chunk chunk))
+            if (!chunks.TryGetValue(chunkPosition, out Chunk chunk))
             {
-                chunk = Instantiate(Instance.chunkPrefab, chunkPosition.WorldPosition, Quaternion.identity, Instance.transform);
+                chunk = Instantiate(chunkPrefab, chunkPosition.WorldPosition, Quaternion.identity, transform);
                 chunk.name = $"Chunk {chunkPosition}";
 
-                Instance.chunks.Add(chunkPosition, chunk);
+                chunks.Add(chunkPosition, chunk);
             }
 
-            chunk.SetVoxel(worldPosition, new Voxel(voxelId, Instance.colorPicker.SelectedColor));
+            chunk.SetVoxel(worldPosition, new Voxel(voxelId, colorPicker.SelectedColor));
         }
 
-        public static Voxel GetVoxel(Vector3 worldPosition)
+        public Voxel GetVoxel(Vector3 worldPosition)
         {
             ChunkPosition chunkPosition = ChunkPosition.FromWorldPosition(worldPosition);
         
-            if (!Instance.chunks.TryGetValue(chunkPosition, out Chunk chunk))
+            if (!chunks.TryGetValue(chunkPosition, out Chunk chunk))
             {
                 return Voxel.Air;
             }
@@ -68,23 +68,23 @@ namespace SemagGames.VoxelEditor
             return chunk.GetVoxelFromWorldPosition(worldPosition);
         }
         
-        public static bool TryGetChunk(Vector3 position, out Chunk chunk)
+        public bool TryGetChunk(Vector3 position, out Chunk chunk)
         {
             ChunkPosition chunkPosition = ChunkPosition.FromWorldPosition(position);
 
-            return Instance.chunks.TryGetValue(chunkPosition, out chunk);
+            return chunks.TryGetValue(chunkPosition, out chunk);
         }
 
-        public static bool TryGetChunk(ChunkPosition chunkPosition, out Chunk chunk)
+        public bool TryGetChunk(ChunkPosition chunkPosition, out Chunk chunk)
         {
-            return Instance.chunks.TryGetValue(chunkPosition, out chunk);
+            return chunks.TryGetValue(chunkPosition, out chunk);
         }
         
-        private static void OnChunkDestroyed(Chunk destroyedChunk)
+        private void OnChunkDestroyed(Chunk destroyedChunk)
         {
-            if (Instance.chunks.ContainsKey(destroyedChunk.ChunkPosition))
+            if (chunks.ContainsKey(destroyedChunk.ChunkPosition))
             {
-                Instance.chunks.Remove(destroyedChunk.ChunkPosition);
+                chunks.Remove(destroyedChunk.ChunkPosition);
             }
         }
     }

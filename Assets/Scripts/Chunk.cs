@@ -19,6 +19,8 @@ namespace SemagGames.VoxelEditor
         public static event Action<Chunk> Destroyed;
 
         public IReadOnlyList<Voxel> Voxels => voxels;
+        
+        public World World { get; private set; }
 
         public ChunkPosition ChunkPosition => ChunkPosition.FromWorldPosition(transform.position);
 
@@ -28,11 +30,15 @@ namespace SemagGames.VoxelEditor
         };
 
         private ChunkMesh mesh;
-        
+
         private bool isDirty;
 
-        private void Awake() => mesh = GetComponent<ChunkMesh>();
-        
+        private void Awake()
+        {
+            mesh = GetComponent<ChunkMesh>();
+            World = GetComponentInParent<World>();
+        }
+
         private void OnEnable()
         {
 #if UNITY_EDITOR
