@@ -62,13 +62,6 @@ namespace SemagGames.VoxelEditor
             SetVoxel(localPosition.x, localPosition.y, localPosition.z, voxel);
         }
 
-        public Voxel GetVoxel(Vector3 worldPosition)
-        {
-            Vector3Int localPosition = ToLocalVoxelPosition(worldPosition);
-            
-            return GetVoxel(localPosition.x, localPosition.y, localPosition.z);
-        }
-
         public bool HasVoxel(Vector3 worldPosition)
         {
             Vector3Int localPosition = ToLocalVoxelPosition(worldPosition);
@@ -85,6 +78,11 @@ namespace SemagGames.VoxelEditor
             
             MarkNeighborsDirtyIfOnEdge(x, y, z);
         }
+        
+        public Voxel GetVoxel(Vector3Int localPosition)
+        {
+            return GetVoxel(localPosition.x, localPosition.y, localPosition.z);
+        }
 
         public Voxel GetVoxel(int x, int y, int z)
         {
@@ -92,6 +90,13 @@ namespace SemagGames.VoxelEditor
             return voxels[GetVoxelIndex(x, y, z)];
         }
 
+        public Voxel GetVoxelFromWorldPosition(Vector3 worldPosition)
+        {
+            Vector3Int localPosition = ToLocalVoxelPosition(worldPosition);
+            
+            return GetVoxel(localPosition.x, localPosition.y, localPosition.z);
+        }
+        
         public bool HasVoxel(int x, int y, int z)
         {
             return GetVoxel(x, y, z).ID != Voxel.AirId;

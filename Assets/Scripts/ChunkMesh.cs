@@ -114,7 +114,7 @@ namespace SemagGames.VoxelEditor
                     {
                         for (startPos[tertiaryAxis] = 0; startPos[tertiaryAxis] < Dimensions[tertiaryAxis]; startPos[tertiaryAxis]++)
                         {
-                            Voxel currentVoxel = chunk.GetVoxel(startPos + chunk.ChunkPosition.VoxelPosition);
+                            Voxel currentVoxel = chunk.GetVoxelFromWorldPosition(startPos + chunk.ChunkPosition.VoxelPosition);
 
                             // If this voxel has already been merged, is air, or not visible, skip it.
                             if (hasMerged[startPos[secondaryAxis], startPos[tertiaryAxis]] || currentVoxel.ID == Voxel.AirId || !IsVoxelFaceVisible(startPos, primaryAxis, isBackFace))
@@ -222,23 +222,23 @@ namespace SemagGames.VoxelEditor
             }
         }
 
-        private bool IsVoxelFaceVisible(Vector3Int voxelPosition, int axis, bool backFace) 
+        private bool IsVoxelFaceVisible(Vector3Int voxelPosition, int axis, bool backFace)
         {
+            var dir = new Vector3();
+            dir[axis] = backFace ? -1 : 1;
+            
             voxelPosition[axis] += backFace ? -1 : 1;
             voxelPosition += chunk.ChunkPosition.VoxelPosition;
 
-            return chunk.GetVoxel(voxelPosition).ID == 0;
+            return World.GetVoxel(voxelPosition).ID == 0;
         }
 
         private bool CompareStep(Vector3Int a, Vector3Int b, int direction, bool backFace) 
         {
-            a += chunk.ChunkPosition.VoxelPosition;
-            b += chunk.ChunkPosition.VoxelPosition;
-
             Voxel voxel1 = chunk.GetVoxel(a);
             Voxel voxel2 = chunk.GetVoxel(b);
 
-            return voxel1 == voxel2 && voxel2.ID != 0 && IsVoxelFaceVisible(b, direction, backFace);
+            return voxel1 == voxel2 && voxel2.ID != Voxel.AirId && IsVoxelFaceVisible(b, direction, backFace);
         }
         
         private static void MarkVoxelsAsMerged(Vector3Int startPos, Vector3Int quadSize, bool[,] hasMerged, int secondaryAxis, int tertiaryAxis)
