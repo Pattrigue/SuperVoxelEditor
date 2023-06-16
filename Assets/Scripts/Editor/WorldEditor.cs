@@ -87,89 +87,89 @@ namespace SemagGames.VoxelEditor.Editor
             deleteMode = currentEvent.shift;
 
             // Get the voxel hit point using either control or raycast method.
-            bool hitVoxel = CalculateVoxelHitPoint(currentEvent, out Vector3 voxelHitPoint);
+            bool validVoxelPosition = CalculateVoxelPosition(currentEvent, out Vector3 voxelPosition);
 
             // Handle mouse click events.
-            if (hitVoxel)
+            if (validVoxelPosition)
             {
-                HandleMouseClickEvents(currentEvent, voxelHitPoint);
+                HandleMouseClickEvents(currentEvent, voxelPosition);
             }
 
             // Update the preview cube.
-            UpdatePreviewCube(voxelHitPoint, hitVoxel);
+            UpdatePreviewCube(voxelPosition, validVoxelPosition);
 
             sceneView.Repaint();
         }
         
-        private bool CalculateVoxelHitPoint(Event currentEvent, out Vector3 voxelHitPoint)
+        private bool CalculateVoxelPosition(Event currentEvent, out Vector3 voxelPosition)
         {
             Ray ray = HandleUtility.GUIPointToWorldRay(currentEvent.mousePosition);
 
             if (currentEvent.control)
             {
-                voxelHitPoint = CalculateControlledVoxelHitPoint(ray);
+                voxelPosition = CalculateControlledVoxelPosition(ray);
                 return true;
             }
 
             if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
             {
-                voxelHitPoint = CalculateRaycastVoxelHitPoint(hit);
+                voxelPosition = CalculateRaycastVoxelPosition(hit);
                 return true;
             }
             
-            voxelHitPoint = Vector3.zero;
+            voxelPosition = Vector3.zero;
 
             return false;
         }
 
-        private Vector3 CalculateControlledVoxelHitPoint(Ray ray)
+        private Vector3 CalculateControlledVoxelPosition(Ray ray)
         {
-            Vector3 voxelHitPoint = ray.origin + ray.direction * controlledVoxelDistance;
-            SnapToVoxelGrid(ref voxelHitPoint);
+            Vector3 voxelPosition = ray.origin + ray.direction * controlledVoxelDistance;
+            SnapToVoxelGrid(ref voxelPosition);
             
-            return voxelHitPoint;
+            return voxelPosition;
         }
 
-        private Vector3 CalculateRaycastVoxelHitPoint(RaycastHit hit)
+        private Vector3 CalculateRaycastVoxelPosition(RaycastHit hit)
         {
-            Vector3 hitPoint = hit.point - hit.normal * 0.1f;
-            SnapToVoxelGrid(ref hitPoint);
+            Vector3 position = hit.point - hit.normal * 0.1f;
+            SnapToVoxelGrid(ref position);
 
             if (!deleteMode)
             {
-                hitPoint += hit.normal;
+                position += hit.normal;
             }
 
-            return hitPoint;
+            return position;
         }
         
-        private void HandleMouseClickEvents(Event currentEvent, Vector3 voxelHitPoint)
+        private void HandleMouseClickEvents(Event currentEvent, Vector3 voxelPosition)
         {
-            if (currentEvent.button == 0 && voxelHitPoint != Vector3.zero)
+            if (currentEvent.button == 0 && voxelPosition != Vector3.zero)
             { 
                 if (currentEvent.type == EventType.MouseDown)
                 {
-                    HandleMouseDownEvent(voxelHitPoint);
+                    HandleMouseDownEvent(voxelPosition);
                 }
                 else if (currentEvent.type == EventType.MouseUp && isDragging)
                 {
-                    HandleMouseUpEvent(voxelHitPoint);
+                    HandleMouseUpEvent(voxelPosition);
                 }
             }
         }
 
-        private void HandleMouseDownEvent(Vector3 voxelHitPoint)
+        private void HandleMouseDownEvent(Vector3 voxelPosition)
         {
-            clickedVoxelPosition = voxelHitPoint;
+            clickedVoxelPosition = voxelPosition;
             isDragging = true;
         }
 
-        private void HandleMouseUpEvent(Vector3 voxelHitPoint)
+        private void HandleMouseUpEvent(Vector3 voxelPosition)
         {
             isDragging = false;
     
             Vector3Int start = Vector3Int.FloorToInt(clickedVoxelPosition);
-            Vector3Int end = Vector3Int.FloorToInt(voxelHitPoint);
+            Vector3Int end = Vector3Int.FloorToInt(voxelPosition);
     
             Vector3Int min = Vector3Int.Min(start, end);
             Vector3Int max = Vector3Int.Max(start, end);
@@ -188,11 +188,11 @@ namespace SemagGames.VoxelEditor.Editor
             }
         }
 
-        private void UpdatePreviewCube(Vector3 voxelHitPoint, bool hitVoxel)
+        private void UpdatePreviewCube(Vector3 voxelPosition, bool hit)
         {
             const float offset = 1.01f;
 
-            if (!hitVoxel)
+            if (!hit)
             {
                 previewCubeRenderer.enabled = false;
                 return;
@@ -202,17 +202,17 @@ namespace SemagGames.VoxelEditor.Editor
             
             if (isDragging)
             {
-                previewCube.transform.position = (voxelHitPoint + clickedVoxelPosition) * 0.5f;
+                previewCube.transform.position = (voxelPosition + clickedVoxelPosition) * 0.5f;
                 previewCube.transform.localScale = new Vector3(
-                    Mathf.Abs(voxelHitPoint.x - clickedVoxelPosition.x) + offset,
-                    Mathf.Abs(voxelHitPoint.y - clickedVoxelPosition.y) + offset,
-                    Mathf.Abs(voxelHitPoint.z - clickedVoxelPosition.z) + offset
+                    Mathf.Abs(voxelPosition.x - clickedVoxelPosition.x) + offset,
+                    Mathf.Abs(voxelPosition.y - clickedVoxelPosition.y) + offset,
+                    Mathf.Abs(voxelPosition.z - clickedVoxelPosition.z) + offset
                 );
             }
             else
             {
                 Vector3 cubeSize = new(offset, offset, offset);
-                previewCube.transform.position = voxelHitPoint;
+                previewCube.transform.position = voxelPosition;
                 previewCube.transform.localScale = cubeSize;
                 previewCubeMaterial.color = deleteMode ? new Color(1, 0, 0, 0.25f) : World.ColorPicker.SelectedColor;
             }
