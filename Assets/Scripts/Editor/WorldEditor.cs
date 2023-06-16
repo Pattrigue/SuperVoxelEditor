@@ -13,6 +13,8 @@ namespace SemagGames.VoxelEditor.Editor
 
         private Vector3 clickedVoxelPosition;
 
+        private float controlledVoxelDistance = 10f;
+
         private bool isDragging;
         private bool deleteMode;
 
@@ -61,53 +63,90 @@ namespace SemagGames.VoxelEditor.Editor
             if (!IsValidSelection(selectedGameObject)) return;
 
             HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
-
-            Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
-            deleteMode = Event.current.shift;
-
-            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
-            {
-                Vector3 voxelHitPoint = CalculateVoxelHitPoint(hit);
-
-                if (Event.current.button == 0)
-                {
-                    if (Event.current.type == EventType.MouseDown)
-                    {
-                        HandleMouseDownEvent(voxelHitPoint);
-                    }
-                    else if (Event.current.type == EventType.MouseUp && isDragging)
-                    {
-                        HandleMouseUpEvent(voxelHitPoint);
-                    }
-                }
-
-                UpdatePreviewCube(voxelHitPoint);
-            }
+    
+            HandleSceneGUIEvents(Event.current, sceneView);
             
-            sceneView.Repaint();
+            if (Event.current.control && Event.current.type == EventType.ScrollWheel)
+            {
+                controlledVoxelDistance -= Event.current.delta.y;
+                controlledVoxelDistance = Mathf.Clamp(controlledVoxelDistance, 1f, 100f);
+                Event.current.Use();  // Prevents the event from propagating further.
+            }
         }
-
+        
         private static bool IsValidSelection(GameObject selectedGameObject)
         {
             return selectedGameObject != null && selectedGameObject.TryGetComponent(out World _);
         }
 
-        private Vector3 CalculateVoxelHitPoint(RaycastHit hit)
+        private void HandleSceneGUIEvents(Event currentEvent, SceneView sceneView)
         {
-            Vector3 hitPoint = hit.point - hit.normal * 0.1f;
-        
-            Vector3 voxelHitPoint = new(
-                Mathf.FloorToInt(hitPoint.x) + 0.5f,
-                Mathf.FloorToInt(hitPoint.y) + 0.5f,
-                Mathf.FloorToInt(hitPoint.z) + 0.5f
-            );
+            // Update the delete mode based on whether the Shift key is held down.
+            deleteMode = currentEvent.shift;
 
-            if (!deleteMode)
+            // Get the voxel hit point using either control or raycast method.
+            Vector3 voxelHitPoint = CalculateVoxelHitPoint(currentEvent);
+
+            // Handle mouse click events.
+            HandleMouseClickEvents(currentEvent, voxelHitPoint);
+
+            // Update the preview cube.
+            UpdatePreviewCube(voxelHitPoint);
+
+            sceneView.Repaint();
+        }
+        
+        private Vector3 CalculateVoxelHitPoint(Event currentEvent)
+        {
+            Ray ray = HandleUtility.GUIPointToWorldRay(currentEvent.mousePosition);
+            Vector3 voxelHitPoint = Vector3.zero;
+    
+            if (currentEvent.control)
             {
-                voxelHitPoint += hit.normal;
+                voxelHitPoint = CalculateControlledVoxelHitPoint(ray);
+            }
+            else if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
+            {
+                voxelHitPoint = CalculateRaycastVoxelHitPoint(hit);
             }
 
             return voxelHitPoint;
+        }
+
+        private Vector3 CalculateControlledVoxelHitPoint(Ray ray)
+        {
+            Vector3 voxelHitPoint = ray.origin + ray.direction * controlledVoxelDistance;
+            SnapToVoxelGrid(ref voxelHitPoint);
+            
+            return voxelHitPoint;
+        }
+
+        private Vector3 CalculateRaycastVoxelHitPoint(RaycastHit hit)
+        {
+            Vector3 hitPoint = hit.point - hit.normal * 0.1f;
+            SnapToVoxelGrid(ref hitPoint);
+
+            if (!deleteMode)
+            {
+                hitPoint += hit.normal;
+            }
+
+            return hitPoint;
+        }
+        
+        private void HandleMouseClickEvents(Event currentEvent, Vector3 voxelHitPoint)
+        {
+            if (currentEvent.button == 0 && voxelHitPoint != Vector3.zero)
+            { 
+                if (currentEvent.type == EventType.MouseDown)
+                {
+                    HandleMouseDownEvent(voxelHitPoint);
+                }
+                else if (currentEvent.type == EventType.MouseUp && isDragging)
+                {
+                    HandleMouseUpEvent(voxelHitPoint);
+                }
+            }
         }
 
         private void HandleMouseDownEvent(Vector3 voxelHitPoint)
@@ -160,6 +199,15 @@ namespace SemagGames.VoxelEditor.Editor
                 previewCube.transform.localScale = cubeSize;
                 previewCubeMaterial.color = deleteMode ? new Color(1, 0, 0, 0.25f) : World.ColorPicker.SelectedColor;
             }
+        }
+
+        private static void SnapToVoxelGrid(ref Vector3 position)
+        {
+            position = new Vector3(
+                Mathf.FloorToInt(position.x) + 0.5f,
+                Mathf.FloorToInt(position.y) + 0.5f,
+                Mathf.FloorToInt(position.z) + 0.5f
+            );
         }
     }
 }
