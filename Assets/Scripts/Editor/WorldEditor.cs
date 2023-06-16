@@ -16,6 +16,7 @@ namespace SemagGames.VoxelEditor.Editor
 
         private float controlledVoxelDistance = 10f;
 
+        private bool isEditingActive;
         private bool isDragging;
         private bool deleteMode;
 
@@ -50,18 +51,28 @@ namespace SemagGames.VoxelEditor.Editor
 
         public override void OnInspectorGUI()
         {
-            if (GUILayout.Button("Clear"))
+            if (!isEditingActive && GUILayout.Button("Edit"))
+            {
+                isEditingActive = true;
+            }
+            else if (isEditingActive && GUILayout.Button("Stop Editing"))
+            {
+                isEditingActive = false;
+            }
+            
+            DrawDefaultInspector();
+            
+            if (GUILayout.Button("Clear World"))
             {
                 World.Clear();
             }
-        
-            DrawDefaultInspector();
         }
 
         private void OnSceneGUI(SceneView sceneView)
         {
             GameObject selectedGameObject = Selection.activeGameObject;
 
+            if (!isEditingActive) return;
             if (!IsValidSelection(selectedGameObject)) return;
 
             Tools.current = Tool.None;
