@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine.Rendering;
 
 namespace SemagGames.VoxelEditor
@@ -136,20 +137,30 @@ namespace SemagGames.VoxelEditor
             }
         }
 
-        private Vector3Int CalculateQuadSize(Vector3Int startPos, int primaryAxis, int secondaryAxis, int tertiaryAxis, bool isBackFace, bool[,] hasMerged)
+        private Vector3Int CalculateQuadSize(in Vector3Int startPos, int primaryAxis, int secondaryAxis, int tertiaryAxis, bool isBackFace, bool[,] hasMerged)
         {
-            // Initialize variables
             Vector3Int quadSize = new Vector3Int();
-            Vector3Int currentPos = new Vector3Int();
+            Vector3Int currentPos = startPos;
 
             // Calculate the width of the quad
-            for (currentPos = startPos, currentPos[tertiaryAxis]++; currentPos[tertiaryAxis] < Dimensions[tertiaryAxis] && CompareStep(startPos, currentPos, primaryAxis, isBackFace) && !hasMerged[currentPos[secondaryAxis], currentPos[tertiaryAxis]]; currentPos[tertiaryAxis]++) { }
+            currentPos[tertiaryAxis]++;
+            
+            while (currentPos[tertiaryAxis] < Dimensions[tertiaryAxis] && CompareStep(startPos, currentPos, primaryAxis, isBackFace) && !hasMerged[currentPos[secondaryAxis], currentPos[tertiaryAxis]]) 
+            {
+                currentPos[tertiaryAxis]++;
+            }
             quadSize[tertiaryAxis] = currentPos[tertiaryAxis] - startPos[tertiaryAxis];
 
             // Calculate the height of the quad
-            for (currentPos = startPos, currentPos[secondaryAxis]++; currentPos[secondaryAxis] < Dimensions[secondaryAxis] && CompareStep(startPos, currentPos, primaryAxis, isBackFace) && !hasMerged[currentPos[secondaryAxis], currentPos[tertiaryAxis]]; currentPos[secondaryAxis]++)
+            currentPos = startPos;
+            currentPos[secondaryAxis]++;
+            
+            while (currentPos[secondaryAxis] < Dimensions[secondaryAxis] && CompareStep(startPos, currentPos, primaryAxis, isBackFace) && !hasMerged[currentPos[secondaryAxis], currentPos[tertiaryAxis]]) 
             {
-                for (currentPos[tertiaryAxis] = startPos[tertiaryAxis]; currentPos[tertiaryAxis] < Dimensions[tertiaryAxis] && CompareStep(startPos, currentPos, primaryAxis, isBackFace) && !hasMerged[currentPos[secondaryAxis], currentPos[tertiaryAxis]]; currentPos[tertiaryAxis]++) { }
+                while (currentPos[tertiaryAxis] < Dimensions[tertiaryAxis] && CompareStep(startPos, currentPos, primaryAxis, isBackFace) && !hasMerged[currentPos[secondaryAxis], currentPos[tertiaryAxis]])
+                {
+                    currentPos[tertiaryAxis]++;
+                }
 
                 // If the quad doesn't span the full width, it's not a good add.
                 if (currentPos[tertiaryAxis] - startPos[tertiaryAxis] < quadSize[tertiaryAxis])
@@ -158,13 +169,15 @@ namespace SemagGames.VoxelEditor
                 }
 
                 currentPos[tertiaryAxis] = startPos[tertiaryAxis];
+                currentPos[secondaryAxis]++;
             }
+            
             quadSize[secondaryAxis] = currentPos[secondaryAxis] - startPos[secondaryAxis];
 
             return quadSize;
         }
 
-        private void AddQuadToMesh(Vector3Int startPos, Vector3Int quadSize, int primaryAxis, int secondaryAxis, int tertiaryAxis, bool isBackFace, Voxel currentVoxel)
+        private void AddQuadToMesh(in Vector3Int startPos, in Vector3Int quadSize, int primaryAxis, int secondaryAxis, int tertiaryAxis, bool isBackFace, in Voxel currentVoxel)
         {
             // Create the vectors for the corners of the quad
             Vector3Int horizontalVector = new Vector3Int();
@@ -191,7 +204,7 @@ namespace SemagGames.VoxelEditor
             AddSquareFace(a, b, c, d, normal, currentVoxel.Color, isBackFace);
         }
 
-        private void AddSquareFace(Vector3 a, Vector3 b, Vector3 c, Vector3 d, Vector3 normal, Color32 color, bool isBackFace)
+        private void AddSquareFace(in Vector3 a, in Vector3 b, in Vector3 c, in Vector3 d, in Vector3 normal, in Color32 color, bool isBackFace)
         {
             // Add the 4 vertices, and color for each vertex.
             meshData.Vertices.Add(new Vertex(a, normal, color));
@@ -221,7 +234,8 @@ namespace SemagGames.VoxelEditor
                 meshData.Triangles.Add((ushort)i);
             }
         }
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool IsVoxelFaceVisible(Vector3Int voxelPosition, int axis, bool backFace)
         {
             voxelPosition[axis] += backFace ? -1 : 1;
@@ -235,6 +249,7 @@ namespace SemagGames.VoxelEditor
             return false;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool CompareStep(Vector3Int a, Vector3Int b, int direction, bool backFace) 
         {
             Voxel voxel1 = chunk.GetVoxel(a);
@@ -243,6 +258,7 @@ namespace SemagGames.VoxelEditor
             return voxel1 == voxel2 && voxel2.ID != Voxel.AirId && IsVoxelFaceVisible(b, direction, backFace);
         }
         
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void MarkVoxelsAsMerged(Vector3Int startPos, Vector3Int quadSize, bool[,] hasMerged, int secondaryAxis, int tertiaryAxis)
         {
             for (int i = 0; i < quadSize[secondaryAxis]; i++)
