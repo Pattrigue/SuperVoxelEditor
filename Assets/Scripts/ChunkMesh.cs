@@ -224,13 +224,15 @@ namespace SemagGames.VoxelEditor
 
         private bool IsVoxelFaceVisible(Vector3Int voxelPosition, int axis, bool backFace)
         {
-            var dir = new Vector3();
-            dir[axis] = backFace ? -1 : 1;
-            
             voxelPosition[axis] += backFace ? -1 : 1;
-            voxelPosition += chunk.ChunkPosition.VoxelPosition;
+            voxelPosition += chunk.ChunkPosition.VoxelPosition; // Note - this is now a world position! (not a local voxel/chunk position)
 
-            return World.GetVoxel(voxelPosition).ID == 0;
+            if (World.TryGetChunk(voxelPosition, out Chunk chunkAtPosition))
+            {
+                return chunkAtPosition.GetVoxelFromWorldPosition(voxelPosition).ID == Voxel.AirId;
+            }
+
+            return false;
         }
 
         private bool CompareStep(Vector3Int a, Vector3Int b, int direction, bool backFace) 
