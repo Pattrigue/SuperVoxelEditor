@@ -110,7 +110,7 @@ namespace SemagGames.VoxelEditor
         
         public bool HasVoxel(int x, int y, int z)
         {
-            return GetVoxel(x, y, z).ID != Voxel.AirId;
+            return GetVoxel(x, y, z).id != Voxel.AirId;
         }
 
         public static bool InChunkBounds(int x, int y, int z)

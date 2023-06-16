@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SemagGames.VoxelEditor.Editor
 {
-    [CustomEditor(typeof(VoxelAssetDatabase))]
+    [CustomEditor(typeof(VoxelProperties))]
     public sealed class VoxelAssetDatabaseEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
@@ -12,7 +12,7 @@ namespace SemagGames.VoxelEditor.Editor
 
             if (GUILayout.Button("Get Voxel Assets In Project"))
             {
-                ((VoxelAssetDatabase)target).GetVoxelAssetsInProject();
+                ((VoxelProperties)target).GetVoxelAssetsInProject();
             }
         }
     }

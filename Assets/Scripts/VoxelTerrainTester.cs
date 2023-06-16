@@ -13,8 +13,8 @@ namespace SemagGames.VoxelEditor
 
         [SerializeField] private int numChunks = 4;
         [SerializeField] private VoxelVolume volume;
-        [SerializeField] private VoxelAsset grassVoxel;
-        [SerializeField] private VoxelAsset stoneVoxel;
+        [SerializeField] private VoxelProperty grassVoxel;
+        [SerializeField] private VoxelProperty stoneVoxel;
 
         private void Start()
         {
@@ -58,7 +58,7 @@ namespace SemagGames.VoxelEditor
                         voxelId = Voxel.AirId;
                     }
 
-                    volume.SetVoxel(new Vector3(x, y, z), voxelId);
+                    volume.SetVoxel(new Vector3(x, y, z), volume.ColorPicker.SelectedColor, voxelId);
                 }
             }
         }

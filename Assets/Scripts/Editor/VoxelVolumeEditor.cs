@@ -4,7 +4,7 @@ using UnityEngine;
 namespace SemagGames.VoxelEditor.Editor
 {
     [CustomEditor(typeof(VoxelVolume))]
-    public sealed class WorldEditor : UnityEditor.Editor
+    public sealed class VoxelVolumeEditor : UnityEditor.Editor
     {
         private VoxelVolume Volume => (VoxelVolume)target;
 
@@ -186,15 +186,13 @@ namespace SemagGames.VoxelEditor.Editor
             Vector3Int min = Vector3Int.Min(start, end);
             Vector3Int max = Vector3Int.Max(start, end);
 
-            uint voxelId = deleteMode ? Voxel.AirId : 1u;
-
             for (int x = min.x; x <= max.x; x++)
             {
                 for (int y = min.y; y <= max.y; y++)
                 {
                     for (int z = min.z; z <= max.z; z++)
-                    {                
-                        Volume.SetVoxel(new Vector3(x, y, z), voxelId);
+                    {
+                        Volume.SetVoxel(new Vector3(x, y, z), Volume.ColorPicker.SelectedColor);
                     }
                 }
             }

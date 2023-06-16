@@ -41,7 +41,7 @@ namespace SemagGames.VoxelEditor
             chunks.Clear();
         }
 
-        public void SetVoxel(Vector3 worldPosition, uint voxelId)
+        public void SetVoxel(Vector3 worldPosition, Color32 color, uint voxelPropertyId = 1)
         {
             ChunkPosition chunkPosition = ChunkPosition.FromWorldPosition(worldPosition);
         
@@ -53,7 +53,7 @@ namespace SemagGames.VoxelEditor
                 chunks.Add(chunkPosition, chunk);
             }
 
-            chunk.SetVoxel(worldPosition, new Voxel(voxelId, colorPicker.SelectedColor));
+            chunk.SetVoxel(worldPosition, new Voxel(voxelPropertyId, color));
         }
 
         public Voxel GetVoxel(Vector3 worldPosition)

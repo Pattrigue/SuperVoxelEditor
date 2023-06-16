@@ -4,22 +4,22 @@ using UnityEngine;
 
 namespace SemagGames.VoxelEditor
 {
-    public sealed class VoxelAssetDatabase : Singleton<VoxelAssetDatabase>
+    public sealed class VoxelProperties : Singleton<VoxelProperties>
     {
-        [SerializeField] private VoxelAsset[] voxelAssets;
+        [SerializeField] private VoxelProperty[] voxelAssets;
 
-        private static VoxelAsset[] VoxelAssets => Instance.voxelAssets;
+        private static VoxelProperty[] VoxelAssets => Instance.voxelAssets;
 
         public void GetVoxelAssetsInProject()
         {
             voxelAssets = AssetDatabase.FindAssets("t:VoxelAsset")
                 .Select(AssetDatabase.GUIDToAssetPath)
-                .Select(AssetDatabase.LoadAssetAtPath<VoxelAsset>)
+                .Select(AssetDatabase.LoadAssetAtPath<VoxelProperty>)
                 .OrderBy(asset => asset.ID)
                 .ToArray();
         }
 
-        public static VoxelAsset GetVoxelAsset(uint id)
+        public static VoxelProperty GetPropertyById(uint id)
         {
             return VoxelAssets[id - 1];
         }

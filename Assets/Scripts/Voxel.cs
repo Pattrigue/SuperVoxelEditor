@@ -10,21 +10,21 @@ namespace SemagGames.VoxelEditor
 
         public static readonly Voxel Air = new(AirId, default);
 
-        public uint ID;
+        public uint id;
 
-        public Color32 Color;
+        public Color32 color;
 
         public Voxel(uint id, Color32 color)
         {
-            ID = id;
-            Color = color;
+            this.id = id;
+            this.color = color;
         }
 
-        public VoxelAsset Asset => VoxelAssetDatabase.GetVoxelAsset(ID);
+        public VoxelProperty Property => VoxelProperties.GetPropertyById(id);
 
         public static bool operator ==(Voxel a, Voxel b)
         {
-            return a.ID == b.ID && a.Color.r == b.Color.r && a.Color.g == b.Color.g && a.Color.b == b.Color.b && a.Color.a == b.Color.a;
+            return a.id == b.id && a.color.r == b.color.r && a.color.g == b.color.g && a.color.b == b.color.b && a.color.a == b.color.a;
         }
 
         public static bool operator !=(Voxel a, Voxel b)
@@ -34,7 +34,7 @@ namespace SemagGames.VoxelEditor
 
         public bool Equals(Voxel other)
         {
-            return ID == other.ID;
+            return id == other.id;
         }
 
         public override bool Equals(object obj)
@@ -44,7 +44,7 @@ namespace SemagGames.VoxelEditor
 
         public override int GetHashCode()
         {
-            return ID.GetHashCode();
+            return id.GetHashCode();
         }
     }
 }

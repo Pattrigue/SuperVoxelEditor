@@ -116,7 +116,7 @@ namespace SemagGames.VoxelEditor
                             Voxel currentVoxel = chunk.GetVoxelFromWorldPosition(startPos + chunk.ChunkPosition.VoxelPosition);
 
                             // If this voxel has already been merged, is air, or not visible, skip it.
-                            if (hasMerged[startPos[secondaryAxis], startPos[tertiaryAxis]] || currentVoxel.ID == Voxel.AirId || !IsVoxelFaceVisible(startPos, primaryAxis, isBackFace))
+                            if (hasMerged[startPos[secondaryAxis], startPos[tertiaryAxis]] || currentVoxel.id == Voxel.AirId || !IsVoxelFaceVisible(startPos, primaryAxis, isBackFace))
                             {
                                 continue;
                             }
@@ -200,7 +200,7 @@ namespace SemagGames.VoxelEditor
             normal[primaryAxis] = isBackFace ? -1 : 1;
 
             // Add the square face to the mesh
-            AddSquareFace(a, b, c, d, normal, currentVoxel.Color, isBackFace);
+            AddSquareFace(a, b, c, d, normal, currentVoxel.color, isBackFace);
         }
 
         private void AddSquareFace(in Vector3 a, in Vector3 b, in Vector3 c, in Vector3 d, in Vector3 normal, in Color32 color, bool isBackFace)
@@ -242,7 +242,7 @@ namespace SemagGames.VoxelEditor
 
             if (chunk.Volume.TryGetChunk(voxelPosition, out Chunk chunkAtPosition))
             {
-                return chunkAtPosition.GetVoxelFromWorldPosition(voxelPosition).ID == Voxel.AirId;
+                return chunkAtPosition.GetVoxelFromWorldPosition(voxelPosition).id == Voxel.AirId;
             }
 
             return true;
@@ -257,7 +257,7 @@ namespace SemagGames.VoxelEditor
             Voxel voxelA = chunk.GetVoxel(a);
             Voxel voxelB = chunk.GetVoxel(b);
 
-            return voxelA == voxelB && voxelB.ID != Voxel.AirId && IsVoxelFaceVisible(b, direction, backFace);
+            return voxelA == voxelB && voxelB.id != Voxel.AirId && IsVoxelFaceVisible(b, direction, backFace);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

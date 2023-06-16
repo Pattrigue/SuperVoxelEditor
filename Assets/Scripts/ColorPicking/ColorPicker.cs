@@ -7,8 +7,8 @@ namespace SemagGames.VoxelEditor.ColorPicking
     public class ColorPicker
     {
         [SerializeField] private Texture2D colorPaletteTexture;
-        [SerializeField] private Color selectedColor;
+        [SerializeField] private Color32 selectedColor;
 
-        public Color SelectedColor => selectedColor;
+        public Color32 SelectedColor => selectedColor;
     }
 }
