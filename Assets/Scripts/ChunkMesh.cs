@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using UnityEngine.Rendering;
 
 namespace SemagGames.VoxelEditor
@@ -245,19 +244,20 @@ namespace SemagGames.VoxelEditor
             {
                 return chunkAtPosition.GetVoxelFromWorldPosition(voxelPosition).ID == Voxel.AirId;
             }
-                
-            bool up = axis == 1 && !backFace;
 
-            return up; // Renders top voxel faces on upper chunk borders without above neighbor chunks. Change to "false" to render both faces.
+            return true;
+            // bool up = axis == 1 && !backFace;
+
+            // return up; // Renders top voxel faces on upper chunk borders without above neighbor chunks. Change to "false" to render both faces.
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool CompareStep(Vector3Int a, Vector3Int b, int direction, bool backFace) 
         {
-            Voxel voxel1 = chunk.GetVoxel(a);
-            Voxel voxel2 = chunk.GetVoxel(b);
+            Voxel voxelA = chunk.GetVoxel(a);
+            Voxel voxelB = chunk.GetVoxel(b);
 
-            return voxel1 == voxel2 && voxel2.ID != Voxel.AirId && IsVoxelFaceVisible(b, direction, backFace);
+            return voxelA == voxelB && voxelB.ID != Voxel.AirId && IsVoxelFaceVisible(b, direction, backFace);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
