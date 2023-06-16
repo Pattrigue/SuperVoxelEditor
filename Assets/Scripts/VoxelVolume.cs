@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SemagGames.VoxelEditor
 {
     [ExecuteAlways]
-    public sealed class World : MonoBehaviour
+    public sealed class VoxelVolume : MonoBehaviour
     {
         [SerializeField] private Chunk chunkPrefab;
         [SerializeField] private ColorPicker colorPicker;

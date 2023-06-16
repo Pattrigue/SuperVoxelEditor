@@ -240,7 +240,7 @@ namespace SemagGames.VoxelEditor
             voxelPosition[axis] += backFace ? -1 : 1;
             voxelPosition += chunk.ChunkPosition.VoxelPosition; // Note - this is now a world position! (not a local voxel/chunk position)
 
-            if (chunk.World.TryGetChunk(voxelPosition, out Chunk chunkAtPosition))
+            if (chunk.Volume.TryGetChunk(voxelPosition, out Chunk chunkAtPosition))
             {
                 return chunkAtPosition.GetVoxelFromWorldPosition(voxelPosition).ID == Voxel.AirId;
             }

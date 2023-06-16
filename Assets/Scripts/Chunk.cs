@@ -20,7 +20,7 @@ namespace SemagGames.VoxelEditor
 
         public IReadOnlyList<Voxel> Voxels => voxels;
         
-        public World World { get; private set; }
+        public VoxelVolume Volume { get; private set; }
 
         public ChunkPosition ChunkPosition => ChunkPosition.FromWorldPosition(transform.position);
 
@@ -36,7 +36,7 @@ namespace SemagGames.VoxelEditor
         private void Awake()
         {
             mesh = GetComponent<ChunkMesh>();
-            World = GetComponentInParent<World>();
+            Volume = GetComponentInParent<VoxelVolume>();
         }
 
         private void OnEnable()
@@ -142,7 +142,7 @@ namespace SemagGames.VoxelEditor
                 for (int i = 0; i < NeighborDirections.Length; i++)
                 {
                     // Check if the voxel is on the edge of the chunk in the current direction
-                    if (World.TryGetChunk(transform.position + NeighborDirections[i], out Chunk chunk))
+                    if (Volume.TryGetChunk(transform.position + NeighborDirections[i], out Chunk chunk))
                     {
                         chunk.isDirty = true;
                     }

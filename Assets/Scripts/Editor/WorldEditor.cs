@@ -3,10 +3,10 @@ using UnityEngine;
 
 namespace SemagGames.VoxelEditor.Editor
 {
-    [CustomEditor(typeof(World))]
+    [CustomEditor(typeof(VoxelVolume))]
     public sealed class WorldEditor : UnityEditor.Editor
     {
-        private World World => (World)target;
+        private VoxelVolume Volume => (VoxelVolume)target;
 
         private GameObject previewCube;
         private Renderer previewCubeRenderer;
@@ -64,7 +64,7 @@ namespace SemagGames.VoxelEditor.Editor
             
             if (GUILayout.Button("Clear World"))
             {
-                World.Clear();
+                Volume.Clear();
             }
         }
 
@@ -90,7 +90,7 @@ namespace SemagGames.VoxelEditor.Editor
         
         private static bool IsValidSelection(GameObject selectedGameObject)
         {
-            return selectedGameObject != null && selectedGameObject.TryGetComponent(out World _);
+            return selectedGameObject != null && selectedGameObject.TryGetComponent(out VoxelVolume _);
         }
 
         private void HandleSceneGUIEvents(Event currentEvent, SceneView sceneView)
@@ -194,7 +194,7 @@ namespace SemagGames.VoxelEditor.Editor
                 {
                     for (int z = min.z; z <= max.z; z++)
                     {                
-                        World.SetVoxel(new Vector3(x, y, z), voxelId);
+                        Volume.SetVoxel(new Vector3(x, y, z), voxelId);
                     }
                 }
             }
@@ -226,7 +226,7 @@ namespace SemagGames.VoxelEditor.Editor
                 Vector3 cubeSize = new(offset, offset, offset);
                 previewCube.transform.position = voxelPosition;
                 previewCube.transform.localScale = cubeSize;
-                previewCubeMaterial.color = deleteMode ? new Color(1, 0, 0, 0.25f) : World.ColorPicker.SelectedColor;
+                previewCubeMaterial.color = deleteMode ? new Color(1, 0, 0, 0.25f) : Volume.ColorPicker.SelectedColor;
             }
 
             Color originalColor = Handles.color;

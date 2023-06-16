@@ -12,7 +12,7 @@ namespace SemagGames.VoxelEditor
         [SerializeField] private float heightMultiplier = 1f; // Multiplier for height
 
         [SerializeField] private int numChunks = 4;
-        [SerializeField] private World world;
+        [SerializeField] private VoxelVolume volume;
         [SerializeField] private VoxelAsset grassVoxel;
         [SerializeField] private VoxelAsset stoneVoxel;
 
@@ -23,7 +23,7 @@ namespace SemagGames.VoxelEditor
 
         public void Rebuild()
         {
-            world.Clear();
+            volume.Clear();
 
             for (int x = 0; x < Chunk.Width * numChunks; x++)
             for (int z = 0; z < Chunk.Depth * numChunks; z++)
@@ -58,7 +58,7 @@ namespace SemagGames.VoxelEditor
                         voxelId = Voxel.AirId;
                     }
 
-                    world.SetVoxel(new Vector3(x, y, z), voxelId);
+                    volume.SetVoxel(new Vector3(x, y, z), voxelId);
                 }
             }
         }
