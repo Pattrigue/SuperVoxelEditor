@@ -1,5 +1,4 @@
-﻿using SemagGames.VoxelEditor.ColorPicking;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace SemagGames.VoxelEditor.Editor
