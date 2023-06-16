@@ -64,6 +64,7 @@ namespace SemagGames.VoxelEditor.Editor
 
             if (!IsValidSelection(selectedGameObject)) return;
 
+            Tools.current = Tool.None;
             HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
     
             HandleSceneGUIEvents(Event.current, sceneView);
@@ -197,7 +198,7 @@ namespace SemagGames.VoxelEditor.Editor
                 previewCubeRenderer.enabled = false;
                 return;
             }
-        
+            
             previewCubeRenderer.enabled = true;
             
             if (isDragging)
@@ -216,6 +217,8 @@ namespace SemagGames.VoxelEditor.Editor
                 previewCube.transform.localScale = cubeSize;
                 previewCubeMaterial.color = deleteMode ? new Color(1, 0, 0, 0.25f) : World.ColorPicker.SelectedColor;
             }
+                    
+            Handles.DrawOutline(new[] { previewCubeRenderer }, deleteMode ? Color.red : Color.cyan);
         }
 
         private static void SnapToVoxelGrid(ref Vector3 position)
