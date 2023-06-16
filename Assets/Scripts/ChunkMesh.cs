@@ -46,7 +46,7 @@ namespace SemagGames.VoxelEditor
 
         public void Build()
         {
-            Debug.Log($"Building chunk mesh at {chunk.ChunkPosition}");
+            Debug.Log($"Building chunk mesh at {chunk.ChunkPosition}", gameObject);
 
             ResetMesh();
             GenerateMeshData();
@@ -103,7 +103,6 @@ namespace SemagGames.VoxelEditor
                 int tertiaryAxis = (primaryAxis + 2) % 3;
 
                 Vector3Int startPos = new Vector3Int();
-                Vector3Int currentPos = new Vector3Int();
 
                 // This loop iterates over each layer of the voxel chunk
                 for (startPos[primaryAxis] = 0; startPos[primaryAxis] < Dimensions[primaryAxis]; startPos[primaryAxis]++)
@@ -149,6 +148,7 @@ namespace SemagGames.VoxelEditor
             {
                 currentPos[tertiaryAxis]++;
             }
+            
             quadSize[tertiaryAxis] = currentPos[tertiaryAxis] - startPos[tertiaryAxis];
 
             // Calculate the height of the quad
@@ -245,8 +245,10 @@ namespace SemagGames.VoxelEditor
             {
                 return chunkAtPosition.GetVoxelFromWorldPosition(voxelPosition).ID == Voxel.AirId;
             }
+                
+            bool up = axis == 1 && !backFace;
 
-            return false;
+            return up; // Renders top voxel faces on upper chunk borders without above neighbor chunks. Change to "false" to render both faces.
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
