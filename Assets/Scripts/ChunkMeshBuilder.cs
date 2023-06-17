@@ -38,7 +38,7 @@ namespace SemagGames.VoxelEditor
             meshData.Dispose();
         }
         
-        public MeshData GenerateMeshData()
+        public ref MeshData GenerateMeshData()
         {
             // This loop goes through each face of a voxel cube (6 faces)
             for (int faceIndex = 0; faceIndex < 6; faceIndex++)
@@ -90,7 +90,7 @@ namespace SemagGames.VoxelEditor
                 }
             }
 
-            return meshData;
+            return ref meshData;
         }
 
         private Vector3Int CalculateQuadSize(in Vector3Int startPos, int primaryAxis, int secondaryAxis, int tertiaryAxis, bool isBackFace, bool[] hasMerged)

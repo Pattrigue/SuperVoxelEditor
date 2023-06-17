@@ -32,11 +32,6 @@ namespace SemagGames.VoxelEditor
             meshBuilder = new ChunkMeshBuilder(chunk);
         }
 
-        private void OnDestroy()
-        {
-            meshBuilder.Dispose();
-        }
-
         public void Build()
         {
             Debug.Log($"Building chunk mesh at {chunk.ChunkPosition}", gameObject);
@@ -63,7 +58,7 @@ namespace SemagGames.VoxelEditor
             meshFilter.mesh = mesh;
             meshCollider.sharedMesh = mesh;
 
-            meshData.Dispose();
+            meshBuilder.Dispose();
         }
 
         private void ResetMesh()
