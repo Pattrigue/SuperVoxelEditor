@@ -113,10 +113,13 @@ namespace SemagGames.VoxelEditor
                     {
                         for (startPos[tertiaryAxis] = 0; startPos[tertiaryAxis] < Dimensions[tertiaryAxis]; startPos[tertiaryAxis]++)
                         {
-                            Voxel currentVoxel = chunk.GetVoxelFromWorldPosition(startPos + chunk.ChunkPosition.VoxelPosition);
+                            uint voxelData = chunk.GetVoxelDataFromWorldPosition(startPos + chunk.ChunkPosition.VoxelPosition);
+                            uint voxelId = Voxel.ExtractId(voxelData);
+                            
+                            Color32 voxelColor = Voxel.ExtractColor(voxelData);
 
                             // If this voxel has already been merged, is air, or not visible, skip it.
-                            if (hasMerged[startPos[secondaryAxis], startPos[tertiaryAxis]] || currentVoxel.id == Voxel.AirId || !IsVoxelFaceVisible(startPos, primaryAxis, isBackFace))
+                            if (hasMerged[startPos[secondaryAxis], startPos[tertiaryAxis]] || voxelId == Voxel.AirId || !IsVoxelFaceVisible(startPos, primaryAxis, isBackFace))
                             {
                                 continue;
                             }
@@ -125,7 +128,7 @@ namespace SemagGames.VoxelEditor
                             Vector3Int quadSize = CalculateQuadSize(startPos, primaryAxis, secondaryAxis, tertiaryAxis, isBackFace, hasMerged);
 
                             // Add the quad to the mesh
-                            AddQuadToMesh(startPos, quadSize, primaryAxis, secondaryAxis, tertiaryAxis, isBackFace, currentVoxel);
+                            AddQuadToMesh(startPos, quadSize, primaryAxis, secondaryAxis, tertiaryAxis, isBackFace, voxelColor);
 
                             // Mark the voxels as merged
                             MarkVoxelsAsMerged(startPos, quadSize, hasMerged, secondaryAxis, tertiaryAxis);
@@ -176,7 +179,7 @@ namespace SemagGames.VoxelEditor
             return quadSize;
         }
 
-        private void AddQuadToMesh(in Vector3Int startPos, in Vector3Int quadSize, int primaryAxis, int secondaryAxis, int tertiaryAxis, bool isBackFace, in Voxel currentVoxel)
+        private void AddQuadToMesh(in Vector3Int startPos, in Vector3Int quadSize, int primaryAxis, int secondaryAxis, int tertiaryAxis, bool isBackFace, in Color32 voxelColor)
         {
             // Create the vectors for the corners of the quad
             Vector3Int horizontalVector = new Vector3Int();
@@ -200,7 +203,7 @@ namespace SemagGames.VoxelEditor
             normal[primaryAxis] = isBackFace ? -1 : 1;
 
             // Add the square face to the mesh
-            AddSquareFace(a, b, c, d, normal, currentVoxel.color, isBackFace);
+            AddSquareFace(a, b, c, d, normal, voxelColor, isBackFace);
         }
 
         private void AddSquareFace(in Vector3 a, in Vector3 b, in Vector3 c, in Vector3 d, in Vector3 normal, in Color32 color, bool isBackFace)
@@ -242,7 +245,9 @@ namespace SemagGames.VoxelEditor
 
             if (chunk.Volume.TryGetChunk(voxelPosition, out Chunk chunkAtPosition))
             {
-                return chunkAtPosition.GetVoxelFromWorldPosition(voxelPosition).id == Voxel.AirId;
+                uint voxelData = chunkAtPosition.GetVoxelDataFromWorldPosition(voxelPosition);
+
+                return Voxel.ExtractId(voxelData) == Voxel.AirId;
             }
 
             return true;
@@ -254,10 +259,19 @@ namespace SemagGames.VoxelEditor
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool CompareStep(Vector3Int a, Vector3Int b, int direction, bool backFace) 
         {
-            Voxel voxelA = chunk.GetVoxel(a);
-            Voxel voxelB = chunk.GetVoxel(b);
-
-            return voxelA == voxelB && voxelB.id != Voxel.AirId && IsVoxelFaceVisible(b, direction, backFace);
+            uint voxelIdB = Voxel.ExtractId(chunk.GetVoxelData(b));
+            
+            if (voxelIdB == Voxel.AirId)
+            {
+                return false;
+            }
+            
+            Color32 voxelColorA = Voxel.ExtractColor(chunk.GetVoxelData(a));
+            Color32 voxelColorB = Voxel.ExtractColor(chunk.GetVoxelData(b));
+            
+            bool isSameColor = voxelColorA.r == voxelColorB.r && voxelColorA.g == voxelColorB.g && voxelColorA.b == voxelColorB.b;
+            
+            return isSameColor && IsVoxelFaceVisible(b, direction, backFace);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

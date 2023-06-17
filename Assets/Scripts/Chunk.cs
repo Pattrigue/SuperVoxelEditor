@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SemagGames.VoxelEditor
@@ -8,7 +7,7 @@ namespace SemagGames.VoxelEditor
     [ExecuteAlways]
     public sealed class Chunk : MonoBehaviour
     {
-        [SerializeField] private Voxel[] voxels = new Voxel[Size3D];
+        [SerializeField] private uint[] voxelData = new uint[Size3D];
         
         public const int Width = 16;
         public const int Height = 16;
@@ -18,8 +17,6 @@ namespace SemagGames.VoxelEditor
 
         public static event Action<Chunk> Destroyed;
 
-        public IReadOnlyList<Voxel> Voxels => voxels;
-        
         public VoxelVolume Volume { get; private set; }
 
         public ChunkPosition ChunkPosition => ChunkPosition.FromWorldPosition(transform.position);
@@ -83,34 +80,35 @@ namespace SemagGames.VoxelEditor
         public void SetVoxel(int x, int y, int z, Voxel voxel)
         {
             int voxelIndex = GetVoxelIndex(x, y, z);
-            
-            voxels[voxelIndex] = voxel;
+
+            voxelData[voxelIndex] = voxel.ToVoxelData();
             isDirty = true;
             
             MarkNeighborsDirtyIfOnEdge(x, y, z);
         }
         
-        public Voxel GetVoxel(Vector3Int localPosition)
+        public uint GetVoxelData(Vector3Int localPosition)
         {
-            return GetVoxel(localPosition.x, localPosition.y, localPosition.z);
+            return GetVoxelData(localPosition.x, localPosition.y, localPosition.z);
         }
 
-        public Voxel GetVoxel(int x, int y, int z)
+        public uint GetVoxelData(int x, int y, int z)
         {
-            if (!InChunkBounds(x, y, z)) return Voxel.Air;
-            return voxels[GetVoxelIndex(x, y, z)];
+            if (!InChunkBounds(x, y, z)) return Voxel.AirVoxelData;
+            
+            return voxelData[GetVoxelIndex(x, y, z)];
         }
 
-        public Voxel GetVoxelFromWorldPosition(Vector3 worldPosition)
+        public uint GetVoxelDataFromWorldPosition(Vector3 worldPosition)
         {
             Vector3Int localPosition = ToLocalVoxelPosition(worldPosition);
             
-            return GetVoxel(localPosition.x, localPosition.y, localPosition.z);
+            return GetVoxelData(localPosition.x, localPosition.y, localPosition.z);
         }
         
         public bool HasVoxel(int x, int y, int z)
         {
-            return GetVoxel(x, y, z).id != Voxel.AirId;
+            return Voxel.ExtractId(GetVoxelData(x, y, z)) != Voxel.AirId;
         }
 
         public static bool InChunkBounds(int x, int y, int z)

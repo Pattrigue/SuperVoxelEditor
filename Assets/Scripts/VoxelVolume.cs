@@ -58,16 +58,16 @@ namespace SemagGames.VoxelEditor
             chunk.SetVoxel(worldPosition, new Voxel(voxelPropertyId, color));
         }
 
-        public Voxel GetVoxel(Vector3 worldPosition)
+        public uint GetVoxelData(Vector3 worldPosition)
         {
             ChunkPosition chunkPosition = ChunkPosition.FromWorldPosition(worldPosition);
         
             if (!chunks.TryGetValue(chunkPosition, out Chunk chunk))
             {
-                return Voxel.Air;
+                return Voxel.AirVoxelData;
             }
             
-            return chunk.GetVoxelFromWorldPosition(worldPosition);
+            return chunk.GetVoxelDataFromWorldPosition(worldPosition);
         }
         
         public bool TryGetChunk(Vector3 position, out Chunk chunk)
