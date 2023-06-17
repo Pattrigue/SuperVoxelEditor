@@ -6,6 +6,8 @@ namespace SemagGames.VoxelEditor
     [ExecuteAlways]
     public sealed class ChunkMesh : MonoBehaviour
     {
+        [SerializeField] private BorderVisibilityFlags borderVisibilityFlags = BorderVisibilityFlags.Everything;
+        
         private const MeshUpdateFlags MeshUpdateFlags = UnityEngine.Rendering.MeshUpdateFlags.DontRecalculateBounds
                                                         | UnityEngine.Rendering.MeshUpdateFlags.DontValidateIndices
                                                         | UnityEngine.Rendering.MeshUpdateFlags.DontNotifyMeshUsers
@@ -29,7 +31,6 @@ namespace SemagGames.VoxelEditor
             chunk = GetComponent<Chunk>();
             meshFilter = GetComponent<MeshFilter>();
             meshCollider = GetComponent<MeshCollider>();
-            meshBuilder = new ChunkMeshBuilder(chunk);
         }
 
         public void Build()
@@ -37,8 +38,8 @@ namespace SemagGames.VoxelEditor
             Debug.Log($"Building chunk mesh at {chunk.ChunkPosition}", gameObject);
 
             ResetMesh();
-            
-            MeshData meshData = meshBuilder.GenerateMeshData();
+
+            MeshData meshData = meshBuilder.GenerateMeshData(borderVisibilityFlags);
             
             mesh.SetVertexBufferParams(meshData.Vertices.Length, VertexAttributeDescriptors);
             mesh.SetVertexBufferData(meshData.Vertices.AsArray(), 0, 0, meshData.Vertices.Length, 0, MeshUpdateFlags);
@@ -57,14 +58,11 @@ namespace SemagGames.VoxelEditor
 
             meshFilter.mesh = mesh;
             meshCollider.sharedMesh = mesh;
-
             meshBuilder.Dispose();
         }
 
         private void ResetMesh()
         {
-            meshBuilder.ResetMeshData();
-            
             meshCollider.sharedMesh = null;
             meshFilter.sharedMesh = null;
             
@@ -75,8 +73,10 @@ namespace SemagGames.VoxelEditor
             }
             else
             {
-                mesh.Clear();
+                mesh.Clear(false);
             }
+                
+            meshBuilder = new ChunkMeshBuilder(chunk);
         }
     }
 }
