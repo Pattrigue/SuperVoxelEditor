@@ -17,8 +17,6 @@ namespace SemagGames.VoxelEditor
             this.colorId = colorId;
         }
 
-        public VoxelProperty Property => VoxelProperties.GetPropertyById(propertyId);
-
         public static uint GetPropertyId(uint voxelData) => voxelData >> 20;
 
         public static uint GetColorId(uint voxelData) => (voxelData >> 12) & 0xFF;
