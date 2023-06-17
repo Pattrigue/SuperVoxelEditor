@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using UnityEngine.Rendering;
 
 namespace SemagGames.VoxelEditor
@@ -93,6 +94,11 @@ namespace SemagGames.VoxelEditor
 
         private void GenerateMeshData()
         {
+            int maxDimension1 = Math.Max(Dimensions.x, Math.Max(Dimensions.y, Dimensions.z));
+            int maxDimension2 = Dimensions.x + Dimensions.y + Dimensions.z - maxDimension1 - Math.Min(Dimensions.x, Math.Min(Dimensions.y, Dimensions.z));
+            
+            bool[] hasMerged = new bool[maxDimension1 * maxDimension2];
+            
             // This loop goes through each face of a voxel cube (6 faces)
             for (int faceIndex = 0; faceIndex < 6; faceIndex++)
             {
@@ -106,7 +112,11 @@ namespace SemagGames.VoxelEditor
                 // This loop iterates over each layer of the voxel chunk
                 for (startPos[primaryAxis] = 0; startPos[primaryAxis] < Dimensions[primaryAxis]; startPos[primaryAxis]++)
                 {
-                    bool[,] hasMerged = new bool[Dimensions[secondaryAxis], Dimensions[tertiaryAxis]];
+                    // Clear hasMerged array
+                    for (int i = 0; i < hasMerged.Length; i++)
+                    {
+                        hasMerged[i] = false;
+                    }
 
                     // Build the slices of the mesh.
                     for (startPos[secondaryAxis] = 0; startPos[secondaryAxis] < Dimensions[secondaryAxis]; startPos[secondaryAxis]++)
@@ -115,11 +125,13 @@ namespace SemagGames.VoxelEditor
                         {
                             uint voxelData = chunk.GetVoxelDataFromWorldPosition(startPos + chunk.ChunkPosition.VoxelPosition);
                             uint voxelId = Voxel.ExtractId(voxelData);
-                            
+                    
                             Color32 voxelColor = Voxel.ExtractColor(voxelData);
 
+                            int index = startPos[secondaryAxis] * Dimensions[tertiaryAxis] + startPos[tertiaryAxis];
+
                             // If this voxel has already been merged, is air, or not visible, skip it.
-                            if (hasMerged[startPos[secondaryAxis], startPos[tertiaryAxis]] || voxelId == Voxel.AirId || !IsVoxelFaceVisible(startPos, primaryAxis, isBackFace))
+                            if (hasMerged[index] || voxelId == Voxel.AirId || !IsVoxelFaceVisible(startPos, primaryAxis, isBackFace))
                             {
                                 continue;
                             }
@@ -138,28 +150,28 @@ namespace SemagGames.VoxelEditor
             }
         }
 
-        private Vector3Int CalculateQuadSize(in Vector3Int startPos, int primaryAxis, int secondaryAxis, int tertiaryAxis, bool isBackFace, bool[,] hasMerged)
+        private Vector3Int CalculateQuadSize(in Vector3Int startPos, int primaryAxis, int secondaryAxis, int tertiaryAxis, bool isBackFace, bool[] hasMerged)
         {
             Vector3Int quadSize = new Vector3Int();
             Vector3Int currentPos = startPos;
 
             // Calculate the width of the quad
             currentPos[tertiaryAxis]++;
-            
-            while (currentPos[tertiaryAxis] < Dimensions[tertiaryAxis] && CompareStep(startPos, currentPos, primaryAxis, isBackFace) && !hasMerged[currentPos[secondaryAxis], currentPos[tertiaryAxis]]) 
+    
+            while (currentPos[tertiaryAxis] < Dimensions[tertiaryAxis] && CompareStep(startPos, currentPos, primaryAxis, isBackFace) && !hasMerged[currentPos[secondaryAxis] * Dimensions[tertiaryAxis] + currentPos[tertiaryAxis]]) 
             {
                 currentPos[tertiaryAxis]++;
             }
-            
+    
             quadSize[tertiaryAxis] = currentPos[tertiaryAxis] - startPos[tertiaryAxis];
 
             // Calculate the height of the quad
             currentPos = startPos;
             currentPos[secondaryAxis]++;
-            
-            while (currentPos[secondaryAxis] < Dimensions[secondaryAxis] && CompareStep(startPos, currentPos, primaryAxis, isBackFace) && !hasMerged[currentPos[secondaryAxis], currentPos[tertiaryAxis]]) 
+    
+            while (currentPos[secondaryAxis] < Dimensions[secondaryAxis] && CompareStep(startPos, currentPos, primaryAxis, isBackFace) && !hasMerged[currentPos[secondaryAxis] * Dimensions[tertiaryAxis] + currentPos[tertiaryAxis]]) 
             {
-                while (currentPos[tertiaryAxis] < Dimensions[tertiaryAxis] && CompareStep(startPos, currentPos, primaryAxis, isBackFace) && !hasMerged[currentPos[secondaryAxis], currentPos[tertiaryAxis]])
+                while (currentPos[tertiaryAxis] < Dimensions[tertiaryAxis] && CompareStep(startPos, currentPos, primaryAxis, isBackFace) && !hasMerged[currentPos[secondaryAxis] * Dimensions[tertiaryAxis] + currentPos[tertiaryAxis]])
                 {
                     currentPos[tertiaryAxis]++;
                 }
@@ -173,7 +185,7 @@ namespace SemagGames.VoxelEditor
                 currentPos[tertiaryAxis] = startPos[tertiaryAxis];
                 currentPos[secondaryAxis]++;
             }
-            
+    
             quadSize[secondaryAxis] = currentPos[secondaryAxis] - startPos[secondaryAxis];
 
             return quadSize;
@@ -275,13 +287,13 @@ namespace SemagGames.VoxelEditor
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void MarkVoxelsAsMerged(Vector3Int startPos, Vector3Int quadSize, bool[,] hasMerged, int secondaryAxis, int tertiaryAxis)
+        private static void MarkVoxelsAsMerged(Vector3Int startPos, Vector3Int quadSize, in bool[] hasMerged, int secondaryAxis, int tertiaryAxis)
         {
             for (int i = 0; i < quadSize[secondaryAxis]; i++)
             {
                 for (int j = 0; j < quadSize[tertiaryAxis]; j++)
                 {
-                    hasMerged[startPos[secondaryAxis] + i, startPos[tertiaryAxis] + j] = true;
+                    hasMerged[(startPos[secondaryAxis] + i) * Dimensions[tertiaryAxis] + (startPos[tertiaryAxis] + j)] = true;
                 }
             }
         }
