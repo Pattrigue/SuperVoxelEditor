@@ -6,7 +6,7 @@ namespace SemagGames.VoxelEditor
 {
     public sealed class ChunkMeshBuilder : IDisposable
     {
-        private static readonly Vector3Int Dimensions = new Vector3Int(16, 16, 16);
+        private static readonly Vector3Int Dimensions = new Vector3Int(Chunk.Width, Chunk.Height, Chunk.Depth);
 
         private readonly Chunk chunk;
         
