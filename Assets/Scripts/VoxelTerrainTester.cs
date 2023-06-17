@@ -48,20 +48,20 @@ namespace SemagGames.VoxelEditor
                 for (int y = 0; y < Chunk.Height; y++)
                 {
                     uint voxelPropertyId;
-                    Color32 color;
+                    uint colorId;
 
                     if (y <= height)
                     {
                         voxelPropertyId = y == height ? grassVoxel.ID : stoneVoxel.ID;
-                        color = y == height ? new Color32(0, 200, 0, 255) : Color.gray;
+                        colorId = y == height ? 167u : 6u;
                     }
                     else
                     {
-                        voxelPropertyId = Voxel.AirId;
-                        color = default;
+                        voxelPropertyId = VoxelProperty.AirId;
+                        colorId = 0;
                     }
 
-                    volume.SetVoxel(new Vector3(x, y, z), color, voxelPropertyId);
+                    volume.SetVoxel(new Vector3(x, y, z), colorId, voxelPropertyId);
                 }
             }
         }

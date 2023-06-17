@@ -56,14 +56,15 @@ namespace SemagGames.VoxelEditor
                         for (startPos[tertiaryAxis] = 0; startPos[tertiaryAxis] < Dimensions[tertiaryAxis]; startPos[tertiaryAxis]++)
                         {
                             uint voxelData = chunk.GetVoxelDataFromWorldPosition(startPos + chunk.ChunkPosition.VoxelPosition);
-                            uint voxelId = Voxel.ExtractId(voxelData);
-                    
-                            Color32 voxelColor = Voxel.ExtractColor(voxelData);
+                            uint voxelId = Voxel.GetPropertyId(voxelData);
+                            uint colorId = Voxel.GetColorId(voxelData);
+
+                            Color32 voxelColor = chunk.Volume.ColorPicker.GetColorByIndex(colorId);
 
                             int index = startPos[secondaryAxis] * Dimensions[tertiaryAxis] + startPos[tertiaryAxis];
 
                             // If this voxel has already been merged, is air, or not visible, skip it.
-                            if (hasMerged[index] || voxelId == Voxel.AirId || !IsVoxelFaceVisible(startPos, primaryAxis, isBackFace, borderVisibilityFlags))
+                            if (hasMerged[index] || Voxel.IsAir(voxelData) || !IsVoxelFaceVisible(startPos, primaryAxis, isBackFace, borderVisibilityFlags))
                             {
                                 continue;
                             }
@@ -204,7 +205,7 @@ namespace SemagGames.VoxelEditor
             {
                 uint voxelData = chunkAtPosition.GetVoxelDataFromWorldPosition(voxelPosition);
 
-                return Voxel.ExtractId(voxelData) == Voxel.AirId;
+                return Voxel.IsAir(voxelData);
             }
             
             // Calculate the bit mask based on the axis and whether it's a back face
@@ -216,17 +217,17 @@ namespace SemagGames.VoxelEditor
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool CompareStep(Vector3Int a, Vector3Int b, int direction, bool backFace, BorderVisibilityFlags borderVisibilityFlags)
         {
-            uint voxelIdB = Voxel.ExtractId(chunk.GetVoxelData(b));
+            uint voxelDataB = chunk.GetVoxelData(b);
             
-            if (voxelIdB == Voxel.AirId)
+            if (Voxel.IsAir(voxelDataB))
             {
                 return false;
             }
             
-            Color32 voxelColorA = Voxel.ExtractColor(chunk.GetVoxelData(a));
-            Color32 voxelColorB = Voxel.ExtractColor(chunk.GetVoxelData(b));
+            uint voxelColorIdA = Voxel.GetColorId(chunk.GetVoxelData(a));
+            uint voxelColorIdB = Voxel.GetColorId(chunk.GetVoxelData(b));
             
-            bool isSameColor = voxelColorA.r == voxelColorB.r && voxelColorA.g == voxelColorB.g && voxelColorA.b == voxelColorB.b;
+            bool isSameColor = voxelColorIdA == voxelColorIdB;
             
             return isSameColor && IsVoxelFaceVisible(b, direction, backFace, borderVisibilityFlags);
         }

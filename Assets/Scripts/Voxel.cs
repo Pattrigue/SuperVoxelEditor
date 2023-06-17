@@ -1,63 +1,51 @@
 ﻿using System;
-using UnityEngine;
 
 namespace SemagGames.VoxelEditor
 {
     [Serializable]
     public struct Voxel
     {
-        public const uint AirId = 0;
-
-        public static readonly Voxel Air = new(AirId, default);
+        public static readonly Voxel Air = new(VoxelProperty.AirId, default);
         public static readonly uint AirVoxelData = Air.ToVoxelData();
 
-        public uint id;
+        public uint propertyId;
+        public uint colorId;
 
-        public Color32 color;
-
-        public Voxel(uint id, Color32 color)
+        public Voxel(uint propertyId, uint colorId)
         {
-            this.id = id;
-            this.color = color;
+            this.propertyId = propertyId;
+            this.colorId = colorId;
         }
 
-        public VoxelProperty Property => VoxelProperties.GetPropertyById(id);
+        public VoxelProperty Property => VoxelProperties.GetPropertyById(propertyId);
 
-        public static uint ExtractId(uint voxelData)
-        {
-            return voxelData >> 20;
-        }
-    
-        public static Color32 ExtractColor(uint voxelData)
-        {
-            return new Color32(
-                (byte) (((voxelData >> 13) & 0x7F) * 2),
-                (byte) (((voxelData >> 6) & 0x7F) * 2),
-                (byte) ((voxelData & 0x3F) * 4), 
-                255
-            );
-        }
-    
+        public static uint GetPropertyId(uint voxelData) => voxelData >> 20;
+
+        public static uint GetColorId(uint voxelData) => (voxelData >> 12) & 0xFF;
+
         public uint ToVoxelData()
         {
-            uint voxelData = (id << 20) |
-                             (((uint)color.r / 2) << 13) |
-                             (((uint)color.g / 2) << 6) |
-                             ((uint)color.b / 4);
+            uint voxelData = (propertyId << 20) |
+                             (colorId << 12);
+            
             return voxelData;
         }
         
         public static Voxel FromVoxelData(uint voxelData)
         {
-            uint id = ExtractId(voxelData);
-            Color32 color = ExtractColor(voxelData);
+            uint id = GetPropertyId(voxelData);
+            uint colorId = GetColorId(voxelData);
 
-            return new Voxel(id, color);
+            return new Voxel(id, colorId);
         }
         
+        public static bool IsAir(uint voxelData) => voxelData == AirVoxelData;
+
+        public static bool IsAirId(uint voxelPropertyId) => voxelPropertyId == VoxelProperty.AirId;
+
         public static bool operator ==(Voxel a, Voxel b)
         {
-            return a.id == b.id && a.color.r == b.color.r && a.color.g == b.color.g && a.color.b == b.color.b && a.color.a == b.color.a;
+            return a.propertyId == b.propertyId && a.colorId == b.colorId;
         }
 
         public static bool operator !=(Voxel a, Voxel b)
@@ -67,7 +55,7 @@ namespace SemagGames.VoxelEditor
 
         public bool Equals(Voxel other)
         {
-            return id == other.id;
+            return propertyId == other.propertyId;
         }
 
         public override bool Equals(object obj)
@@ -77,7 +65,7 @@ namespace SemagGames.VoxelEditor
 
         public override int GetHashCode()
         {
-            return id.GetHashCode();
+            return propertyId.GetHashCode();
         }
     }
 }

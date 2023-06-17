@@ -52,7 +52,13 @@ namespace SemagGames.VoxelEditor
         
         private void OnDestroy() => Destroyed?.Invoke(this);
 
-        public void Rebuild() => mesh.Build();
+        public void Rebuild()
+        {
+            mesh.Build();
+#if UNITY_EDITOR
+            UnityEditor.EditorUtility.SetDirty(gameObject);
+#endif
+        }
 
         private void Update()
         {
@@ -108,7 +114,7 @@ namespace SemagGames.VoxelEditor
         
         public bool HasVoxel(int x, int y, int z)
         {
-            return Voxel.ExtractId(GetVoxelData(x, y, z)) != Voxel.AirId;
+            return !Voxel.IsAir(GetVoxelData(x, y, z));
         }
 
         public static bool InChunkBounds(int x, int y, int z)

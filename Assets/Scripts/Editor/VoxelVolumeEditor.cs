@@ -211,7 +211,7 @@ namespace SemagGames.VoxelEditor.Editor
                 {
                     for (int z = min.z; z <= max.z; z++)
                     {
-                        Volume.SetVoxel(new Vector3(x, y, z), Volume.ColorPicker.SelectedColor, voxelPropertyId);
+                        Volume.SetVoxel(new Vector3(x, y, z), Volume.ColorPicker.SelectedColorIndex, voxelPropertyId);
                     }
                 }
             }
