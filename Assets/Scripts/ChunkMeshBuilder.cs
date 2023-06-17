@@ -56,7 +56,6 @@ namespace SemagGames.VoxelEditor
                         for (startPos[tertiaryAxis] = 0; startPos[tertiaryAxis] < Dimensions[tertiaryAxis]; startPos[tertiaryAxis]++)
                         {
                             uint voxelData = chunk.GetVoxelDataFromWorldPosition(startPos + chunk.ChunkPosition.VoxelPosition);
-                            uint voxelId = Voxel.GetPropertyId(voxelData);
                             uint colorId = Voxel.GetColorId(voxelData);
 
                             Color32 voxelColor = chunk.Volume.ColorPicker.GetColorByIndex(colorId);
