@@ -1,0 +1,16 @@
+{
+    "name": "SuperVoxelEditor.Samples",
+    "rootNamespace": "SemagGames.SuperVoxelEditor",
+    "references": [
+        "GUID:66bbf65894e0d6448bec622e48391865"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

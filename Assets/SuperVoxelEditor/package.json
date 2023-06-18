@@ -1,0 +1,23 @@
+{
+  "name": "com.semaggames.supervoxeleditor",
+  "version": "0.1.0",
+  "displayName": "Super Voxel Editor",
+  "description": "An in-engine voxel editor for building voxel levels and worlds.",
+  "unity": "2022.3",
+  "unityRelease": "0f1",
+  "documentationUrl": "",
+  "changelogUrl": "",
+  "licensesUrl": "",
+  "dependencies": {
+    "com.unity.collections": "2.1.4"
+  },
+  "keywords": [
+    "Voxels",
+    "Level Design"
+  ],
+  "author": {
+    "name": "Pattrigue",
+    "email": "pattrigue@semag-games.com",
+    "url": "https://www.semag-games.com"
+  }
+}
