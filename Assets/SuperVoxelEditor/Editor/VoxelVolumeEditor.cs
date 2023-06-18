@@ -204,7 +204,12 @@ namespace SuperVoxelEditor.Editor
             Vector3Int min = Vector3Int.Min(start, end);
             Vector3Int max = Vector3Int.Max(start, end);
 
-            uint voxelPropertyId = Volume.VoxelProperty != null ? Volume.VoxelProperty.ID : 1;
+            uint voxelPropertyId = 0;
+
+            if (Volume.VoxelProperty != null)
+            {
+                voxelPropertyId = Volume.VoxelProperty.ID;
+            }
 
             for (int x = min.x; x <= max.x; x++)
             {
