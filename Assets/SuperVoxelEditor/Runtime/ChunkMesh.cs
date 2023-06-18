@@ -49,6 +49,7 @@ namespace SemagGames.SuperVoxelEditor
             
             mesh.SetSubMesh(0, new SubMeshDescriptor(0, meshData.Triangles.Length), MeshUpdateFlags);
             mesh.RecalculateBounds();
+            mesh.RecalculateNormals();
             
             if (mesh.vertices.Length == 0)
             {
