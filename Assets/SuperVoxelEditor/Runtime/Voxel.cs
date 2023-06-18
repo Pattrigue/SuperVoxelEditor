@@ -36,8 +36,8 @@ namespace SemagGames.SuperVoxelEditor
 
             return new Voxel(id, colorId);
         }
-        
-        public static bool IsAir(uint voxelData) => voxelData == AirVoxelData;
+
+        public static bool IsAir(uint voxelData) => GetPropertyId(voxelData) == VoxelProperty.AirId;
 
         public static bool IsAirId(uint voxelPropertyId) => voxelPropertyId == VoxelProperty.AirId;
 

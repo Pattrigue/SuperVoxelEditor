@@ -57,7 +57,7 @@ namespace SuperVoxelEditor.Editor
 
             if (Volume.VoxelProperty == null)
             {
-                EditorGUILayout.HelpBox("You have not assigned a Voxel Property - placing a voxel will default to using a Voxel Property with ID 1!", MessageType.Warning);
+                EditorGUILayout.HelpBox("You have not assigned a Voxel Property - placing a voxel will default to placing Air voxels!", MessageType.Warning);
             }
             
             EditorGUILayout.PropertyField(serializedObject.FindProperty("colorPicker"));
@@ -206,7 +206,7 @@ namespace SuperVoxelEditor.Editor
 
             uint voxelPropertyId = 0;
 
-            if (Volume.VoxelProperty != null)
+            if (Volume.VoxelProperty != null && !deleteMode)
             {
                 voxelPropertyId = Volume.VoxelProperty.ID;
             }
