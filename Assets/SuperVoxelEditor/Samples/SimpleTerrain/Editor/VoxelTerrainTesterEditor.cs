@@ -1,9 +1,9 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace SemagGames.VoxelEditor.Editor
+namespace SemagGames.SuperVoxelEditor.Samples.SimpleTerrain.Editor
 {
-    [CustomEditor(typeof(VoxelTerrainTester))]
+    [CustomEditor(typeof(SimpleTerrainGenerator))]
     public sealed class VoxelTerrainTesterEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
@@ -12,7 +12,7 @@ namespace SemagGames.VoxelEditor.Editor
 
             if (GUILayout.Button("Rebuild"))
             {
-                ((VoxelTerrainTester)target).Rebuild();
+                ((SimpleTerrainGenerator)target).Rebuild();
             }
         }
     }

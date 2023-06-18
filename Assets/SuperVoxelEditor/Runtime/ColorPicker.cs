@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace SemagGames.SuperVoxelEditor.ColorPicking
+namespace SemagGames.SuperVoxelEditor
 {
     [Serializable]
     public class ColorPicker

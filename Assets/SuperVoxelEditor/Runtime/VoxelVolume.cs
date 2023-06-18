@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using SemagGames.SuperVoxelEditor.ColorPicking;
 using UnityEngine;
 
 namespace SemagGames.SuperVoxelEditor

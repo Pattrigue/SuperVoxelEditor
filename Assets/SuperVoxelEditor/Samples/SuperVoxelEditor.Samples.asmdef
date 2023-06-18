@@ -1,6 +1,6 @@
 {
     "name": "SuperVoxelEditor.Samples",
-    "rootNamespace": "SemagGames.SuperVoxelEditor",
+    "rootNamespace": "SemagGames",
     "references": [
         "GUID:66bbf65894e0d6448bec622e48391865"
     ],

@@ -1,7 +1,8 @@
-﻿using UnityEditor;
+﻿using SemagGames.SuperVoxelEditor;
+using UnityEditor;
 using UnityEngine;
 
-namespace SemagGames.VoxelEditor.Editor
+namespace SuperVoxelEditor.Editor
 {
     [CustomEditor(typeof(Chunk))]
     public sealed class ChunkEditor : UnityEditor.Editor

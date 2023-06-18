@@ -1,7 +1,8 @@
+using SemagGames.SuperVoxelEditor;
 using UnityEditor;
 using UnityEngine;
 
-namespace SemagGames.SuperVoxelEditor.ColorPicking.Editor
+namespace SuperVoxelEditor.Editor
 {
     [CustomPropertyDrawer(typeof(ColorPicker))]
     public sealed class ColorPickerDrawer : PropertyDrawer
