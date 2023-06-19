@@ -76,9 +76,14 @@ namespace SuperVoxelEditor.Editor
             // Update the preview cube.
             previewCube.Update(voxelPosition, mouseDownVoxelPosition, Volume.ColorPicker.SelectedColor, validVoxelPosition, isDragging, deleteMode);
 
+            if (inspectorDrawer.drawChunkBounds)
+            {
+                DrawChunkBounds();
+            }
+
             sceneView.Repaint();
         }
-        
+
         private bool CalculateVoxelPosition(Event currentEvent, out Vector3 voxelPosition)
         {
             Ray ray = HandleUtility.GUIPointToWorldRay(currentEvent.mousePosition);
@@ -187,6 +192,21 @@ namespace SuperVoxelEditor.Editor
                         Volume.SetVoxel(new Vector3(x, y, z), Volume.ColorPicker.SelectedColorIndex, voxelPropertyId);
                     }
                 }
+            }
+        }
+        
+        private void DrawChunkBounds()
+        {
+            foreach (Chunk chunk in Volume.Chunks)
+            {
+                Vector3 size = new Vector3(Chunk.Width, Chunk.Height, Chunk.Width);
+                Vector3 center = chunk.transform.position + size * 0.5f;
+
+                Color handlesColor = Handles.color;
+
+                Handles.color = Color.red;
+                Handles.DrawWireCube(center, size);
+                Handles.color = handlesColor;
             }
         }
         

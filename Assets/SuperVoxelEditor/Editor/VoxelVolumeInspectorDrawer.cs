@@ -7,7 +7,8 @@ namespace SuperVoxelEditor.Editor
     public sealed class VoxelVolumeInspectorDrawer
     {
         public bool IsEditingActive { get; private set; } = true;
-        
+
+        public bool drawChunkBounds = true;
         private bool foldout;
 
         public void DrawInspectorGUI(VoxelVolumeEditor editor, SerializedObject serializedObject)
@@ -19,6 +20,8 @@ namespace SuperVoxelEditor.Editor
             {
                 EditorGUILayout.HelpBox("You have not assigned a Voxel Property - placing a voxel will default to placing Air voxels!", MessageType.Warning);
             }
+
+            drawChunkBounds = EditorGUILayout.Toggle("Draw Chunk Bounds", drawChunkBounds);
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("colorPicker"));
 
@@ -45,5 +48,6 @@ namespace SuperVoxelEditor.Editor
 
             serializedObject.ApplyModifiedProperties(); // Apply changes after all fields have been drawn
         }
+
     }
 }

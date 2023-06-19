@@ -12,6 +12,8 @@ namespace SemagGames.SuperVoxelEditor
     
         public ColorPicker ColorPicker => colorPicker;
         public VoxelProperty VoxelProperty => voxelProperty;
+        
+        public IEnumerable<Chunk> Chunks => chunks.Values;
 
         private readonly Dictionary<ChunkPosition, Chunk> chunks = new();
     
