@@ -32,7 +32,7 @@ namespace SuperVoxelEditor.Editor
             }
         }
 
-        public void Update(Vector3 voxelPosition, Vector3 mouseDownVoxelPosition, Color32 color, bool validVoxelPosition, bool isDragging, bool deleteMode)
+        public void Update(Vector3 voxelPosition, Vector3 mouseDownVoxelPosition, Color32 color, bool validVoxelPosition, bool isDragging, BuildTool selectedTool)
         {
             const float offset = 1.01f;
 
@@ -41,6 +41,8 @@ namespace SuperVoxelEditor.Editor
                 cubeRenderer.enabled = false;
                 return;
             }
+
+            bool isErasing = selectedTool == BuildTool.Erase;
 
             cubeRenderer.enabled = true;
 
@@ -58,10 +60,10 @@ namespace SuperVoxelEditor.Editor
                 Vector3 cubeSize = new(offset, offset, offset);
                 cube.transform.position = voxelPosition;
                 cube.transform.localScale = cubeSize;
-                cubeMaterial.color = deleteMode ? new Color(1, 0, 0, 0.25f) : color;
+                cubeMaterial.color = isErasing ? new Color(1, 0, 0, 0.25f) : color;
             }
             
-            DrawHandles(deleteMode);
+            DrawHandles(isErasing);
         }
 
         private void DrawHandles(bool deleteMode)

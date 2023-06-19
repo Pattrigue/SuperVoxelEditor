@@ -17,7 +17,6 @@ namespace SuperVoxelEditor.Editor
         private float controlledVoxelDistance = 10f;
 
         private bool isDragging;
-        private bool deleteMode;
 
         private void OnEnable()
         {
@@ -64,9 +63,6 @@ namespace SuperVoxelEditor.Editor
 
         private void HandleSceneGUIEvents(Event currentEvent, SceneView sceneView)
         {
-            // Update the delete mode based on whether the Shift key is held down.
-            deleteMode = currentEvent.shift;
-
             // Get the voxel hit point using either control or raycast method.
             bool validVoxelPosition = CalculateVoxelPosition(currentEvent, out Vector3 voxelPosition);
 
@@ -74,7 +70,7 @@ namespace SuperVoxelEditor.Editor
             HandleMouseClickEvents(currentEvent, voxelPosition, validVoxelPosition);
 
             // Update the preview cube.
-            previewCube.Update(voxelPosition, mouseDownVoxelPosition, Volume.ColorPicker.SelectedColor, validVoxelPosition, isDragging, deleteMode);
+            previewCube.Update(voxelPosition, mouseDownVoxelPosition, Volume.ColorPicker.SelectedColor, validVoxelPosition, isDragging, inspectorDrawer.SelectedTool);
 
             if (inspectorDrawer.DrawChunkBounds)
             {
@@ -131,7 +127,7 @@ namespace SuperVoxelEditor.Editor
             Vector3 position = hit.point - hit.normal * 0.1f;
             SnapToVoxelGrid(ref position);
 
-            if (!deleteMode)
+            if (inspectorDrawer.SelectedTool == BuildTool.Attach)
             {
                 position += hit.normal;
             }
@@ -178,7 +174,7 @@ namespace SuperVoxelEditor.Editor
 
             uint voxelPropertyId = 0;
 
-            if (Volume.VoxelProperty != null && !deleteMode)
+            if (Volume.VoxelProperty != null && inspectorDrawer.SelectedTool is not BuildTool.Erase)
             {
                 voxelPropertyId = Volume.VoxelProperty.ID;
             }
