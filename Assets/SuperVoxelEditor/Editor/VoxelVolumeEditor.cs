@@ -10,24 +10,21 @@ namespace SuperVoxelEditor.Editor
         private VoxelVolume Volume => (VoxelVolume)target;
 
         private PreviewCube previewCube;
+        private VoxelVolumeInspectorDrawer inspectorDrawer;
 
         private Vector3 mouseDownVoxelPosition;
 
         private float controlledVoxelDistance = 10f;
 
-        private bool isEditingActive = true;
         private bool isDragging;
-        private bool foldout;
         private bool deleteMode;
 
         private void OnEnable()
         {
             SceneView.duringSceneGui += OnSceneGUI;
-            
-            if (previewCube == null)
-            {
-                previewCube = new PreviewCube();
-            }
+
+            previewCube ??= new PreviewCube();
+            inspectorDrawer ??= new VoxelVolumeInspectorDrawer();
         }
 
         private void OnDisable()
@@ -38,46 +35,13 @@ namespace SuperVoxelEditor.Editor
             previewCube = null;
         }
 
-        public override void OnInspectorGUI()
-        {
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("voxelProperty"));
-
-            if (Volume.VoxelProperty == null)
-            {
-                EditorGUILayout.HelpBox("You have not assigned a Voxel Property - placing a voxel will default to placing Air voxels!", MessageType.Warning);
-            }
-            
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("colorPicker"));
-
-            if (!isEditingActive && GUILayout.Button("Edit"))
-            {
-                isEditingActive = true;
-            }
-            else if (isEditingActive && GUILayout.Button("Stop Editing"))
-            {
-                isEditingActive = false;
-            }
-
-            if (GUILayout.Button("Clear Volume") && EditorUtility.DisplayDialog("Clear Volume", "Are you sure you want to clear the volume?", "Yes", "No"))
-            {
-                Volume.Clear();
-            }
-
-            foldout = EditorGUILayout.Foldout(foldout, "References");
-            
-            if (foldout)
-            {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("chunkPrefab"));
-            }
-
-            serializedObject.ApplyModifiedProperties(); // Apply changes after all fields have been drawn
-        }
+        public override void OnInspectorGUI() => inspectorDrawer.DrawInspectorGUI(this, serializedObject);
 
         private void OnSceneGUI(SceneView sceneView)
         {
             GameObject selectedGameObject = Selection.activeGameObject;
 
-            if (!isEditingActive) return;
+            if (!inspectorDrawer.IsEditingActive) return;
             if (!IsValidSelection(selectedGameObject)) return;
 
             Tools.current = Tool.None;
