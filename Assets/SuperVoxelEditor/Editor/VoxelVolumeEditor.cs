@@ -13,7 +13,7 @@ namespace SuperVoxelEditor.Editor
         private Renderer previewCubeRenderer;
         private Material previewCubeMaterial;
 
-        private Vector3 clickedVoxelPosition;
+        private Vector3 mouseDownVoxelPosition;
 
         private float controlledVoxelDistance = 10f;
 
@@ -120,10 +120,7 @@ namespace SuperVoxelEditor.Editor
             bool validVoxelPosition = CalculateVoxelPosition(currentEvent, out Vector3 voxelPosition);
 
             // Handle mouse click events.
-            if (validVoxelPosition)
-            {
-                HandleMouseClickEvents(currentEvent, voxelPosition);
-            }
+            HandleMouseClickEvents(currentEvent, voxelPosition, validVoxelPosition);
 
             // Update the preview cube.
             UpdatePreviewCube(voxelPosition, validVoxelPosition);
@@ -147,7 +144,7 @@ namespace SuperVoxelEditor.Editor
                 return true;
             }
             
-            // If no collision, set the position to where the ray would intersect with the y=0 plane
+            // If the ray did not hit any collider, set the position to where the ray would intersect with the y=0 plane
             float distanceToYZeroPlane = -ray.origin.y / ray.direction.y;
             
             if (distanceToYZeroPlane >= 0) // Check to prevent intersecting the y=0 plane behind the origin
@@ -156,10 +153,10 @@ namespace SuperVoxelEditor.Editor
                 voxelPosition.y = 0;
                 
                 SnapToVoxelGrid(ref voxelPosition);
-
+            
                 return true;
             }
-
+            
             // Default to Vector3.zero if ray is parallel to y=0 plane
             voxelPosition = Vector3.zero;
             return false;
@@ -186,33 +183,39 @@ namespace SuperVoxelEditor.Editor
             return position;
         }
         
-        private void HandleMouseClickEvents(Event currentEvent, Vector3 voxelPosition)
+        private void HandleMouseClickEvents(Event currentEvent, Vector3 voxelPosition, bool validVoxelPosition)
         {
-            if (currentEvent.button == 0 && voxelPosition != Vector3.zero)
-            { 
-                if (currentEvent.type == EventType.MouseDown)
+            if (currentEvent.button != 0) return;
+            
+            if (currentEvent.type == EventType.MouseDown && validVoxelPosition)
+            {
+                HandleMouseDownEvent(voxelPosition);
+            }
+            else if (currentEvent.type == EventType.MouseUp && isDragging)
+            {
+                if (validVoxelPosition)
                 {
-                    HandleMouseDownEvent(voxelPosition);
+                    PlaceVoxels(voxelPosition);
                 }
-                else if (currentEvent.type == EventType.MouseUp && isDragging)
+                else
                 {
-                    HandleMouseUpEvent(voxelPosition);
+                    isDragging = false;
                 }
             }
         }
 
         private void HandleMouseDownEvent(Vector3 voxelPosition)
         {
-            clickedVoxelPosition = voxelPosition;
+            mouseDownVoxelPosition = voxelPosition;
             isDragging = true;
         }
 
-        private void HandleMouseUpEvent(Vector3 voxelPosition)
+        private void PlaceVoxels(Vector3 mouseUpVoxelPosition)
         {
             isDragging = false;
     
-            Vector3Int start = Vector3Int.FloorToInt(clickedVoxelPosition);
-            Vector3Int end = Vector3Int.FloorToInt(voxelPosition);
+            Vector3Int start = Vector3Int.FloorToInt(mouseDownVoxelPosition);
+            Vector3Int end = Vector3Int.FloorToInt(mouseUpVoxelPosition);
     
             Vector3Int min = Vector3Int.Min(start, end);
             Vector3Int max = Vector3Int.Max(start, end);
@@ -235,7 +238,7 @@ namespace SuperVoxelEditor.Editor
                 }
             }
         }
-
+        
         private void UpdatePreviewCube(Vector3 voxelPosition, bool hit)
         {
             const float offset = 1.01f;
@@ -250,11 +253,11 @@ namespace SuperVoxelEditor.Editor
             
             if (isDragging)
             {
-                previewCube.transform.position = (voxelPosition + clickedVoxelPosition) * 0.5f;
+                previewCube.transform.position = (voxelPosition + mouseDownVoxelPosition) * 0.5f;
                 previewCube.transform.localScale = new Vector3(
-                    Mathf.Abs(voxelPosition.x - clickedVoxelPosition.x) + offset,
-                    Mathf.Abs(voxelPosition.y - clickedVoxelPosition.y) + offset,
-                    Mathf.Abs(voxelPosition.z - clickedVoxelPosition.z) + offset
+                    Mathf.Abs(voxelPosition.x - mouseDownVoxelPosition.x) + offset,
+                    Mathf.Abs(voxelPosition.y - mouseDownVoxelPosition.y) + offset,
+                    Mathf.Abs(voxelPosition.z - mouseDownVoxelPosition.z) + offset
                 );
             }
             else
