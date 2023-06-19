@@ -76,7 +76,7 @@ namespace SuperVoxelEditor.Editor
             // Update the preview cube.
             previewCube.Update(voxelPosition, mouseDownVoxelPosition, Volume.ColorPicker.SelectedColor, validVoxelPosition, isDragging, deleteMode);
 
-            if (inspectorDrawer.drawChunkBounds)
+            if (inspectorDrawer.DrawChunkBounds)
             {
                 DrawChunkBounds();
             }
