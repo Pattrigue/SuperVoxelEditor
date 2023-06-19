@@ -147,8 +147,21 @@ namespace SuperVoxelEditor.Editor
                 return true;
             }
             
-            voxelPosition = Vector3.zero;
+            // If no collision, set the position to where the ray would intersect with the y=0 plane
+            float distanceToYZeroPlane = -ray.origin.y / ray.direction.y;
+            
+            if (distanceToYZeroPlane >= 0) // Check to prevent intersecting the y=0 plane behind the origin
+            {
+                voxelPosition = ray.origin + ray.direction * distanceToYZeroPlane;
+                voxelPosition.y = 0;
+                
+                SnapToVoxelGrid(ref voxelPosition);
 
+                return true;
+            }
+
+            // Default to Vector3.zero if ray is parallel to y=0 plane
+            voxelPosition = Vector3.zero;
             return false;
         }
 
