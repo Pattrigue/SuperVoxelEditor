@@ -11,8 +11,13 @@ namespace SemagGames.SuperVoxelEditor
         [SerializeField] private Chunk chunkPrefab;
     
         public ColorPicker ColorPicker => colorPicker;
-        public VoxelProperty VoxelProperty => voxelProperty;
-        
+
+        public VoxelProperty VoxelProperty
+        {
+            get => voxelProperty;
+            set => voxelProperty = value; 
+        }
+
         public IEnumerable<Chunk> Chunks => chunks.Values;
 
         private readonly Dictionary<ChunkPosition, Chunk> chunks = new();
@@ -69,6 +74,20 @@ namespace SemagGames.SuperVoxelEditor
             }
             
             return chunk.GetVoxelDataFromWorldPosition(worldPosition);
+        }
+        
+        public bool TryGetVoxel(Vector3 worldPosition, out Voxel voxel)
+        {
+            var voxelData = GetVoxelData(worldPosition);
+            
+            if (Voxel.IsAir(voxelData))
+            {
+                voxel = default;
+                return false;
+            }
+            
+            voxel = Voxel.FromVoxelData(voxelData);
+            return true;
         }
         
         public bool TryGetChunk(Vector3 position, out Chunk chunk)

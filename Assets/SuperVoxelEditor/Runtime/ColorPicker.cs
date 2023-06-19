@@ -14,7 +14,13 @@ namespace SemagGames.SuperVoxelEditor
         public Color32 SelectedColor => selectedColor;
         
         public uint SelectedColorIndex => selectedColorIndex;
-        
+
+        public void SetColor(uint index)
+        {
+            selectedColorIndex = index;
+            selectedColor = colors[index];
+        }
+
         public Color32 GetColorByIndex(uint index)
         {
             return colors[index];

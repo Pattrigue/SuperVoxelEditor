@@ -10,6 +10,7 @@ namespace SuperVoxelEditor.Editor
         private VoxelVolume Volume => (VoxelVolume)target;
 
         private PreviewCube previewCube;
+        private BuildTools buildTools;
         private VoxelVolumeInspectorDrawer inspectorDrawer;
 
         private Vector3 mouseDownVoxelPosition;
@@ -23,6 +24,7 @@ namespace SuperVoxelEditor.Editor
             SceneView.duringSceneGui += OnSceneGUI;
 
             previewCube ??= new PreviewCube();
+            buildTools ??= new BuildTools();
             inspectorDrawer ??= new VoxelVolumeInspectorDrawer();
         }
 
@@ -31,10 +33,14 @@ namespace SuperVoxelEditor.Editor
             SceneView.duringSceneGui -= OnSceneGUI;
             
             previewCube?.Destroy();
+            buildTools = null;
             previewCube = null;
         }
 
-        public override void OnInspectorGUI() => inspectorDrawer.DrawInspectorGUI(this, serializedObject);
+        public override void OnInspectorGUI()
+        {
+            inspectorDrawer.DrawInspectorGUI(this, serializedObject, buildTools.DrawInspectorGUI);
+        }
 
         private void OnSceneGUI(SceneView sceneView)
         {
@@ -70,7 +76,7 @@ namespace SuperVoxelEditor.Editor
             HandleMouseClickEvents(currentEvent, voxelPosition, validVoxelPosition);
 
             // Update the preview cube.
-            previewCube.Update(voxelPosition, mouseDownVoxelPosition, Volume.ColorPicker.SelectedColor, validVoxelPosition, isDragging, inspectorDrawer.SelectedTool);
+            previewCube.Update(voxelPosition, mouseDownVoxelPosition, Volume.ColorPicker.SelectedColor, validVoxelPosition, isDragging, buildTools.SelectedTool);
 
             if (inspectorDrawer.DrawChunkBounds)
             {
@@ -127,7 +133,7 @@ namespace SuperVoxelEditor.Editor
             Vector3 position = hit.point - hit.normal * 0.1f;
             SnapToVoxelGrid(ref position);
 
-            if (inspectorDrawer.SelectedTool == BuildTool.Attach)
+            if (buildTools.SelectedTool == BuildTool.Attach)
             {
                 position += hit.normal;
             }
@@ -158,6 +164,12 @@ namespace SuperVoxelEditor.Editor
 
         private void HandleMouseDownEvent(Vector3 voxelPosition)
         {
+            if (buildTools.SelectedTool is BuildTool.Picker)
+            {
+                buildTools.PickVoxelAtPosition(Volume, voxelPosition);
+                return;
+            }
+            
             mouseDownVoxelPosition = voxelPosition;
             isDragging = true;
         }
@@ -174,7 +186,7 @@ namespace SuperVoxelEditor.Editor
 
             uint voxelPropertyId = 0;
 
-            if (Volume.VoxelProperty != null && inspectorDrawer.SelectedTool is not BuildTool.Erase)
+            if (Volume.VoxelProperty != null && buildTools.SelectedTool is not BuildTool.Erase)
             {
                 voxelPropertyId = Volume.VoxelProperty.ID;
             }
