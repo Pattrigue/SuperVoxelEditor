@@ -9,9 +9,7 @@ namespace SuperVoxelEditor.Editor
     {
         private VoxelVolume Volume => (VoxelVolume)target;
 
-        private GameObject previewCube;
-        private Renderer previewCubeRenderer;
-        private Material previewCubeMaterial;
+        private PreviewCube previewCube;
 
         private Vector3 mouseDownVoxelPosition;
 
@@ -28,27 +26,16 @@ namespace SuperVoxelEditor.Editor
             
             if (previewCube == null)
             {
-                previewCube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                previewCube.hideFlags = HideFlags.HideAndDontSave;
-            
-                previewCubeMaterial = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-                previewCubeRenderer = previewCube.GetComponent<Renderer>();
-                previewCubeRenderer.material = previewCubeMaterial;
-            
-                DestroyImmediate(previewCube.GetComponent<Collider>());
+                previewCube = new PreviewCube();
             }
         }
 
         private void OnDisable()
         {
             SceneView.duringSceneGui -= OnSceneGUI;
-
-            if (previewCube != null)
-            {
-                DestroyImmediate(previewCubeMaterial);
-                DestroyImmediate(previewCube);
-                previewCube = null;
-            }
+            
+            previewCube?.Destroy();
+            previewCube = null;
         }
 
         public override void OnInspectorGUI()
@@ -123,7 +110,7 @@ namespace SuperVoxelEditor.Editor
             HandleMouseClickEvents(currentEvent, voxelPosition, validVoxelPosition);
 
             // Update the preview cube.
-            UpdatePreviewCube(voxelPosition, validVoxelPosition);
+            previewCube.Update(voxelPosition, mouseDownVoxelPosition, Volume.ColorPicker.SelectedColor, validVoxelPosition, isDragging, deleteMode);
 
             sceneView.Repaint();
         }
@@ -239,42 +226,6 @@ namespace SuperVoxelEditor.Editor
             }
         }
         
-        private void UpdatePreviewCube(Vector3 voxelPosition, bool hit)
-        {
-            const float offset = 1.01f;
-
-            if (!hit)
-            {
-                previewCubeRenderer.enabled = false;
-                return;
-            }
-            
-            previewCubeRenderer.enabled = true;
-            
-            if (isDragging)
-            {
-                previewCube.transform.position = (voxelPosition + mouseDownVoxelPosition) * 0.5f;
-                previewCube.transform.localScale = new Vector3(
-                    Mathf.Abs(voxelPosition.x - mouseDownVoxelPosition.x) + offset,
-                    Mathf.Abs(voxelPosition.y - mouseDownVoxelPosition.y) + offset,
-                    Mathf.Abs(voxelPosition.z - mouseDownVoxelPosition.z) + offset
-                );
-            }
-            else
-            {
-                Vector3 cubeSize = new(offset, offset, offset);
-                previewCube.transform.position = voxelPosition;
-                previewCube.transform.localScale = cubeSize;
-                previewCubeMaterial.color = deleteMode ? new Color(1, 0, 0, 0.25f) : Volume.ColorPicker.SelectedColor;
-            }
-
-            Color originalColor = Handles.color;
-            
-            Handles.color = deleteMode ? Color.red : Color.cyan;
-            Handles.DrawWireCube(previewCube.transform.position, previewCube.transform.localScale);
-            Handles.color = originalColor;
-        }
-
         private static void SnapToVoxelGrid(ref Vector3 position)
         {
             position = new Vector3(
