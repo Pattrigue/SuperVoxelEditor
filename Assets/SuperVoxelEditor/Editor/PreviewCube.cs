@@ -44,7 +44,7 @@ namespace SuperVoxelEditor.Editor
 
             bool isErasing = selectedTool == BuildTool.Erase;
 
-            cubeRenderer.enabled = true;
+            cubeRenderer.enabled = selectedTool != BuildTool.Picker;
 
             if (isDragging)
             {
