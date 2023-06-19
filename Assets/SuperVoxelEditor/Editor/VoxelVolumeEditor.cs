@@ -22,7 +22,7 @@ namespace SuperVoxelEditor.Editor
         private void OnEnable()
         {
             SceneView.duringSceneGui += OnSceneGUI;
-
+            
             previewCube ??= new PreviewCube();
             buildTools ??= new BuildTools();
             inspectorDrawer ??= new VoxelVolumeInspectorDrawer();
@@ -41,9 +41,11 @@ namespace SuperVoxelEditor.Editor
         {
             inspectorDrawer.DrawInspectorGUI(this, serializedObject, buildTools.DrawInspectorGUI);
         }
-
+        
         private void OnSceneGUI(SceneView sceneView)
         {
+            buildTools.OnSceneGui();
+            
             GameObject selectedGameObject = Selection.activeGameObject;
 
             if (!inspectorDrawer.IsEditingActive) return;

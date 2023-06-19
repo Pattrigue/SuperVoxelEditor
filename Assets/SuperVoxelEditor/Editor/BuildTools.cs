@@ -8,7 +8,7 @@ namespace SuperVoxelEditor.Editor
 {
     public sealed class BuildTools
     {
-        public BuildTool SelectedTool { get; set; } = BuildTool.Attach;
+        public BuildTool SelectedTool { get; private set; } = BuildTool.Attach;
 
         private readonly Dictionary<BuildTool, Texture2D> toolIcons;
         
@@ -52,6 +52,43 @@ namespace SuperVoxelEditor.Editor
             
             GUILayout.EndHorizontal();
         }
+        
+        public void OnSceneGui()
+        {
+            if (Event.current.type != EventType.KeyDown) return;
+
+            if (!Event.current.shift)
+            {
+                switch (Event.current.keyCode)
+                {
+                    case KeyCode.Q:
+                        CycleTool(-1);
+                        break;
+                    case KeyCode.E:
+                        CycleTool(1);
+                        break;
+                }
+            }
+            else
+            {
+                // Shift + alpha key: switch to a specific tool
+                switch (Event.current.keyCode)
+                {
+                    case KeyCode.Alpha1:
+                        SelectedTool = BuildTool.Attach;
+                        break;
+                    case KeyCode.Alpha2:
+                        SelectedTool = BuildTool.Erase;
+                        break;
+                    case KeyCode.Alpha3:
+                        SelectedTool = BuildTool.Paint;
+                        break;
+                    case KeyCode.Alpha4:
+                        SelectedTool = BuildTool.Picker;
+                        break;
+                }
+            }
+        }
 
         public void PickVoxelAtPosition(VoxelVolume volume, Vector3 voxelPosition)
         {
@@ -73,5 +110,14 @@ namespace SuperVoxelEditor.Editor
             volume.ColorPicker.SetColor(voxel.colorId);
             SelectedTool = BuildTool.Attach;
         }
+        
+        private void CycleTool(int direction)
+        {
+            int toolCount = Enum.GetValues(typeof(BuildTool)).Length;
+            int toolIndex = (int)SelectedTool + direction;
+            toolIndex = (toolIndex + toolCount) % toolCount;
+            SelectedTool = (BuildTool)toolIndex;
+        }
+        
     }
 }
