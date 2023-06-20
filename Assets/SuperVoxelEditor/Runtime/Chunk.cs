@@ -75,6 +75,11 @@ namespace SemagGames.SuperVoxelEditor
             
             SetVoxel(localPosition.x, localPosition.y, localPosition.z, voxel);
         }
+        
+        public void SetVoxel(Vector3Int localPosition, Voxel voxel)
+        {
+            SetVoxel(localPosition.x, localPosition.y, localPosition.z, voxel);
+        }
 
         public bool HasVoxel(Vector3 worldPosition)
         {
@@ -112,6 +117,17 @@ namespace SemagGames.SuperVoxelEditor
             return GetVoxelData(localPosition.x, localPosition.y, localPosition.z);
         }
         
+        public Vector3Int ToLocalVoxelPosition(Vector3 worldPosition)
+        {
+            Vector3Int chunkVoxelPosition = ChunkPosition.VoxelPosition;
+            
+            return new Vector3Int(
+                Mathf.FloorToInt(worldPosition.x) - chunkVoxelPosition.x,
+                Mathf.FloorToInt(worldPosition.y) - chunkVoxelPosition.y,
+                Mathf.FloorToInt(worldPosition.z) - chunkVoxelPosition.z
+            );
+        }
+        
         public bool HasVoxel(int x, int y, int z)
         {
             return !Voxel.IsAir(GetVoxelData(x, y, z));
@@ -125,17 +141,6 @@ namespace SemagGames.SuperVoxelEditor
         public static bool InChunkBounds(Vector3Int voxelPosition)
         {
             return InChunkBounds(voxelPosition.x, voxelPosition.y, voxelPosition.z);
-        }
-
-        private Vector3Int ToLocalVoxelPosition(Vector3 worldPosition)
-        {
-            Vector3Int chunkVoxelPosition = ChunkPosition.VoxelPosition;
-            
-            return new Vector3Int(
-                Mathf.FloorToInt(worldPosition.x) - chunkVoxelPosition.x,
-                Mathf.FloorToInt(worldPosition.y) - chunkVoxelPosition.y,
-                Mathf.FloorToInt(worldPosition.z) - chunkVoxelPosition.z
-            );
         }
 
         private void MarkNeighborsDirtyIfOnEdge(int x, int y, int z)

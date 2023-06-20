@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using SemagGames.SuperVoxelEditor.Commands;
 using UnityEngine;
 
 namespace SemagGames.SuperVoxelEditor
@@ -9,6 +10,7 @@ namespace SemagGames.SuperVoxelEditor
         [SerializeField] private VoxelProperty voxelProperty;
         [SerializeField] private ColorPicker colorPicker;
         [SerializeField] private Chunk chunkPrefab;
+        [SerializeField] private CommandManager commandManager = new();
     
         public ColorPicker ColorPicker => colorPicker;
 
@@ -21,7 +23,7 @@ namespace SemagGames.SuperVoxelEditor
         public IEnumerable<Chunk> Chunks => chunks.Values;
 
         private readonly Dictionary<ChunkPosition, Chunk> chunks = new();
-    
+        
         private void OnEnable()
         {
             chunks.Clear();
@@ -61,7 +63,8 @@ namespace SemagGames.SuperVoxelEditor
                 chunks.Add(chunkPosition, chunk);
             }
 
-            chunk.SetVoxel(worldPosition, new Voxel(voxelPropertyId, colorId));
+            SetVoxelCommand command = new SetVoxelCommand(chunk, worldPosition, new Voxel(voxelPropertyId, colorId));
+            commandManager.Do(command);
         }
 
         public uint GetVoxelData(Vector3 worldPosition)
@@ -78,7 +81,7 @@ namespace SemagGames.SuperVoxelEditor
         
         public bool TryGetVoxel(Vector3 worldPosition, out Voxel voxel)
         {
-            var voxelData = GetVoxelData(worldPosition);
+            uint voxelData = GetVoxelData(worldPosition);
             
             if (Voxel.IsAir(voxelData))
             {
@@ -109,5 +112,9 @@ namespace SemagGames.SuperVoxelEditor
                 chunks.Remove(destroyedChunk.ChunkPosition);
             }
         }
+
+        public void Undo() => commandManager.Undo();
+
+        public void Redo() => commandManager.Redo();
     }
 }

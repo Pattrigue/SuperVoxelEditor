@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SemagGames.SuperVoxelEditor
 {
-    public struct ChunkPosition
+    public readonly struct ChunkPosition
     {
         public static readonly ChunkPosition Zero = new(0, 0, 0);
         public static readonly ChunkPosition Left = new(-1, 0, 0);

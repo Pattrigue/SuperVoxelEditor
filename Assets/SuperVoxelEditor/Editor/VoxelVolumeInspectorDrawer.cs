@@ -53,6 +53,15 @@ namespace SuperVoxelEditor.Editor
                 IsEditingActive = false;
             }
 
+            if (GUILayout.Button("Undo"))
+            {
+                volume.Undo();
+            }
+            else if (GUILayout.Button("Redo"))
+            {
+                volume.Redo();
+            }
+
             if (GUILayout.Button("Clear Volume") && EditorUtility.DisplayDialog("Clear Volume", "Are you sure you want to clear the volume?", "Yes", "No"))
             {
                 volume.Clear();
