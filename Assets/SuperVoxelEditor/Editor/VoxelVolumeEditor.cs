@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using SemagGames.SuperVoxelEditor;
-using SemagGames.SuperVoxelEditor.Commands;
+﻿using SemagGames.SuperVoxelEditor;
 using UnityEditor;
 using UnityEngine;
 
@@ -46,7 +44,8 @@ namespace SuperVoxelEditor.Editor
         
         private void OnSceneGUI(SceneView sceneView)
         {
-            buildTools.OnSceneGui();
+            HandleKeyPressEvents();
+            
             
             GameObject selectedGameObject = Selection.activeGameObject;
 
@@ -64,6 +63,29 @@ namespace SuperVoxelEditor.Editor
                 controlledVoxelDistance = Mathf.Clamp(controlledVoxelDistance, 1f, 100f);
                 Event.current.Use();  // Prevents the event from propagating further.
             }
+        }
+      
+        private void HandleKeyPressEvents()
+        {
+            Event e = Event.current;
+
+            if (e.type != EventType.KeyDown) return;
+
+            if (e.control)
+            {
+                if (Event.current.keyCode == KeyCode.Z)
+                {
+                    Volume.Undo();
+                    e.Use();
+                }
+                else if (e.keyCode == KeyCode.Y)
+                {
+                    Volume.Redo();
+                    e.Use();
+                }
+            }
+
+            buildTools.HandleKeyPressEvents(e);
         }
         
         private static bool IsValidSelection(GameObject selectedGameObject)

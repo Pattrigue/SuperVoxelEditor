@@ -53,13 +53,11 @@ namespace SuperVoxelEditor.Editor
             GUILayout.EndHorizontal();
         }
         
-        public void OnSceneGui()
+        public void HandleKeyPressEvents(Event e)
         {
-            if (Event.current.type != EventType.KeyDown) return;
-
-            if (!Event.current.shift)
+            if (!e.shift)
             {
-                switch (Event.current.keyCode)
+                switch (e.keyCode)
                 {
                     case KeyCode.Q:
                         CycleTool(-1);
@@ -72,7 +70,7 @@ namespace SuperVoxelEditor.Editor
             else
             {
                 // Shift + alpha key: switch to a specific tool
-                switch (Event.current.keyCode)
+                switch (e.keyCode)
                 {
                     case KeyCode.Alpha1:
                         SelectedTool = BuildTool.Attach;
