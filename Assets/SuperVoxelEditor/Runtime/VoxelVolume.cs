@@ -53,8 +53,22 @@ namespace SemagGames.SuperVoxelEditor
 
         public void SetVoxel(Vector3 worldPosition, uint colorId = 0, uint voxelPropertyId = 1)
         {
-            ChunkPosition chunkPosition = ChunkPosition.FromWorldPosition(worldPosition);
+            Chunk chunk = GetOrCreateChunk(worldPosition);
+
+            SetVoxelCommand command = new SetVoxelCommand(chunk, worldPosition, new Voxel(voxelPropertyId, colorId));
+            commandManager.Do(command);
+        }
         
+        public void SetVoxels(Vector3[] worldPositions, uint colorId = 0, uint voxelPropertyId = 1)
+        {
+            SetVoxelBatchCommand command = new SetVoxelBatchCommand(this, worldPositions, new Voxel(voxelPropertyId, colorId));
+            commandManager.Do(command);
+        }
+
+        public Chunk GetOrCreateChunk(Vector3 worldPosition)
+        {
+            ChunkPosition chunkPosition = ChunkPosition.FromWorldPosition(worldPosition);
+
             if (!chunks.TryGetValue(chunkPosition, out Chunk chunk))
             {
                 chunk = Instantiate(chunkPrefab, chunkPosition.WorldPosition, Quaternion.identity, transform);
@@ -63,10 +77,9 @@ namespace SemagGames.SuperVoxelEditor
                 chunks.Add(chunkPosition, chunk);
             }
 
-            SetVoxelCommand command = new SetVoxelCommand(chunk, worldPosition, new Voxel(voxelPropertyId, colorId));
-            commandManager.Do(command);
+            return chunk;
         }
-
+        
         public uint GetVoxelData(Vector3 worldPosition)
         {
             ChunkPosition chunkPosition = ChunkPosition.FromWorldPosition(worldPosition);

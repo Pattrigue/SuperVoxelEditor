@@ -1,4 +1,6 @@
-﻿using SemagGames.SuperVoxelEditor;
+﻿using System.Collections.Generic;
+using SemagGames.SuperVoxelEditor;
+using SemagGames.SuperVoxelEditor.Commands;
 using UnityEditor;
 using UnityEngine;
 
@@ -179,12 +181,18 @@ namespace SuperVoxelEditor.Editor
         private void PlaceVoxels(Vector3 mouseUpVoxelPosition)
         {
             isDragging = false;
-    
+
             Vector3Int start = Vector3Int.FloorToInt(mouseDownVoxelPosition);
             Vector3Int end = Vector3Int.FloorToInt(mouseUpVoxelPosition);
-    
+
             Vector3Int min = Vector3Int.Min(start, end);
             Vector3Int max = Vector3Int.Max(start, end);
+
+            int sizeX = max.x - min.x + 1;
+            int sizeY = max.y - min.y + 1;
+            int sizeZ = max.z - min.z + 1;
+
+            Vector3[] worldPositions = new Vector3[sizeX * sizeY * sizeZ];
 
             uint voxelPropertyId = 0;
 
@@ -193,18 +201,29 @@ namespace SuperVoxelEditor.Editor
                 voxelPropertyId = Volume.VoxelProperty.ID;
             }
 
+            int i = 0;
+
             for (int x = min.x; x <= max.x; x++)
             {
                 for (int y = min.y; y <= max.y; y++)
                 {
                     for (int z = min.z; z <= max.z; z++)
                     {
-                        Volume.SetVoxel(new Vector3(x, y, z), Volume.ColorPicker.SelectedColorIndex, voxelPropertyId);
+                        worldPositions[i++] = new Vector3(x, y, z);
                     }
                 }
             }
+
+            if (worldPositions.Length == 1)
+            {
+                Volume.SetVoxel(worldPositions[0], Volume.ColorPicker.SelectedColorIndex, voxelPropertyId);
+            }
+            else
+            {
+                Volume.SetVoxels(worldPositions, Volume.ColorPicker.SelectedColorIndex, voxelPropertyId);
+            }
         }
-        
+
         private void DrawChunkBounds()
         {
             foreach (Chunk chunk in Volume.Chunks)

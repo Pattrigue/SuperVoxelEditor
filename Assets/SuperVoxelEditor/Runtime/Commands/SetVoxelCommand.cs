@@ -6,24 +6,24 @@ namespace SemagGames.SuperVoxelEditor.Commands
     public sealed class SetVoxelCommand : IVoxelEditCommand
     {
         private readonly Chunk chunk;
-        
-        private readonly Vector3 worldPosition;
 
+        private readonly Vector3 worldPosition;
+        
         private Voxel voxel;
         private Voxel previousVoxel;
 
         public SetVoxelCommand(Chunk chunk, Vector3 worldPosition, Voxel voxel)
         {
-            this.chunk = chunk;
             this.worldPosition = worldPosition;
             this.voxel = voxel;
+            this.chunk = chunk;
         }
 
         public void Execute()
         {
             // Save previous voxel data for undo
-            Vector3Int localPosition = chunk.ToLocalVoxelPosition(worldPosition);
-            previousVoxel = Voxel.FromVoxelData(chunk.GetVoxelData(localPosition));
+            uint voxelData = chunk.GetVoxelDataFromWorldPosition(worldPosition);
+            previousVoxel = Voxel.FromVoxelData(voxelData);
 
             // Perform the voxel set action
             chunk.SetVoxel(worldPosition, voxel);
