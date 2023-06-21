@@ -12,12 +12,11 @@ namespace SuperVoxelEditor.Editor
         private PreviewCube previewCube;
         private BuildTools buildTools;
         private VoxelVolumeInspectorDrawer inspectorDrawer;
-
-        private Vector3 mouseDownVoxelPosition;
-
+        private BuildMode buildMode;
+        
+        private VoxelEditorContext currentVoxelEditorContext;
+        
         private float controlledVoxelDistance = 10f;
-
-        private bool isDragging;
 
         private void OnEnable()
         {
@@ -26,6 +25,7 @@ namespace SuperVoxelEditor.Editor
             previewCube ??= new PreviewCube();
             buildTools ??= new BuildTools();
             inspectorDrawer ??= new VoxelVolumeInspectorDrawer();
+            buildMode ??= new BoxBuildMode();
         }
 
         private void OnDisable()
@@ -34,6 +34,8 @@ namespace SuperVoxelEditor.Editor
             
             previewCube?.Destroy();
             buildTools = null;
+            inspectorDrawer = null;
+            buildMode = null;
             previewCube = null;
         }
 
@@ -46,7 +48,6 @@ namespace SuperVoxelEditor.Editor
         {
             HandleKeyPressEvents();
             
-            
             GameObject selectedGameObject = Selection.activeGameObject;
 
             if (!inspectorDrawer.IsEditingActive) return;
@@ -55,7 +56,7 @@ namespace SuperVoxelEditor.Editor
             Tools.current = Tool.None;
             HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
     
-            HandleSceneGUIEvents(Event.current, sceneView);
+            HandleSceneGUIEvents(sceneView);
             
             if (Event.current.control && Event.current.type == EventType.ScrollWheel)
             {
@@ -93,16 +94,17 @@ namespace SuperVoxelEditor.Editor
             return selectedGameObject != null && selectedGameObject.TryGetComponent(out VoxelVolume _);
         }
 
-        private void HandleSceneGUIEvents(Event currentEvent, SceneView sceneView)
+        private void HandleSceneGUIEvents(SceneView sceneView)
         {
             // Get the voxel hit point using either control or raycast method.
-            bool validVoxelPosition = CalculateVoxelPosition(currentEvent, out Vector3 voxelPosition);
+            bool validVoxelPosition = CalculateVoxelPosition(out Vector3 voxelPosition);
+            currentVoxelEditorContext = new VoxelEditorContext(Volume, voxelPosition, buildTools.SelectedTool, validVoxelPosition);
 
             // Handle mouse click events.
-            HandleMouseClickEvents(currentEvent, voxelPosition, validVoxelPosition);
+            HandleMouseClickEvents();
 
             // Update the preview cube.
-            previewCube.Update(voxelPosition, mouseDownVoxelPosition, Volume.ColorPicker.SelectedColor, validVoxelPosition, isDragging, buildTools.SelectedTool);
+            buildMode.UpdatePreview(currentVoxelEditorContext);
 
             if (inspectorDrawer.DrawChunkBounds)
             {
@@ -112,11 +114,11 @@ namespace SuperVoxelEditor.Editor
             sceneView.Repaint();
         }
 
-        private bool CalculateVoxelPosition(Event currentEvent, out Vector3 voxelPosition)
+        private bool CalculateVoxelPosition(out Vector3 voxelPosition)
         {
-            Ray ray = HandleUtility.GUIPointToWorldRay(currentEvent.mousePosition);
+            Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
 
-            if (currentEvent.control)
+            if (Event.current.control)
             {
                 voxelPosition = CalculateControlledVoxelPosition(ray);
                 return true;
@@ -166,83 +168,24 @@ namespace SuperVoxelEditor.Editor
 
             return position;
         }
-        
-        private void HandleMouseClickEvents(Event currentEvent, Vector3 voxelPosition, bool validVoxelPosition)
+
+        private void HandleMouseClickEvents()
         {
-            if (currentEvent.button != 0) return;
-            
-            if (currentEvent.type == EventType.MouseDown && validVoxelPosition)
+            if (Event.current.button != 0) return;
+
+            if (Event.current.type == EventType.MouseDown && currentVoxelEditorContext.ValidVoxelPosition)
             {
-                HandleMouseDownEvent(voxelPosition);
-            }
-            else if (currentEvent.type == EventType.MouseUp && isDragging)
-            {
-                if (validVoxelPosition)
+                if (buildTools.SelectedTool is BuildTool.Picker)
                 {
-                    PlaceVoxels(voxelPosition);
+                    buildTools.PickVoxelAtPosition(currentVoxelEditorContext.Volume, currentVoxelEditorContext.VoxelPosition);
+                    return;
                 }
-                else
-                {
-                    isDragging = false;
-                }
+
+                buildMode.HandleMouseDown(currentVoxelEditorContext);
             }
-        }
-
-        private void HandleMouseDownEvent(Vector3 voxelPosition)
-        {
-            if (buildTools.SelectedTool is BuildTool.Picker)
+            else if (Event.current.type == EventType.MouseUp)
             {
-                buildTools.PickVoxelAtPosition(Volume, voxelPosition);
-                return;
-            }
-            
-            mouseDownVoxelPosition = voxelPosition;
-            isDragging = true;
-        }
-
-        private void PlaceVoxels(Vector3 mouseUpVoxelPosition)
-        {
-            isDragging = false;
-
-            Vector3Int start = Vector3Int.FloorToInt(mouseDownVoxelPosition);
-            Vector3Int end = Vector3Int.FloorToInt(mouseUpVoxelPosition);
-
-            Vector3Int min = Vector3Int.Min(start, end);
-            Vector3Int max = Vector3Int.Max(start, end);
-
-            int sizeX = max.x - min.x + 1;
-            int sizeY = max.y - min.y + 1;
-            int sizeZ = max.z - min.z + 1;
-
-            Vector3[] worldPositions = new Vector3[sizeX * sizeY * sizeZ];
-
-            uint voxelPropertyId = 0;
-
-            if (Volume.VoxelProperty != null && buildTools.SelectedTool is not BuildTool.Erase)
-            {
-                voxelPropertyId = Volume.VoxelProperty.ID;
-            }
-
-            int i = 0;
-
-            for (int x = min.x; x <= max.x; x++)
-            {
-                for (int y = min.y; y <= max.y; y++)
-                {
-                    for (int z = min.z; z <= max.z; z++)
-                    {
-                        worldPositions[i++] = new Vector3(x, y, z);
-                    }
-                }
-            }
-
-            if (worldPositions.Length == 1)
-            {
-                Volume.SetVoxel(worldPositions[0], Volume.ColorPicker.SelectedColorIndex, voxelPropertyId);
-            }
-            else
-            {
-                Volume.SetVoxels(worldPositions, Volume.ColorPicker.SelectedColorIndex, voxelPropertyId);
+                buildMode.HandleMouseUp(currentVoxelEditorContext);
             }
         }
 

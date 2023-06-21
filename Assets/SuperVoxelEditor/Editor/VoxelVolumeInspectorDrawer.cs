@@ -5,8 +5,13 @@ using UnityEngine;
 
 namespace SuperVoxelEditor.Editor
 {
+    public enum BuildModes { Voxel, Box }
+    public enum Shapes { Cube, Sphere }
+
     public sealed class VoxelVolumeInspectorDrawer
     {
+        public Shapes SelectedShape { get; private set; } = Shapes.Cube;
+        public BuildModes SelectedBuildMode { get; private set; } = BuildModes.Voxel;
         public bool IsEditingActive { get; private set; } = true;
         public bool DrawChunkBounds { get; private set; } = true;
         
@@ -24,7 +29,9 @@ namespace SuperVoxelEditor.Editor
             }
 
             DrawChunkBounds = EditorGUILayout.Toggle("Draw Chunk Bounds", DrawChunkBounds);
-
+            SelectedShape = (Shapes)EditorGUILayout.EnumPopup("Shape", SelectedShape);
+            SelectedBuildMode = (BuildModes)EditorGUILayout.EnumPopup("Build Mode", SelectedBuildMode);
+            
             // Create a GUIStyle for headers
             GUIStyle headerStyle = new GUIStyle(GUI.skin.label)
             {

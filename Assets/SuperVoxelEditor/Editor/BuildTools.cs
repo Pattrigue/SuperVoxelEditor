@@ -33,8 +33,8 @@ namespace SuperVoxelEditor.Editor
             // Set the button height to match the current width (makes it square) 
             GUIStyle buttonStyle = new GUIStyle(GUI.skin.button)
             {
-                fixedWidth = 48f,
-                fixedHeight = 48f 
+                fixedWidth = 32f,
+                fixedHeight = 32f
             };
            
             foreach (BuildTool tool in Enum.GetValues(typeof(BuildTool)))
