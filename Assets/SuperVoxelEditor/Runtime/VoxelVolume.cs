@@ -20,9 +20,27 @@ namespace SemagGames.SuperVoxelEditor
             set => voxelProperty = value; 
         }
 
+        public bool AutoRebuildChunkColliders
+        {
+            get => autoRebuildChunkColliders;
+            set
+            {
+                if (autoRebuildChunkColliders == value) return;
+                
+                foreach (Chunk chunk in chunks.Values)
+                {
+                    chunk.AutoRebuildCollider = value;
+                }
+
+                autoRebuildChunkColliders = value;
+            }
+        }
+        
         public IEnumerable<Chunk> Chunks => chunks.Values;
 
         private readonly Dictionary<ChunkPosition, Chunk> chunks = new();
+
+        private bool autoRebuildChunkColliders = true;
         
         private void OnEnable()
         {
@@ -50,7 +68,7 @@ namespace SemagGames.SuperVoxelEditor
 
             chunks.Clear();
         }
-
+        
         public void SetVoxel(Vector3 worldPosition, uint colorId = 0, uint voxelPropertyId = 1)
         {
             Chunk chunk = GetOrCreateChunk(worldPosition);
@@ -73,6 +91,7 @@ namespace SemagGames.SuperVoxelEditor
             {
                 chunk = Instantiate(chunkPrefab, chunkPosition.WorldPosition, Quaternion.identity, transform);
                 chunk.name = $"Chunk {chunkPosition}";
+                chunk.AutoRebuildCollider = autoRebuildChunkColliders;
 
                 chunks.Add(chunkPosition, chunk);
             }

@@ -22,7 +22,6 @@ namespace SemagGames.SuperVoxelEditor
         
         private Chunk chunk;
         private Mesh mesh;
-        private MeshCollider meshCollider;
         private MeshFilter meshFilter;
         private ChunkMeshBuilder meshBuilder;
 
@@ -30,7 +29,6 @@ namespace SemagGames.SuperVoxelEditor
         {
             chunk = GetComponent<Chunk>();
             meshFilter = GetComponent<MeshFilter>();
-            meshCollider = GetComponent<MeshCollider>();
         }
 
         public void Build()
@@ -58,13 +56,11 @@ namespace SemagGames.SuperVoxelEditor
             }
 
             meshFilter.mesh = mesh;
-            meshCollider.sharedMesh = mesh;
             meshBuilder.Dispose();
         }
-
+        
         private void ResetMesh()
         {
-            meshCollider.sharedMesh = null;
             meshFilter.sharedMesh = null;
             
             if (mesh == null)

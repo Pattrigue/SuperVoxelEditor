@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8573988828890586288}
   - component: {fileID: 450235079009942144}
   - component: {fileID: 7513078600116060555}
+  - component: {fileID: 2044365564364112260}
   - component: {fileID: 4816792553445461523}
   - component: {fileID: 6635770689577304323}
   - component: {fileID: -8536553633753261322}
@@ -62,6 +63,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   borderVisibilityFlags: -1
+--- !u!114 &2044365564364112260
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1102633715648034026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22e431bfb1664e1eb46d1ba76dc98623, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!33 &4816792553445461523
 MeshFilter:
   m_ObjectHideFlags: 0

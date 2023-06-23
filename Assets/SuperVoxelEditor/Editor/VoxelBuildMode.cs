@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SemagGames.SuperVoxelEditor;
 using UnityEngine;
 
 namespace SuperVoxelEditor.Editor
@@ -8,45 +9,56 @@ namespace SuperVoxelEditor.Editor
         private readonly HashSet<Vector3> placedVoxels = new HashSet<Vector3>();
 
         private bool isMouseDown;
+
+        private Vector3 lastVoxelPosition;
         
         public override void HandleMouseDown(VoxelVolumeEditor editor)
         {
+            editor.Volume.AutoRebuildChunkColliders = false;
             isMouseDown = true;
         }
 
         public override void HandleMouseUp(VoxelVolumeEditor editor)
         {
+            editor.Volume.AutoRebuildChunkColliders = true;
             isMouseDown = false;
             placedVoxels.Clear();
         }
 
         public override void OnUpdate(VoxelVolumeEditor editor)
         {
-            if (isMouseDown && !placedVoxels.Contains(editor.VoxelPosition))
-            {
-                int size = editor.Inspector.VoxelSize;
+            if (!isMouseDown) return;
+            if (placedVoxels.Contains(editor.VoxelPosition)) return;
+            if (lastVoxelPosition == editor.VoxelPosition) return;
+            
+            int size = editor.Inspector.VoxelSize;
                 
-                if (size == 1)
+            if (size == 1)
+            {
+                editor.Volume.SetVoxel(editor.VoxelPosition, editor.Volume.ColorPicker.SelectedColorIndex, editor.Volume.VoxelProperty.ID);
+                placedVoxels.Add(editor.VoxelPosition);
+            }
+            else
+            {
+                if (editor.Inspector.SelectedShape == Shapes.Cube)
                 {
-                    editor.Volume.SetVoxel(editor.VoxelPosition, editor.Volume.ColorPicker.SelectedColorIndex, editor.Volume.VoxelProperty.ID);
-                    placedVoxels.Add(editor.VoxelPosition);
+                    DrawCube(editor, size);
                 }
-                else
+                else if (editor.Inspector.SelectedShape == Shapes.Sphere)
                 {
-                    if (editor.Inspector.SelectedShape == Shapes.Cube)
-                    {
-                        DrawCube(editor, size);
-                    }
-                    else if (editor.Inspector.SelectedShape == Shapes.Sphere)
-                    {
-                        DrawSphere(editor, size);
-                    }
+                    DrawSphere(editor, size);
                 }
             }
+            
+            lastVoxelPosition = editor.VoxelPosition;
         }
 
         private void DrawCube(VoxelVolumeEditor editor, int size)
         {
+            Vector3[] worldPositions = new Vector3[size * size * size];
+            
+            int i = 0;
+                
             for (int x = 0; x < size; x++)
             {
                 for (int y = 0; y < size; y++)
@@ -54,17 +66,19 @@ namespace SuperVoxelEditor.Editor
                     for (int z = 0; z < size; z++)
                     {
                         Vector3 voxelPosition = editor.VoxelPosition + new Vector3(x, y, z);
-
-                        editor.Volume.SetVoxel(voxelPosition, editor.Volume.ColorPicker.SelectedColorIndex, editor.Volume.VoxelProperty.ID);
+                        worldPositions[i++] = voxelPosition;
                         placedVoxels.Add(voxelPosition);
                     }
                 }
             }
+            
+            editor.Volume.SetVoxels(worldPositions, editor.Volume.ColorPicker.SelectedColorIndex, editor.Volume.VoxelProperty.ID);
         }
         
         private void DrawSphere(VoxelVolumeEditor editor, int size)
         {
             Vector3Int voxelPosition = Vector3Int.FloorToInt(editor.VoxelPosition);
+            List<Vector3> worldPositions = new List<Vector3>(size * size * size);
 
             for (int x = -size; x <= size; x++)
             {
@@ -77,12 +91,14 @@ namespace SuperVoxelEditor.Editor
 
                         if (Vector3Int.Distance(voxelPosition, position) < size)
                         {
-                            editor.Volume.SetVoxel(position, editor.Volume.ColorPicker.SelectedColorIndex, editor.Volume.VoxelProperty.ID);
+                            worldPositions.Add(position);
                             placedVoxels.Add(position);
                         }
                     }
                 }
             }
+            
+            editor.Volume.SetVoxels(worldPositions.ToArray(), editor.Volume.ColorPicker.SelectedColorIndex, editor.Volume.VoxelProperty.ID);
         }
     }
 }

@@ -183,6 +183,11 @@ namespace SuperVoxelEditor.Editor
             if (BuildTools.SelectedTool == BuildTool.Attach)
             {
                 position += hit.normal;
+                
+                if (Inspector.SelectedBuildMode == BuildModes.Voxel && Inspector.VoxelSize > 1)
+                {
+                    position += hit.normal * Inspector.VoxelSize * 0.5f;
+                }
             }
 
             return position;

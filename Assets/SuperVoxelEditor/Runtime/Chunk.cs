@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SemagGames.SuperVoxelEditor
 {
-    [RequireComponent(typeof(ChunkMesh))]
+    [RequireComponent(typeof(ChunkMesh), typeof(ChunkCollider))]
     [ExecuteAlways]
     public sealed class Chunk : MonoBehaviour
     {
@@ -17,6 +17,22 @@ namespace SemagGames.SuperVoxelEditor
 
         public static event Action<Chunk> Destroyed;
 
+        public bool AutoRebuildCollider
+        {
+            get => autoRebuildCollider;
+            set
+            {
+                if (autoRebuildCollider == value) return;
+
+                if (!autoRebuildCollider && value)
+                {
+                    chunkCollider.Rebuild();
+                }
+                
+                autoRebuildCollider = value;
+            }
+        }
+
         public VoxelVolume Volume { get; private set; }
 
         public ChunkPosition ChunkPosition => ChunkPosition.FromWorldPosition(transform.position);
@@ -27,12 +43,15 @@ namespace SemagGames.SuperVoxelEditor
         };
 
         private ChunkMesh mesh;
+        private ChunkCollider chunkCollider;
 
         private bool isDirty;
+        private bool autoRebuildCollider = true;
 
         private void Awake()
         {
             mesh = GetComponent<ChunkMesh>();
+            chunkCollider = GetComponent<ChunkCollider>();
             Volume = GetComponentInParent<VoxelVolume>();
         }
 
@@ -55,6 +74,11 @@ namespace SemagGames.SuperVoxelEditor
         public void Rebuild()
         {
             mesh.Build();
+            
+            if (AutoRebuildCollider)
+            {
+                chunkCollider.Rebuild();
+            }
 #if UNITY_EDITOR
             UnityEditor.EditorUtility.SetDirty(gameObject);
 #endif
