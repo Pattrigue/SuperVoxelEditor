@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using SemagGames.SuperVoxelEditor;
+using UnityEditor;
 using UnityEngine;
 
 namespace SuperVoxelEditor.Editor
@@ -27,6 +27,8 @@ namespace SuperVoxelEditor.Editor
 
         public override void OnUpdate(VoxelVolumeEditor editor)
         {
+            DrawPreview(editor);
+            
             if (!isMouseDown) return;
             if (placedVoxels.Contains(editor.VoxelPosition)) return;
             if (lastVoxelPosition == editor.VoxelPosition) return;
@@ -53,26 +55,76 @@ namespace SuperVoxelEditor.Editor
             lastVoxelPosition = editor.VoxelPosition;
         }
 
+        private static void DrawPreview(VoxelVolumeEditor editor)
+        {
+            Color handlesColor = Handles.color;
+            
+            if (editor.Inspector.SelectedShape == Shapes.Sphere)
+            { 
+                Camera sceneCamera = SceneView.lastActiveSceneView.camera;
+                
+                Handles.color = Color.cyan;
+                Handles.DrawWireDisc(editor.VoxelPosition, sceneCamera.transform.forward, editor.Inspector.VoxelSize, 5f);
+                Handles.color = new Color(0, 0.8f, 0.8f, 0.2f);
+                Handles.DrawSolidDisc(editor.VoxelPosition, sceneCamera.transform.forward, editor.Inspector.VoxelSize);
+            }
+            else if (editor.Inspector.SelectedShape == Shapes.Cube)
+            {
+                int size = editor.Inspector.VoxelSize;
+                
+                Vector3 offset = size % 2 == 0 ? Vector3.one * 0.5f : Vector3.zero;
+                Vector3 center = editor.VoxelPosition + offset;
+
+                Handles.color = Color.cyan;
+                Handles.DrawWireCube(center, Vector3.one * size);
+                Handles.color = new Color(0, 0.8f, 0.8f, 0.2f);
+                Handles.zTest = UnityEngine.Rendering.CompareFunction.LessEqual;
+                Handles.CubeHandleCap(0, center, Quaternion.identity, size, EventType.Repaint);
+            }
+            
+            Handles.color = handlesColor;
+        }
+
         private void DrawCube(VoxelVolumeEditor editor, int size)
         {
-            Vector3[] worldPositions = new Vector3[size * size * size];
-            
-            int i = 0;
-                
-            for (int x = 0; x < size; x++)
+            List<Vector3> worldPositions = new List<Vector3>();
+            Vector3 offset = size % 2 == 0 ? Vector3.one * 0.5f : Vector3.zero;
+            Vector3 center = editor.VoxelPosition + offset;
+
+            if (size % 2 == 0)
             {
-                for (int y = 0; y < size; y++)
+                // Draw a cube with an even size
+                for (int x = -size / 2; x < size / 2; x++)
                 {
-                    for (int z = 0; z < size; z++)
+                    for (int y = -size / 2; y < size / 2; y++)
                     {
-                        Vector3 voxelPosition = editor.VoxelPosition + new Vector3(x, y, z);
-                        worldPositions[i++] = voxelPosition;
-                        placedVoxels.Add(voxelPosition);
+                        for (int z = -size / 2; z < size / 2; z++)
+                        {
+                            Vector3Int position = Vector3Int.FloorToInt(center) + new Vector3Int(x, y, z);
+                            worldPositions.Add(position);
+                            placedVoxels.Add(position);
+                        }
                     }
                 }
             }
-            
-            editor.Volume.SetVoxels(worldPositions, editor.Volume.ColorPicker.SelectedColorIndex, editor.Volume.VoxelProperty.ID);
+            else
+            {
+                // Draw a cube with an odd size
+                for (int x = -size / 2; x <= size / 2; x++)
+                {
+                    for (int y = -size / 2; y <= size / 2; y++)
+                    {
+                        for (int z = -size / 2; z <= size / 2; z++)
+                        {
+                            Vector3Int position = Vector3Int.FloorToInt(center) + new Vector3Int(x, y, z);
+                            worldPositions.Add(position);
+                            placedVoxels.Add(position);
+                        }
+                    }
+                }
+            }
+
+            editor.Volume.SetVoxels(worldPositions.ToArray(), editor.Volume.ColorPicker.SelectedColorIndex, editor.Volume.VoxelProperty.ID);
         }
         
         private void DrawSphere(VoxelVolumeEditor editor, int size)

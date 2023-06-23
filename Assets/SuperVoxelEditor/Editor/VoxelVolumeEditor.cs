@@ -178,17 +178,35 @@ namespace SuperVoxelEditor.Editor
         private Vector3 CalculateRaycastVoxelPosition(RaycastHit hit)
         {
             Vector3 position = hit.point - hit.normal * 0.1f;
-            SnapToVoxelGrid(ref position);
 
             if (BuildTools.SelectedTool == BuildTool.Attach)
             {
-                position += hit.normal;
-                
                 if (Inspector.SelectedBuildMode == BuildModes.Voxel && Inspector.VoxelSize > 1)
                 {
-                    position += hit.normal * Inspector.VoxelSize * 0.5f;
+                    position += hit.normal * (Inspector.VoxelSize * 0.5f);
+                    
+                    if (hit.normal.x < 0)
+                    {
+                        position.x -= 0.5f;
+                    }
+                    
+                    if (hit.normal.y < 0)
+                    {
+                        position.y -= 0.5f;
+                    }
+                    
+                    if (hit.normal.z < 0)
+                    {
+                        position.z -= 0.5f;
+                    }
+                }
+                else
+                {
+                    position += hit.normal;
                 }
             }
+
+            SnapToVoxelGrid(ref position);
 
             return position;
         }
