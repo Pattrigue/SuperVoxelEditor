@@ -7,14 +7,17 @@ namespace SuperVoxelEditor.Editor
     [CustomEditor(typeof(VoxelVolume))]
     public sealed class VoxelVolumeEditor : UnityEditor.Editor
     {
-        private VoxelVolume Volume => (VoxelVolume)target;
+        public VoxelVolume Volume => (VoxelVolume)target;
+        
+        public VoxelVolumeInspector Inspector { get; private set; }
+        public BuildTools BuildTools { get; private set; }
+        
+        public Vector3 VoxelPosition { get; private set; }
+        
+        public bool ValidVoxelPosition { get; private set; }
 
         private PreviewCube previewCube;
-        private BuildTools buildTools;
-        private VoxelVolumeInspectorDrawer inspectorDrawer;
         private BuildMode buildMode;
-        
-        private VoxelEditorContext currentVoxelEditorContext;
         
         private float controlledVoxelDistance = 10f;
 
@@ -23,25 +26,41 @@ namespace SuperVoxelEditor.Editor
             SceneView.duringSceneGui += OnSceneGUI;
             
             previewCube ??= new PreviewCube();
-            buildTools ??= new BuildTools();
-            inspectorDrawer ??= new VoxelVolumeInspectorDrawer();
-            buildMode ??= new BoxBuildMode();
+            Inspector ??= new VoxelVolumeInspector();
+            BuildTools ??= new BuildTools();
+            buildMode ??= new VoxelBuildMode();
+            
+            Inspector.SelectedBuildModeChanged += OnSelectedBuildModeChanged;
         }
 
         private void OnDisable()
         {
             SceneView.duringSceneGui -= OnSceneGUI;
+            Inspector.SelectedBuildModeChanged -= OnSelectedBuildModeChanged;
             
             previewCube?.Destroy();
-            buildTools = null;
-            inspectorDrawer = null;
+            Inspector = null;
+            BuildTools = null;
             buildMode = null;
             previewCube = null;
         }
 
         public override void OnInspectorGUI()
         {
-            inspectorDrawer.DrawInspectorGUI(this, serializedObject, buildTools.DrawInspectorGUI);
+            Inspector.DrawInspectorGUI(this, serializedObject);
+        }
+        
+        private void OnSelectedBuildModeChanged(BuildModes buildMode)
+        {
+            switch (buildMode)
+            {
+                case BuildModes.Voxel:
+                    this.buildMode = new VoxelBuildMode();
+                    break;
+                case BuildModes.Box:
+                    this.buildMode = new BoxBuildMode();
+                    break;
+            }
         }
         
         private void OnSceneGUI(SceneView sceneView)
@@ -50,7 +69,7 @@ namespace SuperVoxelEditor.Editor
             
             GameObject selectedGameObject = Selection.activeGameObject;
 
-            if (!inspectorDrawer.IsEditingActive) return;
+            if (!Inspector.IsEditingActive) return;
             if (!IsValidSelection(selectedGameObject)) return;
 
             Tools.current = Tool.None;
@@ -86,7 +105,7 @@ namespace SuperVoxelEditor.Editor
                 }
             }
 
-            buildTools.HandleKeyPressEvents(e);
+            BuildTools.HandleKeyPressEvents(e);
         }
         
         private static bool IsValidSelection(GameObject selectedGameObject)
@@ -97,16 +116,16 @@ namespace SuperVoxelEditor.Editor
         private void HandleSceneGUIEvents(SceneView sceneView)
         {
             // Get the voxel hit point using either control or raycast method.
-            bool validVoxelPosition = CalculateVoxelPosition(out Vector3 voxelPosition);
-            currentVoxelEditorContext = new VoxelEditorContext(Volume, voxelPosition, buildTools.SelectedTool, validVoxelPosition);
+            ValidVoxelPosition = CalculateVoxelPosition(out Vector3 voxelPosition);
+            VoxelPosition = voxelPosition;
 
             // Handle mouse click events.
             HandleMouseClickEvents();
 
-            // Update the preview cube.
-            buildMode.UpdatePreview(currentVoxelEditorContext);
+            // Update build mode
+            buildMode.OnUpdate(this);
 
-            if (inspectorDrawer.DrawChunkBounds)
+            if (Inspector.DrawChunkBounds)
             {
                 DrawChunkBounds();
             }
@@ -161,7 +180,7 @@ namespace SuperVoxelEditor.Editor
             Vector3 position = hit.point - hit.normal * 0.1f;
             SnapToVoxelGrid(ref position);
 
-            if (buildTools.SelectedTool == BuildTool.Attach)
+            if (BuildTools.SelectedTool == BuildTool.Attach)
             {
                 position += hit.normal;
             }
@@ -173,19 +192,19 @@ namespace SuperVoxelEditor.Editor
         {
             if (Event.current.button != 0) return;
 
-            if (Event.current.type == EventType.MouseDown && currentVoxelEditorContext.ValidVoxelPosition)
+            if (Event.current.type == EventType.MouseDown && ValidVoxelPosition)
             {
-                if (buildTools.SelectedTool is BuildTool.Picker)
+                if (BuildTools.SelectedTool is BuildTool.Picker)
                 {
-                    buildTools.PickVoxelAtPosition(currentVoxelEditorContext.Volume, currentVoxelEditorContext.VoxelPosition);
+                    BuildTools.PickVoxelAtPosition(Volume, VoxelPosition);
                     return;
                 }
 
-                buildMode.HandleMouseDown(currentVoxelEditorContext);
+                buildMode.HandleMouseDown(this);
             }
             else if (Event.current.type == EventType.MouseUp)
             {
-                buildMode.HandleMouseUp(currentVoxelEditorContext);
+                buildMode.HandleMouseUp(this);
             }
         }
 

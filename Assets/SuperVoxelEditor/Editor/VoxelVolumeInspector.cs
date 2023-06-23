@@ -8,17 +8,35 @@ namespace SuperVoxelEditor.Editor
     public enum BuildModes { Voxel, Box }
     public enum Shapes { Cube, Sphere }
 
-    public sealed class VoxelVolumeInspectorDrawer
+    public sealed class VoxelVolumeInspector
     {
+        public event Action<BuildModes> SelectedBuildModeChanged;
+        
         public Shapes SelectedShape { get; private set; } = Shapes.Cube;
-        public BuildModes SelectedBuildMode { get; private set; } = BuildModes.Voxel;
+
+        public BuildModes SelectedBuildMode
+        {
+            get => selectedBuildMode;
+            private set
+            {
+                if (selectedBuildMode == value) return;
+                
+                selectedBuildMode = value;
+                SelectedBuildModeChanged?.Invoke(selectedBuildMode);
+            }
+        }
+
         public bool IsEditingActive { get; private set; } = true;
         public bool DrawChunkBounds { get; private set; } = true;
         
-        private bool foldout;
+        public int VoxelSize { get; private set; } = 1;
+        
+        private BuildModes selectedBuildMode = BuildModes.Voxel;
 
-        public void DrawInspectorGUI(VoxelVolumeEditor editor, SerializedObject serializedObject, Action drawBuildToolsAction)
-        {
+        private bool foldout;
+        
+        public void DrawInspectorGUI(VoxelVolumeEditor editor, SerializedObject serializedObject)
+        {    
             EditorGUILayout.PropertyField(serializedObject.FindProperty("voxelProperty"));
 
             VoxelVolume volume = (VoxelVolume)editor.target;
@@ -29,9 +47,14 @@ namespace SuperVoxelEditor.Editor
             }
 
             DrawChunkBounds = EditorGUILayout.Toggle("Draw Chunk Bounds", DrawChunkBounds);
-            SelectedShape = (Shapes)EditorGUILayout.EnumPopup("Shape", SelectedShape);
             SelectedBuildMode = (BuildModes)EditorGUILayout.EnumPopup("Build Mode", SelectedBuildMode);
-            
+
+            if (selectedBuildMode == BuildModes.Voxel)
+            {
+                SelectedShape = (Shapes)EditorGUILayout.EnumPopup("Shape", SelectedShape);
+                VoxelSize = EditorGUILayout.IntSlider("Voxel Size", VoxelSize, 1, 100);
+            }
+
             // Create a GUIStyle for headers
             GUIStyle headerStyle = new GUIStyle(GUI.skin.label)
             {
@@ -42,7 +65,7 @@ namespace SuperVoxelEditor.Editor
 
             EditorGUILayout.BeginVertical(GUI.skin.box);
             GUILayout.Label("Build Tools", headerStyle);
-            drawBuildToolsAction();
+            editor.BuildTools.DrawInspectorGUI();
             EditorGUILayout.EndVertical();
 
             EditorGUILayout.BeginVertical(GUI.skin.box);
@@ -74,12 +97,12 @@ namespace SuperVoxelEditor.Editor
                 volume.Clear();
             }
 
-            foldout = EditorGUILayout.Foldout(foldout, "References");
-
-            if (foldout)
-            {
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("chunkPrefab"));
-            }
+            // foldout = EditorGUILayout.Foldout(foldout, "References");
+            //
+            // if (foldout)
+            // {
+            //     EditorGUILayout.PropertyField(serializedObject.FindProperty("chunkPrefab"));
+            // }
 
             serializedObject.ApplyModifiedProperties(); // Apply changes after all fields have been drawn
         }

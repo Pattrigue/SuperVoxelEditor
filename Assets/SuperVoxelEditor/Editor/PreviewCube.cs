@@ -32,35 +32,35 @@ namespace SuperVoxelEditor.Editor
             }
         }
 
-        public void Update(Vector3 voxelPosition, Vector3 mouseDownVoxelPosition, Color32 color, bool validVoxelPosition, bool isDragging, BuildTool selectedTool)
+        public void Update(VoxelVolumeEditor editor, Vector3 mouseDownVoxelPosition, bool isDragging)
         {
             const float offset = 1.01f;
 
-            if (!validVoxelPosition)
+            if (!editor.ValidVoxelPosition)
             {
                 cubeRenderer.enabled = false;
                 return;
             }
 
-            bool isErasing = selectedTool == BuildTool.Erase;
+            bool isErasing = editor.BuildTools.SelectedTool == BuildTool.Erase;
 
-            cubeRenderer.enabled = selectedTool != BuildTool.Picker;
+            cubeRenderer.enabled = editor.BuildTools.SelectedTool != BuildTool.Picker;
 
             if (isDragging)
             {
-                cube.transform.position = (voxelPosition + mouseDownVoxelPosition) * 0.5f;
+                cube.transform.position = (editor.VoxelPosition + mouseDownVoxelPosition) * 0.5f;
                 cube.transform.localScale = new Vector3(
-                    Mathf.Abs(voxelPosition.x - mouseDownVoxelPosition.x) + offset,
-                    Mathf.Abs(voxelPosition.y - mouseDownVoxelPosition.y) + offset,
-                    Mathf.Abs(voxelPosition.z - mouseDownVoxelPosition.z) + offset
+                    Mathf.Abs(editor.VoxelPosition.x - mouseDownVoxelPosition.x) + offset,
+                    Mathf.Abs(editor.VoxelPosition.y - mouseDownVoxelPosition.y) + offset,
+                    Mathf.Abs(editor.VoxelPosition.z - mouseDownVoxelPosition.z) + offset
                 );
             }
             else
             {
                 Vector3 cubeSize = new(offset, offset, offset);
-                cube.transform.position = voxelPosition;
+                cube.transform.position = editor.VoxelPosition;
                 cube.transform.localScale = cubeSize;
-                cubeMaterial.color = isErasing ? new Color(1, 0, 0, 0.25f) : color;
+                cubeMaterial.color = isErasing ? new Color(1, 0, 0, 0.25f) : editor.Volume.ColorPicker.SelectedColor;
             }
             
             DrawHandles(isErasing);

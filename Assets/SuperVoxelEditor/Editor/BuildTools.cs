@@ -116,6 +116,5 @@ namespace SuperVoxelEditor.Editor
             toolIndex = (toolIndex + toolCount) % toolCount;
             SelectedTool = (BuildTool)toolIndex;
         }
-        
     }
 }

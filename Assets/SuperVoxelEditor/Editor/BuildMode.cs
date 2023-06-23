@@ -2,10 +2,10 @@
 {
     public abstract class BuildMode
     {
-        public abstract void HandleMouseDown(VoxelEditorContext ctx);
+        public abstract void HandleMouseDown(VoxelVolumeEditor editor);
         
-        public abstract void HandleMouseUp(VoxelEditorContext ctx);
+        public abstract void HandleMouseUp(VoxelVolumeEditor editor);
 
-        public abstract void UpdatePreview(VoxelEditorContext ctx);
+        public abstract void OnUpdate(VoxelVolumeEditor editor);
     }
 }

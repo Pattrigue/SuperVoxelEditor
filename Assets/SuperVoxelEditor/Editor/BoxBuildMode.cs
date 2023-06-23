@@ -15,19 +15,19 @@ namespace SuperVoxelEditor.Editor
             previewCube = new PreviewCube();
         }
         
-        public override void HandleMouseDown(VoxelEditorContext ctx)
+        public override void HandleMouseDown(VoxelVolumeEditor editor)
         {
-            mouseDownVoxelPosition = ctx.VoxelPosition;
+            mouseDownVoxelPosition = editor.VoxelPosition;
             isDragging = true;
         }
 
-        public override void HandleMouseUp(VoxelEditorContext ctx)
+        public override void HandleMouseUp(VoxelVolumeEditor editor)
         {
             if (isDragging)
             {
-                if (ctx.ValidVoxelPosition)
+                if (editor.ValidVoxelPosition)
                 {
-                    PlaceVoxels(ctx);
+                    PlaceVoxels(editor);
                 }
                 else
                 {
@@ -36,17 +36,17 @@ namespace SuperVoxelEditor.Editor
             }
         }
 
-        public override void UpdatePreview(VoxelEditorContext ctx)
+        public override void OnUpdate(VoxelVolumeEditor editor)
         {
-            previewCube.Update(ctx.VoxelPosition, mouseDownVoxelPosition, ctx.Volume.ColorPicker.SelectedColor, ctx.ValidVoxelPosition, isDragging, ctx.SelectedBuildTool);
+            previewCube.Update(editor, mouseDownVoxelPosition, isDragging);
         }
 
-        private void PlaceVoxels(VoxelEditorContext e)
+        private void PlaceVoxels(VoxelVolumeEditor editor)
         {
             isDragging = false;
 
             Vector3Int start = Vector3Int.FloorToInt(mouseDownVoxelPosition);
-            Vector3Int end = Vector3Int.FloorToInt(e.VoxelPosition);
+            Vector3Int end = Vector3Int.FloorToInt(editor.VoxelPosition);
 
             Vector3Int min = Vector3Int.Min(start, end);
             Vector3Int max = Vector3Int.Max(start, end);
@@ -59,9 +59,9 @@ namespace SuperVoxelEditor.Editor
             
             uint voxelPropertyId = 0;
 
-            if (e.Volume.VoxelProperty != null && e.SelectedBuildTool is not BuildTool.Erase)
+            if (editor.Volume.VoxelProperty != null && editor.BuildTools.SelectedTool is not BuildTool.Erase)
             {
-                voxelPropertyId = e.Volume.VoxelProperty.ID;
+                voxelPropertyId = editor.Volume.VoxelProperty.ID;
             }
 
             int i = 0;
@@ -79,11 +79,11 @@ namespace SuperVoxelEditor.Editor
 
             if (worldPositions.Length == 1)
             {
-                e.Volume.SetVoxel(worldPositions[0], e.Volume.ColorPicker.SelectedColorIndex, voxelPropertyId);
+                editor.Volume.SetVoxel(worldPositions[0], editor.Volume.ColorPicker.SelectedColorIndex, voxelPropertyId);
             }
             else
             {
-                e.Volume.SetVoxels(worldPositions, e.Volume.ColorPicker.SelectedColorIndex, voxelPropertyId);
+                editor.Volume.SetVoxels(worldPositions, editor.Volume.ColorPicker.SelectedColorIndex, voxelPropertyId);
             }
         }
     }
