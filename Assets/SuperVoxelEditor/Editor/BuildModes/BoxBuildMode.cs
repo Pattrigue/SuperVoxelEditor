@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using SuperVoxelEditor.Editor.BuildTools;
+using UnityEngine;
 
-namespace SuperVoxelEditor.Editor
+namespace SuperVoxelEditor.Editor.BuildModes
 {
     public sealed class BoxBuildMode : VoxelVolumeBuildMode
     {

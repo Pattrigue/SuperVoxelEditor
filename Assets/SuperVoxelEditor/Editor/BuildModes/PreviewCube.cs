@@ -1,7 +1,8 @@
-﻿using UnityEditor;
+﻿using SuperVoxelEditor.Editor.BuildTools;
+using UnityEditor;
 using UnityEngine;
 
-namespace SuperVoxelEditor.Editor
+namespace SuperVoxelEditor.Editor.BuildModes
 {
     public sealed class PreviewCube
     {

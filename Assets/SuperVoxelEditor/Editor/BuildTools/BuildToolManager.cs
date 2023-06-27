@@ -1,4 +1,4 @@
-﻿namespace SuperVoxelEditor.Editor
+﻿namespace SuperVoxelEditor.Editor.BuildTools
 {
     public sealed class BuildToolManager
     {

@@ -1,4 +1,4 @@
-﻿namespace SuperVoxelEditor.Editor
+﻿namespace SuperVoxelEditor.Editor.BuildModes
 {
     public abstract class VoxelVolumeBuildMode
     {

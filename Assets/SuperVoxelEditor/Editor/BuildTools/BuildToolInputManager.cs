@@ -1,8 +1,7 @@
 ﻿using System;
-using SemagGames.SuperVoxelEditor;
 using UnityEngine;
 
-namespace SuperVoxelEditor.Editor
+namespace SuperVoxelEditor.Editor.BuildTools
 {
     public sealed class BuildToolInputManager
     {
