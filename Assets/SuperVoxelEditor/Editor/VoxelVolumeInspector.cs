@@ -7,11 +7,11 @@ namespace SuperVoxelEditor.Editor
 {
     public sealed class VoxelVolumeInspector
     {
-        public event Action<BuildModeType> SelectedBuildModeChanged;
+        public event Action<BuildMode> SelectedBuildModeChanged;
         
         public Shape SelectedShape { get; private set; } = Shape.Cube;
 
-        public BuildModeType SelectedBuildMode
+        public BuildMode SelectedBuildMode
         {
             get => selectedBuildMode;
             private set
@@ -28,7 +28,7 @@ namespace SuperVoxelEditor.Editor
         
         public int VoxelSize { get; private set; } = 1;
         
-        private BuildModeType selectedBuildMode = BuildModeType.Voxel;
+        private BuildMode selectedBuildMode = BuildMode.Voxel;
 
         private bool foldout;
         
@@ -44,9 +44,9 @@ namespace SuperVoxelEditor.Editor
             }
 
             DrawChunkBounds = EditorGUILayout.Toggle("Draw Chunk Bounds", DrawChunkBounds);
-            SelectedBuildMode = (BuildModeType)EditorGUILayout.EnumPopup("Build Mode", SelectedBuildMode);
+            SelectedBuildMode = (BuildMode)EditorGUILayout.EnumPopup("Build Mode", SelectedBuildMode);
 
-            if (selectedBuildMode == BuildModeType.Voxel)
+            if (selectedBuildMode == BuildMode.Voxel)
             {
                 SelectedShape = (Shape)EditorGUILayout.EnumPopup("Shape", SelectedShape);
                 VoxelSize = EditorGUILayout.IntSlider("Voxel Size", VoxelSize, 1, 100);

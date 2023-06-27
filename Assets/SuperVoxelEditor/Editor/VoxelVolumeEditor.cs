@@ -17,7 +17,7 @@ namespace SuperVoxelEditor.Editor
         public bool ValidVoxelPosition { get; private set; }
 
         private PreviewCube previewCube;
-        private BuildMode buildMode;
+        private VoxelVolumeBuildMode buildMode;
         
         private float controlledVoxelDistance = 10f;
 
@@ -50,15 +50,15 @@ namespace SuperVoxelEditor.Editor
             Inspector.DrawInspectorGUI(this, serializedObject);
         }
         
-        private void OnSelectedBuildModeChanged(BuildModeType buildModeType)
+        private void OnSelectedBuildModeChanged(BuildMode buildMode)
         {
-            switch (buildModeType)
+            switch (buildMode)
             {
-                case BuildModeType.Voxel:
-                    buildMode = new VoxelBuildMode();
+                case BuildMode.Voxel:
+                    this.buildMode = new VoxelBuildMode();
                     break;
-                case BuildModeType.Box:
-                    buildMode = new BoxBuildMode();
+                case BuildMode.Box:
+                    this.buildMode = new BoxBuildMode();
                     break;
             }
         }
@@ -179,9 +179,9 @@ namespace SuperVoxelEditor.Editor
         {
             Vector3 position = hit.point - hit.normal * 0.1f;
 
-            if (BuildTools.Inspector.SelectedTool == BuildToolType.Attach)
+            if (BuildTools.Inspector.SelectedTool == BuildTool.Attach)
             {
-                if (Inspector.SelectedBuildMode == BuildModeType.Voxel && Inspector.VoxelSize > 1)
+                if (Inspector.SelectedBuildMode == BuildMode.Voxel && Inspector.VoxelSize > 1)
                 {
                     Vector3 offset = new Vector3(
                         hit.normal.x < 0 ? -0.5f : 0.5f,
@@ -207,7 +207,7 @@ namespace SuperVoxelEditor.Editor
 
             if (Event.current.type == EventType.MouseDown && ValidVoxelPosition)
             {
-                if (BuildTools.Inspector.SelectedTool is BuildToolType.Picker)
+                if (BuildTools.Inspector.SelectedTool is BuildTool.Picker)
                 {
                     VoxelPicker.PickVoxelAtPosition(Volume, VoxelPosition);
                     return;

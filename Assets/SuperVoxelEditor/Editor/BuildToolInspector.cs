@@ -6,7 +6,7 @@ namespace SuperVoxelEditor.Editor
 {
     public sealed class BuildToolInspector
     {
-        public BuildToolType SelectedTool { get; set; } = BuildToolType.Attach;
+        public BuildTool SelectedTool { get; set; } = BuildTool.Attach;
     
         private readonly BuildToolIcons buildToolIcons;
     
@@ -21,7 +21,7 @@ namespace SuperVoxelEditor.Editor
             {
                 GUIStyle buttonStyle = CreateSquareButtonStyle(32f);
                     
-                foreach (BuildToolType tool in Enum.GetValues(typeof(BuildToolType)))
+                foreach (BuildTool tool in Enum.GetValues(typeof(BuildTool)))
                 {
                     GUIContent buttonContent = new GUIContent(buildToolIcons.GetIcon(tool), tool.ToString());
     

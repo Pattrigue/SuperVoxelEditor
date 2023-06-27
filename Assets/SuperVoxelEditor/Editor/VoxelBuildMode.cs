@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SuperVoxelEditor.Editor
 {
-    public sealed class VoxelBuildMode : BuildMode
+    public sealed class VoxelBuildMode : VoxelVolumeBuildMode
     {
         private readonly HashSet<Vector3> placedVoxels = new HashSet<Vector3>();
 

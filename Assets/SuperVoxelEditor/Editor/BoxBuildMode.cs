@@ -2,7 +2,7 @@
 
 namespace SuperVoxelEditor.Editor
 {
-    public sealed class BoxBuildMode : BuildMode
+    public sealed class BoxBuildMode : VoxelVolumeBuildMode
     {
         private readonly PreviewCube previewCube;
         
@@ -59,7 +59,7 @@ namespace SuperVoxelEditor.Editor
             
             uint voxelPropertyId = 0;
 
-            if (editor.Volume.VoxelProperty != null && editor.BuildTools.SelectedTool is not BuildToolType.Erase)
+            if (editor.Volume.VoxelProperty != null && editor.BuildTools.SelectedTool is not BuildTool.Erase)
             {
                 voxelPropertyId = editor.Volume.VoxelProperty.ID;
             }

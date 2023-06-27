@@ -6,27 +6,27 @@ namespace SuperVoxelEditor.Editor
 {
     public sealed class BuildToolIcons
     {
-        private readonly Dictionary<BuildToolType, Texture2D> toolIcons;
+        private readonly Dictionary<BuildTool, Texture2D> toolIcons;
     
         public BuildToolIcons()
         {
             toolIcons = LoadToolIcons();
         }
     
-        private static Dictionary<BuildToolType, Texture2D> LoadToolIcons()
+        private static Dictionary<BuildTool, Texture2D> LoadToolIcons()
         {
-            return new Dictionary<BuildToolType, Texture2D>
+            return new Dictionary<BuildTool, Texture2D>
             {
-                { BuildToolType.Attach, Resources.Load<Texture2D>("AttachIcon") },
-                { BuildToolType.Erase, Resources.Load<Texture2D>("EraseIcon") },
-                { BuildToolType.Paint, Resources.Load<Texture2D>("PaintIcon") },
-                { BuildToolType.Picker, Resources.Load<Texture2D>("PickerIcon") },
+                { BuildTool.Attach, Resources.Load<Texture2D>("AttachIcon") },
+                { BuildTool.Erase, Resources.Load<Texture2D>("EraseIcon") },
+                { BuildTool.Paint, Resources.Load<Texture2D>("PaintIcon") },
+                { BuildTool.Picker, Resources.Load<Texture2D>("PickerIcon") },
             };
         }
     
-        public Texture2D GetIcon(BuildToolType buildToolType)
+        public Texture2D GetIcon(BuildTool buildTool)
         {
-            return toolIcons[buildToolType];
+            return toolIcons[buildTool];
         }
     }
 }

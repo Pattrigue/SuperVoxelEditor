@@ -5,7 +5,7 @@
         public BuildToolInputManager Input { get; }
         public BuildToolInspector Inspector { get; }
         
-        public BuildToolType SelectedTool => Inspector.SelectedTool;
+        public BuildTool SelectedTool => Inspector.SelectedTool;
         
         public BuildToolManager()
         {

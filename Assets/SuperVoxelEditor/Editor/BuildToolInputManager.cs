@@ -43,26 +43,26 @@ namespace SuperVoxelEditor.Editor
             switch (keyCode)
             {
                 case KeyCode.Alpha1:
-                    buildToolInspector.SelectedTool = BuildToolType.Attach;
+                    buildToolInspector.SelectedTool = BuildTool.Attach;
                     break;
                 case KeyCode.Alpha2:
-                    buildToolInspector.SelectedTool = BuildToolType.Erase;
+                    buildToolInspector.SelectedTool = BuildTool.Erase;
                     break;
                 case KeyCode.Alpha3:
-                    buildToolInspector.SelectedTool = BuildToolType.Paint;
+                    buildToolInspector.SelectedTool = BuildTool.Paint;
                     break;
                 case KeyCode.Alpha4:
-                    buildToolInspector.SelectedTool = BuildToolType.Picker;
+                    buildToolInspector.SelectedTool = BuildTool.Picker;
                     break;
             }
         }
  
         private void CycleTool(int direction)
         {
-            int toolCount = Enum.GetValues(typeof(BuildToolType)).Length;
+            int toolCount = Enum.GetValues(typeof(BuildTool)).Length;
             int toolIndex = (int)buildToolInspector.SelectedTool + direction;
             toolIndex = (toolIndex + toolCount) % toolCount;
-            buildToolInspector.SelectedTool = (BuildToolType)toolIndex;
+            buildToolInspector.SelectedTool = (BuildTool)toolIndex;
         }
     }
 }
