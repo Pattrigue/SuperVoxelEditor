@@ -183,22 +183,12 @@ namespace SuperVoxelEditor.Editor
             {
                 if (Inspector.SelectedBuildMode == BuildModes.Voxel && Inspector.VoxelSize > 1)
                 {
-                    position += hit.normal * (Inspector.VoxelSize * 0.5f);
-                    
-                    if (hit.normal.x < 0)
-                    {
-                        position.x -= 0.5f;
-                    }
-                    
-                    if (hit.normal.y < 0)
-                    {
-                        position.y -= 0.5f;
-                    }
-                    
-                    if (hit.normal.z < 0)
-                    {
-                        position.z -= 0.5f;
-                    }
+                    Vector3 offset = new Vector3(
+                        hit.normal.x < 0 ? -0.5f : 0.5f,
+                        hit.normal.y < 0 ? -0.5f : 0.5f,
+                        hit.normal.z < 0 ? -0.5f : 0.5f
+                    );
+                    position += hit.normal * (Inspector.VoxelSize * 0.5f) + offset;
                 }
                 else
                 {
