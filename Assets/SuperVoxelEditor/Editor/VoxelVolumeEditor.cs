@@ -16,7 +16,6 @@ namespace SuperVoxelEditor.Editor
         
         public bool ValidVoxelPosition { get; private set; }
 
-        private PreviewCube previewCube;
         private VoxelVolumeBuildMode buildMode;
         
         private float controlledVoxelDistance = 10f;
@@ -25,7 +24,6 @@ namespace SuperVoxelEditor.Editor
         {
             SceneView.duringSceneGui += OnSceneGUI;
             
-            previewCube ??= new PreviewCube();
             Inspector ??= new VoxelVolumeInspector();
             BuildTools ??= new BuildToolManager();
             buildMode ??= new VoxelBuildMode();
@@ -38,11 +36,9 @@ namespace SuperVoxelEditor.Editor
             SceneView.duringSceneGui -= OnSceneGUI;
             Inspector.SelectedBuildModeChanged -= OnSelectedBuildModeChanged;
             
-            previewCube?.Destroy();
             Inspector = null;
             BuildTools = null;
             buildMode = null;
-            previewCube = null;
         }
 
         public override void OnInspectorGUI()
@@ -209,7 +205,10 @@ namespace SuperVoxelEditor.Editor
             {
                 if (BuildTools.Inspector.SelectedTool is BuildTool.Picker)
                 {
-                    VoxelPicker.PickVoxelAtPosition(Volume, VoxelPosition);
+                    if (VoxelPicker.PickVoxelAtPosition(Volume, VoxelPosition))
+                    {
+                        BuildTools.Inspector.SelectedTool = BuildTool.Attach;
+                    }
                     return;
                 }
 

@@ -1,4 +1,8 @@
 ﻿namespace SuperVoxelEditor.Editor
 {
-    public enum Shape { Cube, Sphere }
+    public enum Shape
+    {
+        Cube, 
+        Sphere
+    }
 }
