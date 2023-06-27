@@ -42,9 +42,9 @@ namespace SuperVoxelEditor.Editor
                 return;
             }
 
-            bool isErasing = editor.BuildTools.SelectedTool == BuildTool.Erase;
+            bool isErasing = editor.BuildTools.SelectedTool == BuildToolType.Erase;
 
-            cubeRenderer.enabled = editor.BuildTools.SelectedTool != BuildTool.Picker;
+            cubeRenderer.enabled = editor.BuildTools.SelectedTool != BuildToolType.Picker;
 
             if (isDragging)
             {

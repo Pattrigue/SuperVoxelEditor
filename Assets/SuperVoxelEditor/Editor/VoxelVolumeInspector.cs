@@ -5,16 +5,13 @@ using UnityEngine;
 
 namespace SuperVoxelEditor.Editor
 {
-    public enum BuildModes { Voxel, Box }
-    public enum Shapes { Cube, Sphere }
-
     public sealed class VoxelVolumeInspector
     {
-        public event Action<BuildModes> SelectedBuildModeChanged;
+        public event Action<BuildModeType> SelectedBuildModeChanged;
         
-        public Shapes SelectedShape { get; private set; } = Shapes.Cube;
+        public Shape SelectedShape { get; private set; } = Shape.Cube;
 
-        public BuildModes SelectedBuildMode
+        public BuildModeType SelectedBuildMode
         {
             get => selectedBuildMode;
             private set
@@ -31,7 +28,7 @@ namespace SuperVoxelEditor.Editor
         
         public int VoxelSize { get; private set; } = 1;
         
-        private BuildModes selectedBuildMode = BuildModes.Voxel;
+        private BuildModeType selectedBuildMode = BuildModeType.Voxel;
 
         private bool foldout;
         
@@ -47,11 +44,11 @@ namespace SuperVoxelEditor.Editor
             }
 
             DrawChunkBounds = EditorGUILayout.Toggle("Draw Chunk Bounds", DrawChunkBounds);
-            SelectedBuildMode = (BuildModes)EditorGUILayout.EnumPopup("Build Mode", SelectedBuildMode);
+            SelectedBuildMode = (BuildModeType)EditorGUILayout.EnumPopup("Build Mode", SelectedBuildMode);
 
-            if (selectedBuildMode == BuildModes.Voxel)
+            if (selectedBuildMode == BuildModeType.Voxel)
             {
-                SelectedShape = (Shapes)EditorGUILayout.EnumPopup("Shape", SelectedShape);
+                SelectedShape = (Shape)EditorGUILayout.EnumPopup("Shape", SelectedShape);
                 VoxelSize = EditorGUILayout.IntSlider("Voxel Size", VoxelSize, 1, 100);
             }
 
@@ -65,7 +62,7 @@ namespace SuperVoxelEditor.Editor
 
             EditorGUILayout.BeginVertical(GUI.skin.box);
             GUILayout.Label("Build Tools", headerStyle);
-            editor.BuildTools.DrawInspectorGUI();
+            editor.BuildTools.Inspector.Draw();
             EditorGUILayout.EndVertical();
 
             EditorGUILayout.BeginVertical(GUI.skin.box);

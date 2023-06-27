@@ -10,7 +10,7 @@ namespace SuperVoxelEditor.Editor
         public VoxelVolume Volume => (VoxelVolume)target;
         
         public VoxelVolumeInspector Inspector { get; private set; }
-        public BuildTools BuildTools { get; private set; }
+        public BuildToolManager BuildTools { get; private set; }
         
         public Vector3 VoxelPosition { get; private set; }
         
@@ -27,7 +27,7 @@ namespace SuperVoxelEditor.Editor
             
             previewCube ??= new PreviewCube();
             Inspector ??= new VoxelVolumeInspector();
-            BuildTools ??= new BuildTools();
+            BuildTools ??= new BuildToolManager();
             buildMode ??= new VoxelBuildMode();
             
             Inspector.SelectedBuildModeChanged += OnSelectedBuildModeChanged;
@@ -50,15 +50,15 @@ namespace SuperVoxelEditor.Editor
             Inspector.DrawInspectorGUI(this, serializedObject);
         }
         
-        private void OnSelectedBuildModeChanged(BuildModes buildMode)
+        private void OnSelectedBuildModeChanged(BuildModeType buildModeType)
         {
-            switch (buildMode)
+            switch (buildModeType)
             {
-                case BuildModes.Voxel:
-                    this.buildMode = new VoxelBuildMode();
+                case BuildModeType.Voxel:
+                    buildMode = new VoxelBuildMode();
                     break;
-                case BuildModes.Box:
-                    this.buildMode = new BoxBuildMode();
+                case BuildModeType.Box:
+                    buildMode = new BoxBuildMode();
                     break;
             }
         }
@@ -105,7 +105,7 @@ namespace SuperVoxelEditor.Editor
                 }
             }
 
-            BuildTools.HandleKeyPressEvents(e);
+            BuildTools.Input.HandleKeyPressEvents(e);
         }
         
         private static bool IsValidSelection(GameObject selectedGameObject)
@@ -179,9 +179,9 @@ namespace SuperVoxelEditor.Editor
         {
             Vector3 position = hit.point - hit.normal * 0.1f;
 
-            if (BuildTools.SelectedTool == BuildTool.Attach)
+            if (BuildTools.Inspector.SelectedTool == BuildToolType.Attach)
             {
-                if (Inspector.SelectedBuildMode == BuildModes.Voxel && Inspector.VoxelSize > 1)
+                if (Inspector.SelectedBuildMode == BuildModeType.Voxel && Inspector.VoxelSize > 1)
                 {
                     Vector3 offset = new Vector3(
                         hit.normal.x < 0 ? -0.5f : 0.5f,
@@ -207,9 +207,9 @@ namespace SuperVoxelEditor.Editor
 
             if (Event.current.type == EventType.MouseDown && ValidVoxelPosition)
             {
-                if (BuildTools.SelectedTool is BuildTool.Picker)
+                if (BuildTools.Inspector.SelectedTool is BuildToolType.Picker)
                 {
-                    BuildTools.PickVoxelAtPosition(Volume, VoxelPosition);
+                    VoxelPicker.PickVoxelAtPosition(Volume, VoxelPosition);
                     return;
                 }
 

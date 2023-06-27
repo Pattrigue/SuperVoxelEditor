@@ -42,11 +42,11 @@ namespace SuperVoxelEditor.Editor
             }
             else
             {
-                if (editor.Inspector.SelectedShape == Shapes.Cube)
+                if (editor.Inspector.SelectedShape == Shape.Cube)
                 {
                     DrawCube(editor, size);
                 }
-                else if (editor.Inspector.SelectedShape == Shapes.Sphere)
+                else if (editor.Inspector.SelectedShape == Shape.Sphere)
                 {
                     DrawSphere(editor, size);
                 }
@@ -59,7 +59,7 @@ namespace SuperVoxelEditor.Editor
         {
             Color handlesColor = Handles.color;
             
-            if (editor.Inspector.SelectedShape == Shapes.Sphere)
+            if (editor.Inspector.SelectedShape == Shape.Sphere)
             { 
                 Camera sceneCamera = SceneView.lastActiveSceneView.camera;
                 
@@ -68,7 +68,7 @@ namespace SuperVoxelEditor.Editor
                 Handles.color = new Color(0, 0.8f, 0.8f, 0.2f);
                 Handles.DrawSolidDisc(editor.VoxelPosition, sceneCamera.transform.forward, editor.Inspector.VoxelSize);
             }
-            else if (editor.Inspector.SelectedShape == Shapes.Cube)
+            else if (editor.Inspector.SelectedShape == Shape.Cube)
             {
                 int size = editor.Inspector.VoxelSize;
                 

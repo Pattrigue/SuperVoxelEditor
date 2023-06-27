@@ -1,6 +1,6 @@
 ﻿namespace SuperVoxelEditor.Editor
 {
-    public enum BuildTool
+    public enum BuildToolType
     {
         Attach,
         Erase,

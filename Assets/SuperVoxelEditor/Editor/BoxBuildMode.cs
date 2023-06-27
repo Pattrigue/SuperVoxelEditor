@@ -59,7 +59,7 @@ namespace SuperVoxelEditor.Editor
             
             uint voxelPropertyId = 0;
 
-            if (editor.Volume.VoxelProperty != null && editor.BuildTools.SelectedTool is not BuildTool.Erase)
+            if (editor.Volume.VoxelProperty != null && editor.BuildTools.SelectedTool is not BuildToolType.Erase)
             {
                 voxelPropertyId = editor.Volume.VoxelProperty.ID;
             }
