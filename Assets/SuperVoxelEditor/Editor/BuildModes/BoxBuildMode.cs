@@ -80,11 +80,11 @@ namespace SuperVoxelEditor.Editor.BuildModes
 
             if (worldPositions.Length == 1)
             {
-                editor.Volume.SetVoxel(worldPositions[0], editor.Volume.ColorPicker.SelectedColorIndex, voxelPropertyId);
+                editor.Volume.SetVoxel(worldPositions[0], voxelPropertyId, editor.Volume.VoxelColor);
             }
             else
             {
-                editor.Volume.SetVoxels(worldPositions, editor.Volume.ColorPicker.SelectedColorIndex, voxelPropertyId);
+                editor.Volume.SetVoxels(worldPositions, voxelPropertyId, editor.Volume.VoxelColor);
             }
         }
     }

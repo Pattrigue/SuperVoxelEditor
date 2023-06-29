@@ -37,7 +37,7 @@ namespace SuperVoxelEditor.Editor.BuildModes
                 
             if (size == 1)
             {
-                editor.Volume.SetVoxel(editor.VoxelPosition, editor.Volume.ColorPicker.SelectedColorIndex, editor.Volume.VoxelProperty.ID);
+                editor.Volume.SetVoxel(editor.VoxelPosition, editor.Volume.VoxelProperty.ID, editor.Volume.VoxelColor);
                 placedVoxels.Add(editor.VoxelPosition);
             }
             else
@@ -124,7 +124,7 @@ namespace SuperVoxelEditor.Editor.BuildModes
                 }
             }
 
-            editor.Volume.SetVoxels(worldPositions.ToArray(), editor.Volume.ColorPicker.SelectedColorIndex, editor.Volume.VoxelProperty.ID);
+            editor.Volume.SetVoxels(worldPositions.ToArray(), editor.Volume.VoxelProperty.ID, editor.Volume.VoxelColor);
         }
         
         private void DrawSphere(VoxelVolumeEditor editor, int size)
@@ -150,7 +150,7 @@ namespace SuperVoxelEditor.Editor.BuildModes
                 }
             }
             
-            editor.Volume.SetVoxels(worldPositions.ToArray(), editor.Volume.ColorPicker.SelectedColorIndex, editor.Volume.VoxelProperty.ID);
+            editor.Volume.SetVoxels(worldPositions.ToArray(), editor.Volume.VoxelProperty.ID, editor.Volume.VoxelColor);
         }
     }
 }

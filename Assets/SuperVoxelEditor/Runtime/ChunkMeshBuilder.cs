@@ -56,9 +56,7 @@ namespace SemagGames.SuperVoxelEditor
                         for (startPos[tertiaryAxis] = 0; startPos[tertiaryAxis] < Dimensions[tertiaryAxis]; startPos[tertiaryAxis]++)
                         {
                             uint voxelData = chunk.GetVoxelDataFromWorldPosition(startPos + chunk.ChunkPosition.VoxelPosition);
-                            uint colorId = Voxel.GetColorId(voxelData);
-
-                            Color32 voxelColor = chunk.Volume.ColorPicker.GetColorByIndex(colorId);
+                            Color32 voxelColor = Voxel.GetColor32(voxelData);
 
                             int index = startPos[secondaryAxis] * Dimensions[tertiaryAxis] + startPos[tertiaryAxis];
 
@@ -223,12 +221,9 @@ namespace SemagGames.SuperVoxelEditor
                 return false;
             }
             
-            uint voxelColorIdA = Voxel.GetColorId(chunk.GetVoxelData(a));
-            uint voxelColorIdB = Voxel.GetColorId(chunk.GetVoxelData(b));
+            uint voxelDataA = chunk.GetVoxelData(a);
             
-            bool isSameColor = voxelColorIdA == voxelColorIdB;
-            
-            return isSameColor && IsVoxelFaceVisible(b, direction, backFace, borderVisibilityFlags);
+            return Voxel.IsSameColor(voxelDataA, voxelDataB) && IsVoxelFaceVisible(b, direction, backFace, borderVisibilityFlags);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

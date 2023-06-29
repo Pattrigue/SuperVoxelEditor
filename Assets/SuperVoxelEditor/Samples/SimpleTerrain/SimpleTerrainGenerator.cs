@@ -48,20 +48,20 @@ namespace SemagGames.SuperVoxelEditor.Samples.SimpleTerrain
                 for (int y = 0; y < Chunk.Height; y++)
                 {
                     uint voxelPropertyId;
-                    uint colorId;
+                    Color32 color;
 
                     if (y <= height)
                     {
                         voxelPropertyId = y == height ? grassVoxel.ID : stoneVoxel.ID;
-                        colorId = y == height ? 167u : 6u;
+                        color = y == height ? new Color32(0, 240, 0, 255) : new Color32(200, 200, 200, 255);
                     }
                     else
                     {
                         voxelPropertyId = VoxelProperty.AirId;
-                        colorId = 0;
+                        color = default;
                     }
 
-                    volume.SetVoxel(new Vector3(x, y, z), colorId, voxelPropertyId);
+                    volume.SetVoxel(new Vector3(x, y, z), voxelPropertyId, color);
                 }
             }
         }

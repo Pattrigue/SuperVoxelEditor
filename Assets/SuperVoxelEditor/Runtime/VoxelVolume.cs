@@ -8,11 +8,15 @@ namespace SemagGames.SuperVoxelEditor
     public sealed class VoxelVolume : MonoBehaviour
     {
         [SerializeField] private VoxelProperty voxelProperty;
-        [SerializeField] private ColorPicker colorPicker;
+        [SerializeField] private Color32 voxelColor = new Color32(127, 127, 127, 255);
         [SerializeField] private Chunk chunkPrefab;
         [SerializeField] private CommandManager commandManager = new();
-    
-        public ColorPicker ColorPicker => colorPicker;
+
+        public Color32 VoxelColor
+        {
+            get => voxelColor;
+            set => voxelColor = value;
+        }
 
         public VoxelProperty VoxelProperty
         {
@@ -69,17 +73,17 @@ namespace SemagGames.SuperVoxelEditor
             chunks.Clear();
         }
         
-        public void SetVoxel(Vector3 worldPosition, uint colorId = 0, uint voxelPropertyId = 1)
+        public void SetVoxel(Vector3 worldPosition, uint voxelPropertyId, Color32 color)
         {
             Chunk chunk = GetOrCreateChunk(worldPosition);
 
-            SetVoxelCommand command = new SetVoxelCommand(chunk, worldPosition, new Voxel(voxelPropertyId, colorId));
+            SetVoxelCommand command = new SetVoxelCommand(chunk, worldPosition, new Voxel(voxelPropertyId, color));
             commandManager.Do(command);
         }
         
-        public void SetVoxels(Vector3[] worldPositions, uint colorId = 0, uint voxelPropertyId = 1)
+        public void SetVoxels(Vector3[] worldPositions, uint voxelPropertyId, Color32 color)
         {
-            SetVoxelBatchCommand command = new SetVoxelBatchCommand(this, worldPositions, new Voxel(voxelPropertyId, colorId));
+            SetVoxelBatchCommand command = new SetVoxelBatchCommand(this, worldPositions, new Voxel(voxelPropertyId, color));
             commandManager.Do(command);
         }
 

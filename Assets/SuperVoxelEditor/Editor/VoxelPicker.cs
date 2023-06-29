@@ -17,7 +17,7 @@ namespace SuperVoxelEditor.Editor
                 volume.VoxelProperty = voxelProperty;
             }
                 
-            volume.ColorPicker.SetColor(voxel.colorId);
+            volume.VoxelColor = voxel.GetColor();
             
             return true;
         }

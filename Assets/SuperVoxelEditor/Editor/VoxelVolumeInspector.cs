@@ -44,6 +44,8 @@ namespace SuperVoxelEditor.Editor
                 EditorGUILayout.HelpBox("You have not assigned a Voxel Property - placing a voxel will default to placing Air voxels!", MessageType.Warning);
             }
 
+            volume.VoxelColor = EditorGUILayout.ColorField("Voxel Color", volume.VoxelColor);
+
             DrawChunkBounds = EditorGUILayout.Toggle("Draw Chunk Bounds", DrawChunkBounds);
             SelectedBuildMode = (BuildMode)EditorGUILayout.EnumPopup("Build Mode", SelectedBuildMode);
 
@@ -64,12 +66,6 @@ namespace SuperVoxelEditor.Editor
             EditorGUILayout.BeginVertical(GUI.skin.box);
             GUILayout.Label("Build Tools", headerStyle);
             editor.BuildTools.Inspector.Draw();
-            EditorGUILayout.EndVertical();
-
-            EditorGUILayout.BeginVertical(GUI.skin.box);
-            GUILayout.Label("Color Palette", headerStyle);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("colorPicker"));
-            GUILayout.Label("", GUILayout.Height(-EditorGUIUtility.singleLineHeight * 0.75f)); // hack to shrink the box
             EditorGUILayout.EndVertical();
 
             if (!IsEditingActive && GUILayout.Button("Edit"))
