@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Opaque
-  m_Shader: {fileID: -6465566751694194690, guid: c8d1fb5691478dd46bda7e2a53320889,
+  m_Shader: {fileID: -6465566751694194690, guid: e1c836d245db4dc4ab2128c4d4931b96,
     type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
