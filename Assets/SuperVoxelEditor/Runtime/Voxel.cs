@@ -49,11 +49,10 @@ namespace SemagGames.SuperVoxelEditor
 
         public static uint GetPropertyId(uint voxelData) => voxelData >> 22;
 
-        public static uint GetRedChannel(uint voxelData) => (voxelData >> 15) & 0x7F;
-        
-        public static uint GetGreenChannel(uint voxelData) => (voxelData >> 8) & 0x7F;
-        
-        public static uint GetBlueChannel(uint voxelData) => (voxelData >> 1) & 0x7F;
+        public static uint GetRedChannel(uint voxelData) => ((voxelData >> 15) & 0x7F) * 2;
+        public static uint GetGreenChannel(uint voxelData) => ((voxelData >> 8) & 0x7F) * 2;
+        public static uint GetBlueChannel(uint voxelData) => ((voxelData >> 1) & 0x7F) * 2;
+
         
         public static Color GetColor(uint voxelData)
         {
@@ -76,10 +75,10 @@ namespace SemagGames.SuperVoxelEditor
         public uint ToVoxelData()
         {
             uint voxelData = (propertyId << 22) |
-                             ((uint)r / 2 << 15) |
-                             ((uint)g / 2 << 8) |
-                             ((uint)b / 2 << 1);
-    
+                             ((uint)Math.Round(r / 255.0 * 127) << 15) |
+                             ((uint)Math.Round(g / 255.0 * 127) << 8) |
+                             ((uint)Math.Round(b / 255.0 * 127) << 1);
+
             return voxelData;
         }
     
