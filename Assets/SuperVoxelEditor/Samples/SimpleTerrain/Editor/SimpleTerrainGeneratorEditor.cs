@@ -4,7 +4,7 @@ using UnityEngine;
 namespace SemagGames.SuperVoxelEditor.Samples.SimpleTerrain.Editor
 {
     [CustomEditor(typeof(SimpleTerrainGenerator))]
-    public sealed class VoxelTerrainTesterEditor : UnityEditor.Editor
+    public sealed class SimpleTerrainGeneratorEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {

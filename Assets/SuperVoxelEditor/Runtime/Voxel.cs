@@ -49,11 +49,12 @@ namespace SemagGames.SuperVoxelEditor
 
         public static uint GetPropertyId(uint voxelData) => voxelData >> 22;
 
-        public static uint GetRedChannel(uint voxelData) => ((voxelData >> 15) & 0x7F) * 2;
-        public static uint GetGreenChannel(uint voxelData) => ((voxelData >> 8) & 0x7F) * 2;
-        public static uint GetBlueChannel(uint voxelData) => ((voxelData >> 1) & 0x7F) * 2;
-
+        public static uint GetRedChannel(uint voxelData) => ((voxelData >> 15) & 0xFF) * 255 / 127;
         
+        public static uint GetGreenChannel(uint voxelData) => ((voxelData >> 8) & 0xFF) * 255 / 127;
+        
+        public static uint GetBlueChannel(uint voxelData) => ((voxelData >> 1) & 0xFF) * 255 / 127;
+
         public static Color GetColor(uint voxelData)
         {
             byte redChannel = (byte)GetRedChannel(voxelData);
@@ -81,17 +82,17 @@ namespace SemagGames.SuperVoxelEditor
 
             return voxelData;
         }
-    
+
         public static Voxel FromVoxelData(uint voxelData)
         {
             uint id = GetPropertyId(voxelData);
-            byte redChannel = (byte)(GetRedChannel(voxelData) * 2);
-            byte greenChannel = (byte)(GetGreenChannel(voxelData) * 2);
-            byte blueChannel = (byte)(GetBlueChannel(voxelData) * 2);
+            byte redChannel = (byte)GetRedChannel(voxelData);
+            byte greenChannel = (byte)GetGreenChannel(voxelData);
+            byte blueChannel = (byte)GetBlueChannel(voxelData);
 
             return new Voxel(id, redChannel, greenChannel, blueChannel);
         }
-        
+
         public static bool IsSameColor(uint voxelDataA, uint voxelDataB)
         {
             uint redChannelA = GetRedChannel(voxelDataA);
