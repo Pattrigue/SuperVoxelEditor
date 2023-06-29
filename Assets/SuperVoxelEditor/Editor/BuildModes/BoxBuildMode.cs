@@ -25,7 +25,7 @@ namespace SuperVoxelEditor.Editor.BuildModes
         {
             if (isDragging)
             {
-                if (editor.ValidVoxelPosition)
+                if (editor.Raycaster.IsValidVoxelPosition)
                 {
                     PlaceVoxels(editor);
                 }

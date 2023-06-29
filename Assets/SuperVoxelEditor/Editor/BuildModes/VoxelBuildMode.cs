@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using SemagGames.SuperVoxelEditor;
-using SuperVoxelEditor.Editor.BuildTools;
 using UnityEditor;
 using UnityEngine;
 

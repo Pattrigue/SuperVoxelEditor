@@ -25,7 +25,7 @@ namespace SuperVoxelEditor.Editor
         }
 
         public bool IsEditingActive { get; private set; } = true;
-        public bool DrawChunkBounds { get; private set; } = true;
+        public bool DrawChunkBounds { get; private set; } 
         
         public int VoxelSize { get; private set; } = 1;
         

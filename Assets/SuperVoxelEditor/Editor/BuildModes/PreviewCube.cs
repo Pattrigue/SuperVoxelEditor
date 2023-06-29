@@ -37,7 +37,7 @@ namespace SuperVoxelEditor.Editor.BuildModes
         {
             const float offset = 1.01f;
 
-            if (!editor.ValidVoxelPosition)
+            if (!editor.Raycaster.IsValidVoxelPosition)
             {
                 cubeRenderer.enabled = false;
                 return;

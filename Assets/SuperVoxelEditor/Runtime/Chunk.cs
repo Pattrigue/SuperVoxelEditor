@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SemagGames.SuperVoxelEditor
@@ -37,6 +38,8 @@ namespace SemagGames.SuperVoxelEditor
 
         public ChunkPosition ChunkPosition => ChunkPosition.FromWorldPosition(transform.position);
 
+        public IReadOnlyList<uint> VoxelData => voxelData;
+        
         private static readonly Vector3[] NeighborDirections =
         {
             Vector3.up, Vector3.down, Vector3.left, Vector3.right, Vector3.forward, Vector3.back
