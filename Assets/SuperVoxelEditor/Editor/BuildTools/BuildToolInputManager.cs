@@ -53,6 +53,9 @@ namespace SuperVoxelEditor.Editor.BuildTools
                 case KeyCode.Alpha4:
                     buildToolInspector.SelectedTool = BuildTool.Picker;
                     break;
+                case KeyCode.Alpha5:
+                    buildToolInspector.SelectedTool = BuildTool.Cover;
+                    break;
             }
         }
  

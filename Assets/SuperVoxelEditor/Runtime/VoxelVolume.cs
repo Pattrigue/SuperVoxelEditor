@@ -133,6 +133,12 @@ namespace SemagGames.SuperVoxelEditor
             return true;
         }
         
+        public bool HasVoxel(Vector3 worldPosition)
+        {
+            uint voxelData = GetVoxelData(worldPosition);
+            return !Voxel.IsAir(voxelData);
+        }
+        
         public bool TryGetChunk(Vector3 position, out Chunk chunk)
         {
             ChunkPosition chunkPosition = ChunkPosition.FromWorldPosition(position);

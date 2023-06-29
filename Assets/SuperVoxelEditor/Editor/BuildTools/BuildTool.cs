@@ -5,6 +5,7 @@
         Attach,
         Erase,
         Paint,
-        Picker
+        Picker,
+        Cover
     }
 }

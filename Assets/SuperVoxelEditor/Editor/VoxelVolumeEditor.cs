@@ -1,4 +1,5 @@
-﻿using SemagGames.SuperVoxelEditor;
+﻿using System.Linq;
+using SemagGames.SuperVoxelEditor;
 using SuperVoxelEditor.Editor.BuildModes;
 using SuperVoxelEditor.Editor.BuildTools;
 using UnityEditor;
@@ -50,6 +51,13 @@ namespace SuperVoxelEditor.Editor
 
         public void SetVoxel(Vector3 worldPosition)
         {
+            if (BuildTools.SelectedTool == BuildTool.Cover 
+                && (Volume.HasVoxel(worldPosition + Vector3.up)
+                    || !Volume.HasVoxel(worldPosition - Vector3.up)))
+            {
+                return;
+            }
+            
             if (BuildTools.SelectedTool != BuildTool.Erase)
             {
                 Volume.SetVoxel(worldPosition, Volume.VoxelProperty.ID, Volume.VoxelColor);
@@ -67,7 +75,20 @@ namespace SuperVoxelEditor.Editor
                 SetVoxel(worldPositions[0]);
                 return;
             }
-            
+
+            if (BuildTools.SelectedTool == BuildTool.Cover)
+            {
+                worldPositions = worldPositions
+                    .Where(position =>
+                        Volume.HasVoxel(position)
+                        && Volume.HasVoxel(position - Vector3.up)
+                        && !Volume.HasVoxel(position + Vector3.up)
+                        && Volume.TryGetVoxel(position - Vector3.up, out var voxelBelow)
+                        && !voxelBelow.GetColor().IsSameColor(Volume.VoxelColor)
+                    )
+                    .ToArray();
+            }
+
             if (BuildTools.SelectedTool != BuildTool.Erase)
             {
                 Volume.SetVoxels(worldPositions, Volume.VoxelProperty.ID, Volume.VoxelColor);

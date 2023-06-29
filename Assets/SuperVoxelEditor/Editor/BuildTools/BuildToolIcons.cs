@@ -20,6 +20,7 @@ namespace SuperVoxelEditor.Editor.BuildTools
                 { BuildTool.Erase, Resources.Load<Texture2D>("EraseIcon") },
                 { BuildTool.Paint, Resources.Load<Texture2D>("PaintIcon") },
                 { BuildTool.Picker, Resources.Load<Texture2D>("PickerIcon") },
+                { BuildTool.Cover, Resources.Load<Texture2D>("CoverIcon") }
             };
         }
     
