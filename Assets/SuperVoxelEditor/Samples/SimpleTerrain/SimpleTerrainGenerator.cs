@@ -53,7 +53,7 @@ namespace SemagGames.SuperVoxelEditor.Samples.SimpleTerrain
                     if (y <= height)
                     {
                         voxelPropertyId = y == height ? grassVoxel.ID : stoneVoxel.ID;
-                        color = y == height ? new Color32(0, 255, 0, 255) : new Color32(200, 200, 200, 255);
+                        color = y == height ? volume.VoxelColor : Color.gray;
                     }
                     else
                     {
