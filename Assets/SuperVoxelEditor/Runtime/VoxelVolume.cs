@@ -87,6 +87,10 @@ namespace SemagGames.SuperVoxelEditor
             commandManager.Do(command);
         }
 
+        public void EraseVoxel(Vector3 worldPosition) => SetVoxel(worldPosition, Voxel.Air.propertyId, Color.clear);
+        
+        public void EraseVoxels(Vector3[] worldPositions) => SetVoxels(worldPositions, Voxel.Air.propertyId, Color.clear);
+
         public Chunk GetOrCreateChunk(Vector3 worldPosition)
         {
             ChunkPosition chunkPosition = ChunkPosition.FromWorldPosition(worldPosition);

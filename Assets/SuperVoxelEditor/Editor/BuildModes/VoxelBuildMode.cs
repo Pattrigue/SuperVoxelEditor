@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using SemagGames.SuperVoxelEditor;
+using SuperVoxelEditor.Editor.BuildTools;
 using UnityEditor;
 using UnityEngine;
 
@@ -37,19 +39,19 @@ namespace SuperVoxelEditor.Editor.BuildModes
                 
             if (size == 1)
             {
-                editor.Volume.SetVoxel(editor.VoxelPosition, editor.Volume.VoxelProperty.ID, editor.Volume.VoxelColor);
+                editor.SetVoxel(editor.VoxelPosition);
                 placedVoxels.Add(editor.VoxelPosition);
             }
             else
             {
-                if (editor.Inspector.SelectedShape == Shape.Cube)
+                Vector3[] worldPositions = editor.Inspector.SelectedShape switch
                 {
-                    DrawCube(editor, size);
-                }
-                else if (editor.Inspector.SelectedShape == Shape.Sphere)
-                {
-                    DrawSphere(editor, size);
-                }
+                    Shape.Cube => DrawCube(editor, size),
+                    Shape.Sphere => DrawSphere(editor, size),
+                    _ => throw new System.NotImplementedException()
+                };
+
+                editor.SetVoxels(worldPositions);
             }
             
             lastVoxelPosition = editor.VoxelPosition;
@@ -85,7 +87,7 @@ namespace SuperVoxelEditor.Editor.BuildModes
             Handles.color = handlesColor;
         }
 
-        private void DrawCube(VoxelVolumeEditor editor, int size)
+        private Vector3[] DrawCube(VoxelVolumeEditor editor, int size)
         {
             List<Vector3> worldPositions = new List<Vector3>();
             Vector3 offset = size % 2 == 0 ? Vector3.one * 0.5f : Vector3.zero;
@@ -124,10 +126,10 @@ namespace SuperVoxelEditor.Editor.BuildModes
                 }
             }
 
-            editor.Volume.SetVoxels(worldPositions.ToArray(), editor.Volume.VoxelProperty.ID, editor.Volume.VoxelColor);
+            return worldPositions.ToArray();
         }
         
-        private void DrawSphere(VoxelVolumeEditor editor, int size)
+        private Vector3[] DrawSphere(VoxelVolumeEditor editor, int size)
         {
             Vector3Int voxelPosition = Vector3Int.FloorToInt(editor.VoxelPosition);
             List<Vector3> worldPositions = new List<Vector3>(size * size * size);
@@ -149,8 +151,8 @@ namespace SuperVoxelEditor.Editor.BuildModes
                     }
                 }
             }
-            
-            editor.Volume.SetVoxels(worldPositions.ToArray(), editor.Volume.VoxelProperty.ID, editor.Volume.VoxelColor);
+
+            return worldPositions.ToArray();
         }
     }
 }

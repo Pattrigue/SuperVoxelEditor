@@ -1,5 +1,4 @@
-﻿using SuperVoxelEditor.Editor.BuildTools;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SuperVoxelEditor.Editor.BuildModes
 {
@@ -58,13 +57,6 @@ namespace SuperVoxelEditor.Editor.BuildModes
 
             Vector3[] worldPositions = new Vector3[sizeX * sizeY * sizeZ];
             
-            uint voxelPropertyId = 0;
-
-            if (editor.Volume.VoxelProperty != null && editor.BuildTools.SelectedTool is not BuildTool.Erase)
-            {
-                voxelPropertyId = editor.Volume.VoxelProperty.ID;
-            }
-
             int i = 0;
 
             for (int x = min.x; x <= max.x; x++)
@@ -77,15 +69,8 @@ namespace SuperVoxelEditor.Editor.BuildModes
                     }
                 }
             }
-
-            if (worldPositions.Length == 1)
-            {
-                editor.Volume.SetVoxel(worldPositions[0], voxelPropertyId, editor.Volume.VoxelColor);
-            }
-            else
-            {
-                editor.Volume.SetVoxels(worldPositions, voxelPropertyId, editor.Volume.VoxelColor);
-            }
+            
+            editor.SetVoxels(worldPositions);
         }
     }
 }

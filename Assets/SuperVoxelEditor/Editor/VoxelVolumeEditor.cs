@@ -47,7 +47,37 @@ namespace SuperVoxelEditor.Editor
         {
             Inspector.DrawInspectorGUI(this, serializedObject);
         }
+
+        public void SetVoxel(Vector3 worldPosition)
+        {
+            if (BuildTools.SelectedTool != BuildTool.Erase)
+            {
+                Volume.SetVoxel(worldPosition, Volume.VoxelProperty.ID, Volume.VoxelColor);
+            }
+            else
+            {
+                Volume.EraseVoxel(worldPosition);
+            }
+        }
         
+        public void SetVoxels(Vector3[] worldPositions)
+        {
+            if (worldPositions.Length == 1)
+            {
+                SetVoxel(worldPositions[0]);
+                return;
+            }
+            
+            if (BuildTools.SelectedTool != BuildTool.Erase)
+            {
+                Volume.SetVoxels(worldPositions, Volume.VoxelProperty.ID, Volume.VoxelColor);
+            }
+            else
+            {
+                Volume.EraseVoxels(worldPositions);
+            }
+        }
+
         private void OnSelectedBuildModeChanged(BuildMode buildMode)
         {
             switch (buildMode)
@@ -110,7 +140,7 @@ namespace SuperVoxelEditor.Editor
         {
             return selectedGameObject != null && selectedGameObject.TryGetComponent(out VoxelVolume _);
         }
-
+        
         private void HandleSceneGUIEvents(SceneView sceneView)
         {
             // Get the voxel hit point using either control or raycast method.
