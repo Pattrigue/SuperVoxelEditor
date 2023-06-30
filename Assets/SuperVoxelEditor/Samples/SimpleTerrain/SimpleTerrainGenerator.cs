@@ -26,42 +26,44 @@ namespace SemagGames.SuperVoxelEditor.Samples.SimpleTerrain
             volume.Clear();
 
             for (int x = 0; x < Chunk.Width * numChunks; x++)
-            for (int z = 0; z < Chunk.Depth * numChunks; z++)
             {
-                float amplitude = 1;
-                float frequency = 1;
-                float noiseHeight = 0;
-
-                for (int i = 0; i < octaves; i++)
+                for (int z = 0; z < Chunk.Depth * numChunks; z++)
                 {
-                    float perlinValue = Mathf.PerlinNoise(x * scale * frequency, z * scale * frequency);
-                    noiseHeight += Mathf.Abs(perlinValue) * amplitude;
+                    float amplitude = 1;
+                    float frequency = 1;
+                    float noiseHeight = 0;
 
-                    amplitude *= persistence;
-                    frequency *= lacunarity;
-                }
-
-                noiseHeight = Mathf.Pow(noiseHeight, exponentiation) * heightMultiplier;
-
-                int height = Mathf.Min(Chunk.Height, Mathf.FloorToInt(noiseHeight));
-
-                for (int y = 0; y < Chunk.Height; y++)
-                {
-                    uint voxelPropertyId;
-                    Color32 color;
-
-                    if (y <= height)
+                    for (int i = 0; i < octaves; i++)
                     {
-                        voxelPropertyId = y == height ? grassVoxel.ID : stoneVoxel.ID;
-                        color = y == height ? volume.VoxelColor : Color.gray;
-                    }
-                    else
-                    {
-                        voxelPropertyId = VoxelProperty.AirId;
-                        color = default;
+                        float perlinValue = Mathf.PerlinNoise(x * scale * frequency, z * scale * frequency);
+                        noiseHeight += Mathf.Abs(perlinValue) * amplitude;
+
+                        amplitude *= persistence;
+                        frequency *= lacunarity;
                     }
 
-                    volume.SetVoxel(new Vector3(x, y, z), voxelPropertyId, color);
+                    noiseHeight = Mathf.Pow(noiseHeight, exponentiation) * heightMultiplier;
+
+                    int height = Mathf.Min(Chunk.Height, Mathf.FloorToInt(noiseHeight));
+
+                    for (int y = 0; y < Chunk.Height; y++)
+                    {
+                        uint voxelPropertyId;
+                        Color32 color;
+
+                        if (y <= height)
+                        {
+                            voxelPropertyId = y == height ? grassVoxel.ID : stoneVoxel.ID;
+                            color = y == height ? volume.VoxelColor : Color.gray;
+                        }
+                        else
+                        {
+                            voxelPropertyId = VoxelProperty.AirId;
+                            color = default;
+                        }
+
+                        volume.SetVoxel(new Vector3(x, y, z), voxelPropertyId, color);
+                    }
                 }
             }
         }
