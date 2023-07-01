@@ -1,6 +1,7 @@
 ﻿using System;
 using SemagGames.SuperVoxelEditor;
 using SuperVoxelEditor.Editor.BuildModes;
+using SuperVoxelEditor.Editor.BuildTools;
 using UnityEditor;
 using UnityEngine;
 
@@ -68,6 +69,11 @@ namespace SuperVoxelEditor.Editor
             else if (editor.ActiveBuildMode is FaceBuildMode faceBuildMode)
             {
                 faceBuildMode.MaxExploreLimit = EditorGUILayout.IntSlider("Max Explore Limit", faceBuildMode.MaxExploreLimit, 1, 1000);
+
+                if (editor.BuildTools.SelectedTool == BuildTool.Attach)
+                {
+                    faceBuildMode.ExtrudeHeight = EditorGUILayout.IntSlider("Extrude Height", faceBuildMode.ExtrudeHeight, 1, 16);
+                }
             }
         }
 

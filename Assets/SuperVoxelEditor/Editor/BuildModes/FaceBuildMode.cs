@@ -14,6 +14,7 @@ namespace SuperVoxelEditor.Editor.BuildModes
         private enum Axis { X, Y, Z }
 
         public int MaxExploreLimit { get; set; } = 128;
+        public int ExtrudeHeight { get; set; } = 1;
         
         public override void HandleMouseDown(VoxelVolumeEditor editor)
         {
@@ -110,7 +111,7 @@ namespace SuperVoxelEditor.Editor.BuildModes
                 foreach (Vector3 neighborDirection in neighborDirections)
                 {
                     Vector3 neighborPosition = position + neighborDirection;
-
+                                
                     if (exploredPositions.Contains(neighborPosition)) continue;
                     if (!editor.Volume.TryGetVoxel(neighborPosition, out Voxel voxel)) continue;
                     if (voxel != baseVoxel) continue;
@@ -141,33 +142,38 @@ namespace SuperVoxelEditor.Editor.BuildModes
             return Axis.Z;
         }
         
-        private static Vector3[] CreateWorldPositions(VoxelVolumeEditor editor, HashSet<Vector3> exploredPositions, Vector3 normal)
+        private Vector3[] CreateWorldPositions(VoxelVolumeEditor editor, HashSet<Vector3> exploredPositions, Vector3 normal)
         {
-            Vector3[] worldPositions = new Vector3[exploredPositions.Count];
-            
+            Vector3[] worldPositions = editor.BuildTools.SelectedTool == BuildTool.Attach 
+                ? new Vector3[exploredPositions.Count * ExtrudeHeight] 
+                : new Vector3[exploredPositions.Count];
+    
             int i = 0;
 
             foreach (Vector3 exploredPosition in exploredPositions)
             {
                 if (editor.BuildTools.SelectedTool == BuildTool.Attach)
                 {
-                    Vector3 extrudedPosition = exploredPosition + normal;
-
-                    if (!editor.Volume.HasVoxel(extrudedPosition))
+                    for (int layer = 1; layer <= ExtrudeHeight; layer++)
                     {
-                        worldPositions[i] = extrudedPosition;
+                        Vector3 extrudedPosition = exploredPosition + normal * layer;
+
+                        if (!editor.Volume.HasVoxel(extrudedPosition))
+                        {
+                            worldPositions[i] = extrudedPosition;
+                            i++;
+                        }
                     }
                 }
                 else
                 {
                     worldPositions[i] = exploredPosition;
+                    i++;
                 }
-
-                i++;
             }
 
             Array.Resize(ref worldPositions, i);
-            
+
             return worldPositions;
         }
     }
