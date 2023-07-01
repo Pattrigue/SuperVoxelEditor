@@ -24,7 +24,7 @@ namespace SuperVoxelEditor.Editor.BuildModes
             Vector3 normal = hit.normal;
 
             Vector3[] neighborDirections = GetNeighborDirections(normal);
-            HashSet<Vector3> exploredPositions = ExploreNeighbors(editor, voxelPosition, neighborDirections, MaxExploreLimit);
+            HashSet<Vector3> exploredPositions = ExploreNeighbors(editor, voxelPosition, neighborDirections, normal, MaxExploreLimit);
 
             Vector3[] worldPositions = CreateWorldPositions(editor, exploredPositions, normal);
             editor.SetVoxels(worldPositions);
@@ -95,7 +95,7 @@ namespace SuperVoxelEditor.Editor.BuildModes
             return neighborDirections;
         }
 
-        private static HashSet<Vector3> ExploreNeighbors(VoxelVolumeEditor editor, Vector3 voxelPosition, Vector3[] neighborDirections, int maxExploreLimit)
+        private static HashSet<Vector3> ExploreNeighbors(VoxelVolumeEditor editor, Vector3 voxelPosition, Vector3[] neighborDirections, Vector3 normal, int maxExploreLimit)
         {
             Voxel baseVoxel = editor.Volume.GetVoxel(voxelPosition);
             
@@ -103,7 +103,9 @@ namespace SuperVoxelEditor.Editor.BuildModes
 
             Queue<Vector3> toExplore = new Queue<Vector3>();
             toExplore.Enqueue(voxelPosition);
-
+            
+            bool isAttachTool = editor.BuildTools.SelectedTool == BuildTool.Attach;
+            
             while (toExplore.TryDequeue(out Vector3 position))
             {
                 if (exploredPositions.Count > maxExploreLimit) break;
@@ -111,10 +113,11 @@ namespace SuperVoxelEditor.Editor.BuildModes
                 foreach (Vector3 neighborDirection in neighborDirections)
                 {
                     Vector3 neighborPosition = position + neighborDirection;
-                                
+
                     if (exploredPositions.Contains(neighborPosition)) continue;
                     if (!editor.Volume.TryGetVoxel(neighborPosition, out Voxel voxel)) continue;
                     if (voxel != baseVoxel) continue;
+                    if (isAttachTool && editor.Volume.HasVoxel(neighborPosition + normal)) continue;
 
                     toExplore.Enqueue(neighborPosition);
                 }
