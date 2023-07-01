@@ -39,23 +39,11 @@ namespace SuperVoxelEditor.Editor.BuildTools
  
         private void HandleShiftKeyPressEvents(KeyCode keyCode)
         {
-            switch (keyCode)
+            int keyCodeNumber = keyCode - KeyCode.Alpha1;
+
+            if (Enum.IsDefined(typeof(BuildTool), keyCodeNumber))
             {
-                case KeyCode.Alpha1:
-                    buildToolInspector.SelectedTool = BuildTool.Attach;
-                    break;
-                case KeyCode.Alpha2:
-                    buildToolInspector.SelectedTool = BuildTool.Erase;
-                    break;
-                case KeyCode.Alpha3:
-                    buildToolInspector.SelectedTool = BuildTool.Paint;
-                    break;
-                case KeyCode.Alpha4:
-                    buildToolInspector.SelectedTool = BuildTool.Picker;
-                    break;
-                case KeyCode.Alpha5:
-                    buildToolInspector.SelectedTool = BuildTool.Cover;
-                    break;
+                buildToolInspector.SelectedTool = (BuildTool)keyCodeNumber;
             }
         }
  

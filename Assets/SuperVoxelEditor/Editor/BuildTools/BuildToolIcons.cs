@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SuperVoxelEditor.Editor.BuildTools
@@ -14,14 +16,8 @@ namespace SuperVoxelEditor.Editor.BuildTools
     
         private static Dictionary<BuildTool, Texture2D> LoadToolIcons()
         {
-            return new Dictionary<BuildTool, Texture2D>
-            {
-                { BuildTool.Attach, Resources.Load<Texture2D>("AttachIcon") },
-                { BuildTool.Erase, Resources.Load<Texture2D>("EraseIcon") },
-                { BuildTool.Paint, Resources.Load<Texture2D>("PaintIcon") },
-                { BuildTool.Picker, Resources.Load<Texture2D>("PickerIcon") },
-                { BuildTool.Cover, Resources.Load<Texture2D>("CoverIcon") }
-            };
+            return Enum.GetNames(typeof(BuildTool))
+                .ToDictionary(Enum.Parse<BuildTool>, buildToolName => Resources.Load<Texture2D>($"{buildToolName}Icon"));
         }
     
         public Texture2D GetIcon(BuildTool buildTool)

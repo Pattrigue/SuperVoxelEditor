@@ -16,13 +16,6 @@ namespace SuperVoxelEditor.Editor
 
         public void SetVoxel(Vector3 worldPosition, Color32 voxelColor)
         {
-            if (editor.BuildTools.SelectedTool == BuildTool.Cover 
-                && (editor.Volume.HasVoxel(worldPosition + Vector3.up)
-                    || !editor.Volume.HasVoxel(worldPosition - Vector3.up)))
-            {
-                return;
-            }
-        
             if (editor.BuildTools.SelectedTool != BuildTool.Erase)
             {
                 editor.Volume.SetVoxel(worldPosition, editor.Volume.VoxelProperty.ID, voxelColor);
@@ -39,19 +32,6 @@ namespace SuperVoxelEditor.Editor
             {
                 SetVoxel(worldPositions[0], voxelColor);
                 return;
-            }
-
-            if (editor.BuildTools.SelectedTool == BuildTool.Cover)
-            {
-                worldPositions = worldPositions
-                    .Where(position =>
-                        editor.Volume.HasVoxel(position)
-                        && editor.Volume.HasVoxel(position - Vector3.up)
-                        && !editor.Volume.HasVoxel(position + Vector3.up)
-                        && editor.Volume.TryGetVoxel(position - Vector3.up, out var voxelBelow)
-                        && !voxelBelow.GetColor().IsSameColor(voxelColor)
-                    )
-                    .ToArray();
             }
 
             if (editor.BuildTools.SelectedTool != BuildTool.Erase)
