@@ -17,7 +17,6 @@ namespace SemagGames.SuperVoxelEditor
 
         public void Rebuild()
         {
-            Debug.Log($"Rebuilding chunk collider {transform.name}", gameObject);
             meshCollider.sharedMesh = meshFilter.sharedMesh;
         }
     }
