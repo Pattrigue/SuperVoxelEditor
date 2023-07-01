@@ -9,12 +9,19 @@ namespace SuperVoxelEditor.Editor.BuildModes
 {
     public sealed class FaceBuildMode : VoxelVolumeBuildMode
     {
+        private enum Axis { X, Y, Z }
+        
         public override BuildMode BuildMode => BuildMode.Face;
         
-        private enum Axis { X, Y, Z }
-
         public int MaxExploreLimit { get; set; } = 128;
         public int ExtrudeHeight { get; set; } = 1;
+        
+        private static readonly Dictionary<Axis, Vector3[]> NeighborDirectionsByAxis = new Dictionary<Axis, Vector3[]>
+        {
+            { Axis.X, new[] { Vector3.up, Vector3.down, Vector3.forward, Vector3.back } },
+            { Axis.Y, new[] { Vector3.left, Vector3.right, Vector3.forward, Vector3.back } },
+            { Axis.Z, new[] { Vector3.up, Vector3.down, Vector3.left, Vector3.right } },
+        };
         
         public override void HandleMouseDown(VoxelVolumeEditor editor)
         {
@@ -84,15 +91,7 @@ namespace SuperVoxelEditor.Editor.BuildModes
         private static Vector3[] GetNeighborDirections(Vector3 normal)
         {
             Axis dominantAxis = GetDominantAxis(normal);
-
-            Vector3[] neighborDirections = dominantAxis switch
-            {
-                Axis.X => new[] { Vector3.up, Vector3.down, Vector3.forward, Vector3.back },
-                Axis.Y => new[] { Vector3.left, Vector3.right, Vector3.forward, Vector3.back },
-                _ => new[] { Vector3.up, Vector3.down, Vector3.left, Vector3.right }
-            };
-
-            return neighborDirections;
+            return NeighborDirectionsByAxis[dominantAxis];
         }
 
         private static HashSet<Vector3> ExploreNeighbors(VoxelVolumeEditor editor, Vector3 voxelPosition, Vector3[] neighborDirections, Vector3 normal, int maxExploreLimit)
