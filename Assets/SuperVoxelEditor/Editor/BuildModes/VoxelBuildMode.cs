@@ -6,6 +6,12 @@ namespace SuperVoxelEditor.Editor.BuildModes
 {
     public sealed class VoxelBuildMode : VoxelVolumeBuildMode
     {
+        public override BuildMode BuildMode => BuildMode.Voxel;
+
+        public Shape SelectedShape { get; set; } = Shape.Cube;
+        
+        public int VoxelSize { get; set; } = 1;
+        
         private readonly HashSet<Vector3> placedVoxels = new HashSet<Vector3>();
 
         private bool isMouseDown;
@@ -33,19 +39,17 @@ namespace SuperVoxelEditor.Editor.BuildModes
             if (placedVoxels.Contains(editor.VoxelPosition)) return;
             if (lastVoxelPosition == editor.VoxelPosition) return;
             
-            int size = editor.Inspector.VoxelSize;
-                
-            if (size == 1)
+            if (VoxelSize == 1)
             {
                 editor.SetVoxel(editor.VoxelPosition);
                 placedVoxels.Add(editor.VoxelPosition);
             }
             else
             {
-                Vector3[] worldPositions = editor.Inspector.SelectedShape switch
+                Vector3[] worldPositions = SelectedShape switch
                 {
-                    Shape.Cube => DrawCube(editor, size),
-                    Shape.Sphere => DrawSphere(editor, size),
+                    Shape.Cube => DrawCube(editor, VoxelSize),
+                    Shape.Sphere => DrawSphere(editor, VoxelSize),
                     _ => throw new System.NotImplementedException()
                 };
 
@@ -55,31 +59,29 @@ namespace SuperVoxelEditor.Editor.BuildModes
             lastVoxelPosition = editor.VoxelPosition;
         }
 
-        private static void DrawPreview(VoxelVolumeEditor editor)
+        private void DrawPreview(VoxelVolumeEditor editor)
         {
             Color handlesColor = Handles.color;
             
-            if (editor.Inspector.SelectedShape == Shape.Sphere)
+            if (SelectedShape == Shape.Sphere)
             { 
                 Camera sceneCamera = SceneView.lastActiveSceneView.camera;
                 
                 Handles.color = Color.cyan;
-                Handles.DrawWireDisc(editor.VoxelPosition, sceneCamera.transform.forward, editor.Inspector.VoxelSize, 5f);
+                Handles.DrawWireDisc(editor.VoxelPosition, sceneCamera.transform.forward, VoxelSize, 5f);
                 Handles.color = new Color(0, 0.8f, 0.8f, 0.2f);
-                Handles.DrawSolidDisc(editor.VoxelPosition, sceneCamera.transform.forward, editor.Inspector.VoxelSize);
+                Handles.DrawSolidDisc(editor.VoxelPosition, sceneCamera.transform.forward, VoxelSize);
             }
-            else if (editor.Inspector.SelectedShape == Shape.Cube)
+            else if (SelectedShape == Shape.Cube)
             {
-                int size = editor.Inspector.VoxelSize;
-                
-                Vector3 offset = size % 2 == 0 ? Vector3.one * 0.5f : Vector3.zero;
+                Vector3 offset = VoxelSize % 2 == 0 ? Vector3.one * 0.5f : Vector3.zero;
                 Vector3 center = editor.VoxelPosition + offset;
 
                 Handles.color = Color.cyan;
-                Handles.DrawWireCube(center, Vector3.one * size);
+                Handles.DrawWireCube(center, Vector3.one * VoxelSize);
                 Handles.color = new Color(0, 0.8f, 0.8f, 0.2f);
                 Handles.zTest = UnityEngine.Rendering.CompareFunction.LessEqual;
-                Handles.CubeHandleCap(0, center, Quaternion.identity, size, EventType.Repaint);
+                Handles.CubeHandleCap(0, center, Quaternion.identity, VoxelSize, EventType.Repaint);
             }
             
             Handles.color = handlesColor;

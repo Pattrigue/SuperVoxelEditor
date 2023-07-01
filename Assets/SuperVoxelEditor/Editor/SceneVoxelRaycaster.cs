@@ -82,14 +82,14 @@ namespace SuperVoxelEditor.Editor
 
             if (editor.BuildTools.Inspector.SelectedTool == BuildTool.Attach)
             {
-                if (editor.Inspector.SelectedBuildMode == BuildMode.Voxel && editor.Inspector.VoxelSize > 1)
+                if (editor.ActiveBuildMode is VoxelBuildMode voxelBuildMode && voxelBuildMode.VoxelSize > 1)
                 {
                     Vector3 offset = new Vector3(
                         hit.normal.x < 0 ? -0.5f : 0f,
                         hit.normal.y < 0 ? -0.5f : 0f,
                         hit.normal.z < 0 ? -0.5f : 0f
                     );
-                    position += hit.normal * (editor.Inspector.VoxelSize * 0.5f) + offset;
+                    position += hit.normal * (voxelBuildMode.VoxelSize * 0.5f) + offset;
                 }
                 else
                 {

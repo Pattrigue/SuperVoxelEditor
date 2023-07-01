@@ -9,6 +9,8 @@ namespace SuperVoxelEditor.Editor.BuildModes
 {
     public sealed class FaceBuildMode : VoxelVolumeBuildMode
     {
+        public override BuildMode BuildMode => BuildMode.Face;
+        
         private enum Axis { X, Y, Z }
 
         public int MaxExploreLimit { get; set; } = 128;

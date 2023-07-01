@@ -4,6 +4,8 @@ namespace SuperVoxelEditor.Editor.BuildModes
 {
     public sealed class BoxBuildMode : VoxelVolumeBuildMode
     {
+        public override BuildMode BuildMode => BuildMode.Box;
+        
         private readonly PreviewCube previewCube;
         
         private Vector3 mouseDownVoxelPosition;

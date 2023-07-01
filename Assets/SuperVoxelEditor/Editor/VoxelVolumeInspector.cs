@@ -8,29 +8,9 @@ namespace SuperVoxelEditor.Editor
 {
     public sealed class VoxelVolumeInspector
     {
-        public event Action<BuildMode> SelectedBuildModeChanged;
-        
-        public Shape SelectedShape { get; private set; } = Shape.Cube;
-
-        public BuildMode SelectedBuildMode
-        {
-            get => selectedBuildMode;
-            private set
-            {
-                if (selectedBuildMode == value) return;
-                
-                selectedBuildMode = value;
-                SelectedBuildModeChanged?.Invoke(selectedBuildMode);
-            }
-        }
-
         public bool IsEditingActive { get; private set; } = true;
         public bool DrawChunkBounds { get; private set; } 
         
-        public int VoxelSize { get; private set; } = 1;
-        
-        private BuildMode selectedBuildMode = BuildMode.Voxel;
-
         private bool foldout;
         
         public void DrawInspectorGUI(VoxelVolumeEditor editor, SerializedObject serializedObject)
@@ -47,12 +27,18 @@ namespace SuperVoxelEditor.Editor
             volume.VoxelColor = EditorGUILayout.ColorField("Voxel Color", volume.VoxelColor);
 
             DrawChunkBounds = EditorGUILayout.Toggle("Draw Chunk Bounds", DrawChunkBounds);
-            SelectedBuildMode = (BuildMode)EditorGUILayout.EnumPopup("Build Mode", SelectedBuildMode);
-
-            if (selectedBuildMode == BuildMode.Voxel)
+            
+            BuildMode selectedBuildMode = (BuildMode)EditorGUILayout.EnumPopup("Build Mode", editor.ActiveBuildMode.BuildMode);
+            
+            if (selectedBuildMode != editor.ActiveBuildMode.BuildMode)
             {
-                SelectedShape = (Shape)EditorGUILayout.EnumPopup("Shape", SelectedShape);
-                VoxelSize = EditorGUILayout.IntSlider("Voxel Size", VoxelSize, 1, 100);
+                editor.SwitchBuildMode(selectedBuildMode);
+            }
+
+            if (editor.ActiveBuildMode is VoxelBuildMode voxelBuildMode)
+            {
+                voxelBuildMode.SelectedShape = (Shape)EditorGUILayout.EnumPopup("Shape", voxelBuildMode.SelectedShape);
+                voxelBuildMode.VoxelSize = EditorGUILayout.IntSlider("Voxel Size", voxelBuildMode.VoxelSize, 1, 100);
             }
             else if (editor.ActiveBuildMode is FaceBuildMode faceBuildMode)
             {
@@ -94,13 +80,6 @@ namespace SuperVoxelEditor.Editor
             {
                 volume.Clear();
             }
-
-            // foldout = EditorGUILayout.Foldout(foldout, "References");
-            //
-            // if (foldout)
-            // {
-            //     EditorGUILayout.PropertyField(serializedObject.FindProperty("chunkPrefab"));
-            // }
 
             serializedObject.ApplyModifiedProperties(); // Apply changes after all fields have been drawn
         }
