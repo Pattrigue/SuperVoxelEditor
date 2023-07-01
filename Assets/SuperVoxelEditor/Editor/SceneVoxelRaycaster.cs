@@ -1,3 +1,4 @@
+using SemagGames.SuperVoxelEditor;
 using SuperVoxelEditor.Editor.BuildModes;
 using SuperVoxelEditor.Editor.BuildTools;
 using UnityEditor;
@@ -56,8 +57,8 @@ namespace SuperVoxelEditor.Editor
             {
                 voxelPosition = ray.origin + ray.direction * distanceToYZeroPlane;
                 voxelPosition.y = 0;
+                voxelPosition = voxelPosition.SnapToVoxelGrid();
                 
-                SnapToVoxelGrid(ref voxelPosition);
                 IsValidVoxelPosition = true;
                 
                 return;
@@ -71,8 +72,7 @@ namespace SuperVoxelEditor.Editor
         public void CalculateControlledVoxelPosition(float controlledVoxelDistance)
         {
             Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
-            voxelPosition = ray.origin + ray.direction * controlledVoxelDistance;
-            SnapToVoxelGrid(ref voxelPosition);
+            voxelPosition = (ray.origin + ray.direction * controlledVoxelDistance).SnapToVoxelGrid();
             IsValidVoxelPosition = true;
         }
 
@@ -97,18 +97,7 @@ namespace SuperVoxelEditor.Editor
                 }
             }
 
-            SnapToVoxelGrid(ref position);
-
-            voxelPosition = position;
-        }
-
-        private static void SnapToVoxelGrid(ref Vector3 position)
-        {
-            position = new Vector3(
-                Mathf.FloorToInt(position.x) + 0.5f,
-                Mathf.FloorToInt(position.y) + 0.5f,
-                Mathf.FloorToInt(position.z) + 0.5f
-            );
+            voxelPosition = position.SnapToVoxelGrid();
         }
     }
 }

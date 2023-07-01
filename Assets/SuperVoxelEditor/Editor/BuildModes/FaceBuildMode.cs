@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SemagGames.SuperVoxelEditor;
+using SuperVoxelEditor.Editor.BuildTools;
 using UnityEditor;
 using UnityEngine;
 
@@ -15,25 +17,28 @@ namespace SuperVoxelEditor.Editor.BuildModes
         {
             if (!editor.Raycaster.TryGetRaycastHit(out RaycastHit hit)) return;
 
-            Vector3 voxelPosition = editor.VoxelPosition;
-            Voxel baseVoxel = editor.Volume.GetVoxel(voxelPosition);
+            Vector3 voxelPosition = GetVoxelPosition(editor, hit);
 
+            Voxel baseVoxel = editor.Volume.GetVoxel(voxelPosition);
             Vector3 normal = hit.normal;
 
             Vector3[] neighborDirections = GetNeighborDirections(normal);
             HashSet<Vector3> exploredPositions = ExploreNeighbors(editor, voxelPosition, neighborDirections, baseVoxel);
 
-            Vector3[] worldPositions = new Vector3[exploredPositions.Count];
+            Vector3[] worldPositions = CreateWorldPositions(editor, exploredPositions, normal);
+            editor.SetVoxels(worldPositions);
+        }
 
-            int i = 0;
-
-            foreach (Vector3 exploredPosition in exploredPositions)
+        private static Vector3 GetVoxelPosition(VoxelVolumeEditor editor, RaycastHit hit)
+        {
+            Vector3 voxelPosition = editor.VoxelPosition;
+            
+            if (editor.BuildTools.SelectedTool == BuildTool.Attach)
             {
-                worldPositions[i] = exploredPosition + normal; 
-                i++;
+                voxelPosition = (hit.point - hit.normal * 0.1f).SnapToVoxelGrid();
             }
-
-            editor.Volume.SetVoxels(worldPositions, baseVoxel);
+            
+            return voxelPosition;
         }
 
         public override void HandleMouseUp(VoxelVolumeEditor editor) { }
@@ -47,6 +52,12 @@ namespace SuperVoxelEditor.Editor.BuildModes
             Color color;
 
             Vector3 center = editor.VoxelPosition + hit.normal * 0.5f;
+
+            if (editor.BuildTools.SelectedTool == BuildTool.Attach)
+            {
+                center -= hit.normal;
+            }
+            
             Vector3 size;
 
             if (dominantAxis == Axis.X)
@@ -68,7 +79,7 @@ namespace SuperVoxelEditor.Editor.BuildModes
             Handles.color = color;
             Handles.DrawWireCube(center, size);
         }
-
+        
         private static Vector3[] GetNeighborDirections(Vector3 normal)
         {
             Axis dominantAxis = GetDominantAxis(normal);
@@ -98,7 +109,6 @@ namespace SuperVoxelEditor.Editor.BuildModes
                 {
                     Vector3 neighborPosition = position + neighborDirection;
 
-                    // Check if already explored before performing more expensive operations
                     if (exploredPositions.Contains(neighborPosition)) continue;
                     if (!editor.Volume.TryGetVoxel(neighborPosition, out Voxel voxel)) continue;
                     if (voxel != baseVoxel) continue;
@@ -127,6 +137,36 @@ namespace SuperVoxelEditor.Editor.BuildModes
             }
 
             return Axis.Z;
+        }
+        
+        private static Vector3[] CreateWorldPositions(VoxelVolumeEditor editor, HashSet<Vector3> exploredPositions, Vector3 normal)
+        {
+            Vector3[] worldPositions = new Vector3[exploredPositions.Count];
+            
+            int i = 0;
+
+            foreach (Vector3 exploredPosition in exploredPositions)
+            {
+                if (editor.BuildTools.SelectedTool == BuildTool.Attach)
+                {
+                    Vector3 extrudedPosition = exploredPosition + normal;
+
+                    if (!editor.Volume.HasVoxel(extrudedPosition))
+                    {
+                        worldPositions[i] = extrudedPosition;
+                    }
+                }
+                else
+                {
+                    worldPositions[i] = exploredPosition;
+                }
+
+                i++;
+            }
+
+            Array.Resize(ref worldPositions, i);
+            
+            return worldPositions;
         }
     }
 }

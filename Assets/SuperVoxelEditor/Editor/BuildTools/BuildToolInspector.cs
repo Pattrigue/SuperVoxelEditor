@@ -21,6 +21,7 @@ namespace SuperVoxelEditor.Editor.BuildTools
         }
 
         private readonly BuildToolIcons buildToolIcons;
+        
         private BuildTool selectedTool = BuildTool.Attach;
 
         public BuildToolInspector()
