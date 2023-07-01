@@ -34,12 +34,14 @@ namespace SuperVoxelEditor.Editor
             buildModeController = new BuildModeController();
             
             Inspector.SelectedBuildModeChanged += buildModeController.SwitchBuildMode;
+            BuildTools.Inspector .BuildToolChanged += OnBuildToolChanged;
         }
 
         private void OnDisable()
         {
             SceneView.duringSceneGui -= OnSceneGUI;
             Inspector.SelectedBuildModeChanged -= buildModeController.SwitchBuildMode;
+            BuildTools.Inspector .BuildToolChanged -= OnBuildToolChanged;
         }
 
         public override void OnInspectorGUI() => Inspector.DrawInspectorGUI(this, serializedObject);
@@ -49,5 +51,7 @@ namespace SuperVoxelEditor.Editor
         public void SetVoxels(Vector3[] voxelPositions) => voxelOperations.SetVoxels(voxelPositions, Volume.VoxelColor);
 
         private void OnSceneGUI(SceneView sceneView) => sceneGuiEventProcessor.ProcessSceneGUIEvents(sceneView);
+        
+        private void OnBuildToolChanged(BuildTool _) => Repaint();
     }
 }

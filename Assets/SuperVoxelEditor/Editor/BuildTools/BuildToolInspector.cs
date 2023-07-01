@@ -6,10 +6,23 @@ namespace SuperVoxelEditor.Editor.BuildTools
 {
     public sealed class BuildToolInspector
     {
-        public BuildTool SelectedTool { get; set; } = BuildTool.Attach;
-    
+        public event Action<BuildTool> BuildToolChanged;
+        
+        public BuildTool SelectedTool
+        {
+            get => selectedTool;
+            set
+            {
+                if (selectedTool == value) return;
+                
+                selectedTool = value;
+                BuildToolChanged?.Invoke(selectedTool);
+            }
+        }
+
         private readonly BuildToolIcons buildToolIcons;
-    
+        private BuildTool selectedTool = BuildTool.Attach;
+
         public BuildToolInspector()
         {
             buildToolIcons = new BuildToolIcons();
