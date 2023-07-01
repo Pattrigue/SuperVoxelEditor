@@ -10,20 +10,18 @@ namespace SuperVoxelEditor.Editor.BuildModes
     public sealed class FaceBuildMode : VoxelVolumeBuildMode
     {
         private enum Axis { X, Y, Z }
-         
-        private const int MaxExploreLimit = 64;
+
+        public int MaxExploreLimit { get; set; } = 128;
         
         public override void HandleMouseDown(VoxelVolumeEditor editor)
         {
             if (!editor.Raycaster.TryGetRaycastHit(out RaycastHit hit)) return;
 
             Vector3 voxelPosition = GetVoxelPosition(editor, hit);
-
-            Voxel baseVoxel = editor.Volume.GetVoxel(voxelPosition);
             Vector3 normal = hit.normal;
 
             Vector3[] neighborDirections = GetNeighborDirections(normal);
-            HashSet<Vector3> exploredPositions = ExploreNeighbors(editor, voxelPosition, neighborDirections, baseVoxel);
+            HashSet<Vector3> exploredPositions = ExploreNeighbors(editor, voxelPosition, neighborDirections, MaxExploreLimit);
 
             Vector3[] worldPositions = CreateWorldPositions(editor, exploredPositions, normal);
             editor.SetVoxels(worldPositions);
@@ -94,8 +92,10 @@ namespace SuperVoxelEditor.Editor.BuildModes
             return neighborDirections;
         }
 
-        private static HashSet<Vector3> ExploreNeighbors(VoxelVolumeEditor editor, Vector3 voxelPosition, Vector3[] neighborDirections, Voxel baseVoxel)
+        private static HashSet<Vector3> ExploreNeighbors(VoxelVolumeEditor editor, Vector3 voxelPosition, Vector3[] neighborDirections, int maxExploreLimit)
         {
+            Voxel baseVoxel = editor.Volume.GetVoxel(voxelPosition);
+            
             HashSet<Vector3> exploredPositions = new HashSet<Vector3>();
 
             Queue<Vector3> toExplore = new Queue<Vector3>();
@@ -103,7 +103,7 @@ namespace SuperVoxelEditor.Editor.BuildModes
 
             while (toExplore.TryDequeue(out Vector3 position))
             {
-                if (exploredPositions.Count > MaxExploreLimit) break;
+                if (exploredPositions.Count > maxExploreLimit) break;
                 
                 foreach (Vector3 neighborDirection in neighborDirections)
                 {

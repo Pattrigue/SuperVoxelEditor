@@ -54,6 +54,10 @@ namespace SuperVoxelEditor.Editor
                 SelectedShape = (Shape)EditorGUILayout.EnumPopup("Shape", SelectedShape);
                 VoxelSize = EditorGUILayout.IntSlider("Voxel Size", VoxelSize, 1, 100);
             }
+            else if (editor.ActiveBuildMode is FaceBuildMode faceBuildMode)
+            {
+                faceBuildMode.MaxExploreLimit = EditorGUILayout.IntSlider("Max Explore Limit", faceBuildMode.MaxExploreLimit, 1, 1000);
+            }
 
             // Create a GUIStyle for headers
             GUIStyle headerStyle = new GUIStyle(GUI.skin.label)
