@@ -33,8 +33,6 @@ namespace SemagGames.SuperVoxelEditor
 
         public void Build()
         {
-            Debug.Log($"Building chunk mesh at {chunk.ChunkPosition}", gameObject);
-
             ResetMesh();
 
             MeshData meshData = meshBuilder.GenerateMeshData(borderVisibilityFlags);
