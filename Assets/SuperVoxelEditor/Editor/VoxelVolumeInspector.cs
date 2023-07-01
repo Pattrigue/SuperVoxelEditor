@@ -1,6 +1,4 @@
-﻿using System;
-using SemagGames.SuperVoxelEditor;
-using SuperVoxelEditor.Editor.BuildModes;
+﻿using SuperVoxelEditor.Editor.BuildModes;
 using SuperVoxelEditor.Editor.BuildTools;
 using UnityEditor;
 using UnityEngine;
@@ -68,7 +66,7 @@ namespace SuperVoxelEditor.Editor
             }
             else if (editor.ActiveBuildMode is FaceBuildMode faceBuildMode)
             {
-                faceBuildMode.MaxExploreLimit = EditorGUILayout.IntSlider("Max Explore Limit", faceBuildMode.MaxExploreLimit, 1, 1000);
+                faceBuildMode.MaxExploreLimit = EditorGUILayout.IntSlider("Max Explore Limit", faceBuildMode.MaxExploreLimit, 1, 10000);
 
                 if (editor.BuildTools.SelectedTool == BuildTool.Attach)
                 {
