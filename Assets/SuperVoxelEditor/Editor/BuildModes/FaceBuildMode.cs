@@ -118,7 +118,10 @@ namespace SuperVoxelEditor.Editor.BuildModes
                     if (voxel != baseVoxel) continue;
                     if (isAttachTool && editor.Volume.HasVoxel(neighborPosition + normal)) continue;
 
-                    toExplore.Enqueue(neighborPosition);
+                    if (exploredPositions.Add(neighborPosition))
+                    {
+                        toExplore.Enqueue(neighborPosition);
+                    }
                 }
 
                 exploredPositions.Add(position);
