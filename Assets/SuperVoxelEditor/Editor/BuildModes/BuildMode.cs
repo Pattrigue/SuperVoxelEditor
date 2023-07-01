@@ -1,4 +1,4 @@
 ﻿namespace SuperVoxelEditor.Editor.BuildModes
 {
-    public enum BuildMode { Voxel, Box }
+    public enum BuildMode { Voxel, Box, Face }
 }

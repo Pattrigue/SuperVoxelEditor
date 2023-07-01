@@ -6,7 +6,7 @@ MonoImporter:
   defaultReferences:
   - chunkPrefab: {fileID: 450235079009942144, guid: 5506462e6faa1ae42b254f648bb66d15,
       type: 3}
-  executionOrder: 0
+  executionOrder: -20
   icon: {instanceID: 0}
   userData: 
   assetBundleName: 

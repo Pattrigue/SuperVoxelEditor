@@ -27,6 +27,9 @@ namespace SuperVoxelEditor.Editor
                 case BuildMode.Box:
                     ActiveBuildMode = new BoxBuildMode();
                     break;
+                case BuildMode.Face:
+                    ActiveBuildMode = new FaceBuildMode();
+                    break;
                 default:
                     Debug.LogError($"Invalid BuildMode: {newMode}");
                     break;

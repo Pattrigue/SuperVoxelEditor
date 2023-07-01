@@ -73,18 +73,28 @@ namespace SemagGames.SuperVoxelEditor
             chunks.Clear();
         }
         
-        public void SetVoxel(Vector3 worldPosition, uint voxelPropertyId, Color32 color)
+        public void SetVoxel(Vector3 worldPosition, Voxel voxel)
         {
             Chunk chunk = GetOrCreateChunk(worldPosition);
 
-            SetVoxelCommand command = new SetVoxelCommand(chunk, worldPosition, new Voxel(voxelPropertyId, color));
+            SetVoxelCommand command = new SetVoxelCommand(chunk, worldPosition, voxel);
             commandManager.Do(command);
         }
         
+        public void SetVoxel(Vector3 worldPosition, uint voxelPropertyId, Color32 color)
+        {
+            SetVoxel(worldPosition, new Voxel(voxelPropertyId, color));
+        }
+        
+        public void SetVoxels(Vector3[] worldPositions, Voxel voxel)
+        {
+            SetVoxelBatchCommand command = new SetVoxelBatchCommand(this, worldPositions, voxel);
+            commandManager.Do(command);
+        }
+
         public void SetVoxels(Vector3[] worldPositions, uint voxelPropertyId, Color32 color)
         {
-            SetVoxelBatchCommand command = new SetVoxelBatchCommand(this, worldPositions, new Voxel(voxelPropertyId, color));
-            commandManager.Do(command);
+            SetVoxels(worldPositions, new Voxel(voxelPropertyId, color));
         }
 
         public void EraseVoxel(Vector3 worldPosition) => SetVoxel(worldPosition, Voxel.Air.propertyId, Color.clear);
@@ -117,6 +127,13 @@ namespace SemagGames.SuperVoxelEditor
             }
             
             return chunk.GetVoxelDataFromWorldPosition(worldPosition);
+        }
+        
+        public Voxel GetVoxel(Vector3 worldPosition)
+        {
+            uint voxelData = GetVoxelData(worldPosition);
+            
+            return Voxel.FromVoxelData(voxelData);
         }
         
         public bool TryGetVoxel(Vector3 worldPosition, out Voxel voxel)

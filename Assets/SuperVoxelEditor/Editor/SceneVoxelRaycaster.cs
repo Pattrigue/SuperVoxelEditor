@@ -8,25 +8,43 @@ namespace SuperVoxelEditor.Editor
     public sealed class SceneVoxelRaycaster
     {
         public Vector3 VoxelPosition => voxelPosition;
-        
+
         public bool IsValidVoxelPosition { get; private set; }
         
         private readonly VoxelVolumeEditor editor;
 
         private Vector3 voxelPosition;
+        private RaycastHit raycastHit;
+
+        private bool didRaycastHit;
 
         public SceneVoxelRaycaster(VoxelVolumeEditor editor)
         {
             this.editor = editor;
+        }
+
+        public bool TryGetRaycastHit(out RaycastHit hit)
+        {
+            if (didRaycastHit)
+            {
+                hit = raycastHit;
+                return true;
+            }
+
+            hit = default;
+            
+            return false;
         }
         
         public void CalculateVoxelPosition()
         {
             Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
 
-            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
+            didRaycastHit = Physics.Raycast(ray, out raycastHit, Mathf.Infinity); 
+            
+            if (didRaycastHit)
             {
-                CalculateRaycastVoxelPosition(hit);
+                CalculateRaycastVoxelPosition(raycastHit);
                 IsValidVoxelPosition = true;
                 return;
             }
