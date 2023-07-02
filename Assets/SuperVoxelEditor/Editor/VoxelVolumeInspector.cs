@@ -1,4 +1,5 @@
-﻿using SuperVoxelEditor.Editor.BuildModes;
+﻿using SemagGames.SuperVoxelEditor;
+using SuperVoxelEditor.Editor.BuildModes;
 using SuperVoxelEditor.Editor.BuildTools;
 using UnityEditor;
 using UnityEngine;
@@ -7,12 +8,15 @@ namespace SuperVoxelEditor.Editor
 {
     public sealed class VoxelVolumeInspector
     {
+        public Color32 SelectedColor { get; set; } = Color.gray;
+        
         public bool IsEditingActive { get; private set; } = true;
         public bool DrawChunkBounds { get; private set; } 
         
         private bool foldout;
 
         private VoxelVolumeEditor editor;
+        private VoxelAsset previousVoxelAsset;
         
         public void DrawInspectorGUI(VoxelVolumeEditor editor, SerializedObject serializedObject)
         {
@@ -37,6 +41,16 @@ namespace SuperVoxelEditor.Editor
             if (editor.Volume.VoxelAsset == null)
             {
                 EditorGUILayout.HelpBox("You have not assigned a Voxel Asset - placing a voxel will default to placing Air voxels!", MessageType.Warning);
+            }
+            else
+            {
+                if (previousVoxelAsset != editor.Volume.VoxelAsset)
+                {
+                    SelectedColor = editor.Volume.VoxelAsset.BaseColor;
+                    previousVoxelAsset = editor.Volume.VoxelAsset;
+                }
+                
+                SelectedColor = EditorGUILayout.ColorField("Voxel Color", SelectedColor);
             }
         }
 

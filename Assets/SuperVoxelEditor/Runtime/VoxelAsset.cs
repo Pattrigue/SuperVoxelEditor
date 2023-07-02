@@ -8,6 +8,6 @@ namespace SemagGames.SuperVoxelEditor
         public const int AirId = 0;
         
         [field: SerializeField] public uint ID { get; private set; }
-        [field: SerializeField] public Color32 Color { get; private set; }
+        [field: SerializeField] public Color32 BaseColor { get; private set; }
     }
 }

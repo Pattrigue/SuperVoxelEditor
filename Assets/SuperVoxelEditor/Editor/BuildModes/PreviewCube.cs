@@ -61,7 +61,7 @@ namespace SuperVoxelEditor.Editor.BuildModes
                 Vector3 cubeSize = new(offset, offset, offset);
                 cube.transform.position = editor.VoxelPosition;
                 cube.transform.localScale = cubeSize;
-                cubeMaterial.color = isErasing ? new Color(1, 0, 0, 0.25f) : editor.Volume.VoxelAsset.Color;
+                cubeMaterial.color = isErasing ? new Color(1, 0, 0, 0.25f) : editor.Inspector.SelectedColor;
             }
             
             DrawHandles(isErasing);

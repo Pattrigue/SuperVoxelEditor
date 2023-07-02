@@ -16,7 +16,7 @@ namespace SuperVoxelEditor.Editor
         {
             if (editor.BuildTools.SelectedTool != BuildTool.Erase && editor.Volume.VoxelAsset != null)
             {
-                editor.Volume.SetVoxel(worldPosition, editor.Volume.VoxelAsset);
+                editor.Volume.SetVoxel(worldPosition, editor.Volume.VoxelAsset, editor.Inspector.SelectedColor);
             }
             else
             {
@@ -34,7 +34,7 @@ namespace SuperVoxelEditor.Editor
 
             if (editor.BuildTools.SelectedTool != BuildTool.Erase && editor.Volume.VoxelAsset != null)
             {
-                editor.Volume.SetVoxels(worldPositions, editor.Volume.VoxelAsset);
+                editor.Volume.SetVoxels(worldPositions, editor.Volume.VoxelAsset, editor.Inspector.SelectedColor);
             }
             else
             {

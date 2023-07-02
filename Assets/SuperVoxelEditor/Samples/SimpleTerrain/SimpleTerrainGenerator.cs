@@ -53,14 +53,15 @@ namespace SemagGames.SuperVoxelEditor.Samples.SimpleTerrain
                             Vector3 pos = new Vector3(x, y, z);
                             
                             VoxelAsset voxelAsset = y == height ? grassVoxel : stoneVoxel;
-                            volume.SetVoxel(pos, voxelAsset);
-
+                            Color32 color = voxelAsset.BaseColor;
+                            
                             if (voxelAsset == grassVoxel && Random.Range(0, 100) < 50)
                             {
                                 // Add some random color variation to the grass
-                                Color color = grassVoxel.Color + new Color(0, Random.Range(0, 0.02f), 0);
-                                volume.SetVoxelColor(pos, color);
+                                color = grassVoxel.BaseColor + new Color(0, Random.Range(0, 0.02f), 0);
                             }
+
+                            volume.SetVoxel(pos, voxelAsset, color);
                         }
                     }
                 }

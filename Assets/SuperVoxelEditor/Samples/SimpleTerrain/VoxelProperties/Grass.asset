@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Grass
   m_EditorClassIdentifier: 
   <ID>k__BackingField: 1
-  <Color>k__BackingField:
+  <BaseColor>k__BackingField:
     serializedVersion: 2
-    rgba: 4282830199
+    rgba: 4284141729

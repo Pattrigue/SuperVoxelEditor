@@ -32,9 +32,9 @@ namespace SemagGames.SuperVoxelEditor
         public Voxel(VoxelAsset voxelAsset)
         {
             id = voxelAsset.ID;
-            r = voxelAsset.Color.r;
-            g = voxelAsset.Color.g;
-            b = voxelAsset.Color.b;
+            r = voxelAsset.BaseColor.r;
+            g = voxelAsset.BaseColor.g;
+            b = voxelAsset.BaseColor.b;
         }
     
         public Voxel(uint id, Color color)

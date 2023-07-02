@@ -80,12 +80,9 @@ namespace SemagGames.SuperVoxelEditor
             SetVoxel(worldPosition, new Voxel(voxelAsset));
         }
         
-        public void SetVoxelColor(Vector3 worldPosition, Color32 color)
+        public void SetVoxel(Vector3 worldPosition, VoxelAsset voxelAsset, Color32 color)
         {
-            Voxel voxel = GetVoxel(worldPosition);
-            voxel.SetColor(color);
-            
-            SetVoxel(worldPosition, voxel);
+            SetVoxel(worldPosition, new Voxel(voxelAsset.ID, color));
         }
         
         public void SetVoxels(Vector3[] worldPositions, Voxel voxel)
@@ -97,6 +94,19 @@ namespace SemagGames.SuperVoxelEditor
         public void SetVoxels(Vector3[] worldPositions, VoxelAsset voxelAsset)
         {
             SetVoxels(worldPositions, new Voxel(voxelAsset));
+        }
+        
+        public void SetVoxels(Vector3[] worldPositions, VoxelAsset voxelAsset, Color32 color)
+        {
+            SetVoxels(worldPositions, new Voxel(voxelAsset.ID, color));
+        }
+        
+        public void SetVoxelColor(Vector3 worldPosition, Color32 color)
+        {
+            Voxel voxel = GetVoxel(worldPosition);
+            voxel.SetColor(color);
+            
+            SetVoxel(worldPosition, voxel);
         }
 
         public void EraseVoxel(Vector3 worldPosition) => SetVoxel(worldPosition, Voxel.Air);
