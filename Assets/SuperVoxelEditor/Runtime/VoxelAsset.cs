@@ -2,11 +2,12 @@
 
 namespace SemagGames.SuperVoxelEditor
 {
-    [CreateAssetMenu(menuName = "VoxelProperty")]
-    public sealed class VoxelProperty : ScriptableObject
+    [CreateAssetMenu(menuName = "VoxelAsset")]
+    public sealed class VoxelAsset : ScriptableObject
     {
         public const int AirId = 0;
         
         [field: SerializeField] public uint ID { get; private set; }
+        [field: SerializeField] public Color32 Color { get; private set; }
     }
 }

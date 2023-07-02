@@ -18,7 +18,7 @@ namespace SuperVoxelEditor.Editor
         {
             this.editor = editor;
 
-            DrawVoxelPropertyField(serializedObject);
+            DrawVoxelAssetField(serializedObject);
             DrawChunkBoundsToggle();
             DrawBuildModeSelector();
             DrawBuildModeSpecificSettings();
@@ -30,16 +30,14 @@ namespace SuperVoxelEditor.Editor
             serializedObject.ApplyModifiedProperties(); 
         }
 
-        private void DrawVoxelPropertyField(SerializedObject serializedObject)
+        private void DrawVoxelAssetField(SerializedObject serializedObject)
         {
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("voxelProperty"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("voxelAsset"));
 
-            if (editor.Volume.VoxelProperty == null)
+            if (editor.Volume.VoxelAsset == null)
             {
-                EditorGUILayout.HelpBox("You have not assigned a Voxel Property - placing a voxel will default to placing Air voxels!", MessageType.Warning);
+                EditorGUILayout.HelpBox("You have not assigned a Voxel Asset - placing a voxel will default to placing Air voxels!", MessageType.Warning);
             }
-
-            editor.Volume.VoxelColor = EditorGUILayout.ColorField("Voxel Color", editor.Volume.VoxelColor);
         }
 
         private void DrawChunkBoundsToggle()

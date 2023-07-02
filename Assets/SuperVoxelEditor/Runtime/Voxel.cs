@@ -13,47 +13,65 @@ namespace SemagGames.SuperVoxelEditor
         // 24-31: B
         // 32: Unused
         
-        public static readonly Voxel Air = new(VoxelProperty.AirId, default, default, default);
+        public static readonly Voxel Air = new(VoxelAsset.AirId, default, default, default);
         public static readonly uint AirVoxelData = Air.ToVoxelData();
 
-        public uint propertyId;
+        public uint id;
         public byte r;
         public byte g;
         public byte b;
 
-        public Voxel(uint propertyId, byte r, byte g, byte b)
+        public Voxel(uint id, byte r, byte g, byte b)
         {
-            this.propertyId = propertyId;
+            this.id = id;
             this.r = r;
             this.g = g;
             this.b = b;
         }
-    
-        public Voxel(uint propertyId, Color color)
+
+        public Voxel(VoxelAsset voxelAsset)
         {
-            this.propertyId = propertyId;
+            id = voxelAsset.ID;
+            r = voxelAsset.Color.r;
+            g = voxelAsset.Color.g;
+            b = voxelAsset.Color.b;
+        }
+    
+        public Voxel(uint id, Color color)
+        {
+            this.id = id;
             r = (byte)(color.r * 255);
             g = (byte)(color.g * 255);
             b = (byte)(color.b * 255);
         }
     
-        public Voxel(uint propertyId, Color32 color)
+        public Voxel(uint id, Color32 color)
         {
-            this.propertyId = propertyId;
+            this.id = id;
             r = color.r;
             g = color.g;
             b = color.b;
         }
 
-        public Color32 GetColor() => new(r, g, b, 255);
+        public Color32 GetColor()
+        {
+            return new Color32(r, g, b, 255);
+        }
 
-        public static uint GetPropertyId(uint voxelData) => voxelData >> 22;
+        public void SetColor(Color32 color)
+        {
+            r = color.r;
+            g = color.g;
+            b = color.b;
+        }
 
-        public static uint GetRedChannel(uint voxelData) => ((voxelData >> 15) & 0xFF) * 255 / 127;
+        public static uint GetId(uint voxelData) => voxelData >> 22;
+
+        public static uint GetRedChannel(uint voxelData) => ((voxelData >> 15) & 0x7F) * 255 / 127;
         
-        public static uint GetGreenChannel(uint voxelData) => ((voxelData >> 8) & 0xFF) * 255 / 127;
+        public static uint GetGreenChannel(uint voxelData) => ((voxelData >> 8) & 0x7F) * 255 / 127;
         
-        public static uint GetBlueChannel(uint voxelData) => ((voxelData >> 1) & 0xFF) * 255 / 127;
+        public static uint GetBlueChannel(uint voxelData) => ((voxelData >> 1) & 0x7F) * 255 / 127;
 
         public static Color GetColor(uint voxelData)
         {
@@ -75,7 +93,7 @@ namespace SemagGames.SuperVoxelEditor
         
         public uint ToVoxelData()
         {
-            uint voxelData = (propertyId << 22) |
+            uint voxelData = (id << 22) |
                              ((uint)Math.Round(r / 255.0 * 127) << 15) |
                              ((uint)Math.Round(g / 255.0 * 127) << 8) |
                              ((uint)Math.Round(b / 255.0 * 127) << 1);
@@ -85,7 +103,7 @@ namespace SemagGames.SuperVoxelEditor
 
         public static Voxel FromVoxelData(uint voxelData)
         {
-            uint id = GetPropertyId(voxelData);
+            uint id = GetId(voxelData);
             byte redChannel = (byte)GetRedChannel(voxelData);
             byte greenChannel = (byte)GetGreenChannel(voxelData);
             byte blueChannel = (byte)GetBlueChannel(voxelData);
@@ -106,13 +124,13 @@ namespace SemagGames.SuperVoxelEditor
             return redChannelA == redChannelB && greenChannelA == greenChannelB && blueChannelA == blueChannelB;
         }
 
-        public static bool IsAir(uint voxelData) => GetPropertyId(voxelData) == VoxelProperty.AirId;
+        public static bool IsAir(uint voxelData) => GetId(voxelData) == VoxelAsset.AirId;
 
-        public static bool IsAirId(uint voxelPropertyId) => voxelPropertyId == VoxelProperty.AirId;
+        public static bool IsAirId(uint voxelId) => voxelId == VoxelAsset.AirId;
 
         public static bool operator ==(Voxel a, Voxel b)
         {
-            return a.propertyId == b.propertyId && a.r == b.r && a.g == b.g && a.b == b.b;
+            return a.id == b.id;
         }
 
         public static bool operator !=(Voxel a, Voxel b)
@@ -122,7 +140,7 @@ namespace SemagGames.SuperVoxelEditor
 
         public bool Equals(Voxel other)
         {
-            return propertyId == other.propertyId && r == other.r && g == other.g && b == other.b;
+            return id == other.id;
         }
 
         public override bool Equals(object obj)
@@ -132,7 +150,7 @@ namespace SemagGames.SuperVoxelEditor
 
         public override int GetHashCode()
         {
-            return propertyId.GetHashCode();
+            return id.GetHashCode();
         }
     }
 }

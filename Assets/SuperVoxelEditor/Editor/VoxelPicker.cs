@@ -10,29 +10,27 @@ namespace SuperVoxelEditor.Editor
         {
             if (!volume.TryGetVoxel(voxelPosition, out Voxel voxel)) return false;
     
-            VoxelProperty voxelProperty = GetVoxelProperty(voxel.propertyId);
+            VoxelAsset voxelAsset = GetVoxelAsset(voxel.id);
     
-            if (voxelProperty != null)
+            if (voxelAsset != null)
             {
-                volume.VoxelProperty = voxelProperty;
+                volume.VoxelAsset = voxelAsset;
             }
                 
-            volume.VoxelColor = voxel.GetColor();
-            
             return true;
         }
     
-        private static VoxelProperty GetVoxelProperty(uint propertyId)
+        private static VoxelAsset GetVoxelAsset(uint assetId)
         {
-            string[] voxelProperties = AssetDatabase.FindAssets("t:VoxelProperty");
+            string[] voxelAssets = AssetDatabase.FindAssets("t:VoxelAsset");
                 
-            foreach (string voxelProperty in voxelProperties)
+            foreach (string voxelAsset in voxelAssets)
             {
-                var voxelPropertyObject = AssetDatabase.LoadAssetAtPath<VoxelProperty>(AssetDatabase.GUIDToAssetPath(voxelProperty));
+                var voxelAssetObject = AssetDatabase.LoadAssetAtPath<VoxelAsset>(AssetDatabase.GUIDToAssetPath(voxelAsset));
                     
-                if (voxelPropertyObject.ID == propertyId)
+                if (voxelAssetObject.ID == assetId)
                 {
-                    return voxelPropertyObject;
+                    return voxelAssetObject;
                 }
             }
     

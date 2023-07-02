@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using SemagGames.SuperVoxelEditor;
-using SuperVoxelEditor.Editor.BuildTools;
+﻿using SuperVoxelEditor.Editor.BuildTools;
 using UnityEngine;
 
 namespace SuperVoxelEditor.Editor
@@ -14,11 +12,11 @@ namespace SuperVoxelEditor.Editor
             this.editor = editor;
         }
 
-        public void SetVoxel(Vector3 worldPosition, Color32 voxelColor)
+        public void SetVoxel(Vector3 worldPosition)
         {
-            if (editor.BuildTools.SelectedTool != BuildTool.Erase)
+            if (editor.BuildTools.SelectedTool != BuildTool.Erase && editor.Volume.VoxelAsset != null)
             {
-                editor.Volume.SetVoxel(worldPosition, editor.Volume.VoxelProperty.ID, voxelColor);
+                editor.Volume.SetVoxel(worldPosition, editor.Volume.VoxelAsset);
             }
             else
             {
@@ -26,17 +24,17 @@ namespace SuperVoxelEditor.Editor
             }
         }
     
-        public void SetVoxels(Vector3[] worldPositions, Color32 voxelColor)
+        public void SetVoxels(Vector3[] worldPositions)
         {
             if (worldPositions.Length == 1)
             {
-                SetVoxel(worldPositions[0], voxelColor);
+                SetVoxel(worldPositions[0]);
                 return;
             }
 
-            if (editor.BuildTools.SelectedTool != BuildTool.Erase)
+            if (editor.BuildTools.SelectedTool != BuildTool.Erase && editor.Volume.VoxelAsset != null)
             {
-                editor.Volume.SetVoxels(worldPositions, editor.Volume.VoxelProperty.ID, voxelColor);
+                editor.Volume.SetVoxels(worldPositions, editor.Volume.VoxelAsset);
             }
             else
             {

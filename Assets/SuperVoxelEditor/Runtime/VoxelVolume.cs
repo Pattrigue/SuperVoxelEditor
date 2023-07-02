@@ -7,21 +7,14 @@ namespace SemagGames.SuperVoxelEditor
     [ExecuteAlways]
     public sealed class VoxelVolume : MonoBehaviour
     {
-        [SerializeField] private VoxelProperty voxelProperty;
-        [SerializeField] private Color32 voxelColor = new Color32(127, 127, 127, 255);
+        [SerializeField] private VoxelAsset voxelAsset;
         [SerializeField] private Chunk chunkPrefab;
         [SerializeField] private CommandManager commandManager = new();
 
-        public Color32 VoxelColor
+        public VoxelAsset VoxelAsset
         {
-            get => voxelColor;
-            set => voxelColor = value;
-        }
-
-        public VoxelProperty VoxelProperty
-        {
-            get => voxelProperty;
-            set => voxelProperty = value; 
+            get => voxelAsset;
+            set => voxelAsset = value; 
         }
 
         public bool AutoRebuildChunkColliders
@@ -82,9 +75,17 @@ namespace SemagGames.SuperVoxelEditor
             commandManager.Do(command);
         }
         
-        public void SetVoxel(Vector3 worldPosition, uint voxelPropertyId, Color32 color)
+        public void SetVoxel(Vector3 worldPosition, VoxelAsset voxelAsset)
         {
-            SetVoxel(worldPosition, new Voxel(voxelPropertyId, color));
+            SetVoxel(worldPosition, new Voxel(voxelAsset));
+        }
+        
+        public void SetVoxelColor(Vector3 worldPosition, Color32 color)
+        {
+            Voxel voxel = GetVoxel(worldPosition);
+            voxel.SetColor(color);
+            
+            SetVoxel(worldPosition, voxel);
         }
         
         public void SetVoxels(Vector3[] worldPositions, Voxel voxel)
@@ -93,14 +94,14 @@ namespace SemagGames.SuperVoxelEditor
             commandManager.Do(command);
         }
 
-        public void SetVoxels(Vector3[] worldPositions, uint voxelPropertyId, Color32 color)
+        public void SetVoxels(Vector3[] worldPositions, VoxelAsset voxelAsset)
         {
-            SetVoxels(worldPositions, new Voxel(voxelPropertyId, color));
+            SetVoxels(worldPositions, new Voxel(voxelAsset));
         }
 
-        public void EraseVoxel(Vector3 worldPosition) => SetVoxel(worldPosition, Voxel.Air.propertyId, Color.clear);
+        public void EraseVoxel(Vector3 worldPosition) => SetVoxel(worldPosition, Voxel.Air);
         
-        public void EraseVoxels(Vector3[] worldPositions) => SetVoxels(worldPositions, Voxel.Air.propertyId, Color.clear);
+        public void EraseVoxels(Vector3[] worldPositions) => SetVoxels(worldPositions, Voxel.Air);
 
         public Chunk GetOrCreateChunk(Vector3 worldPosition)
         {

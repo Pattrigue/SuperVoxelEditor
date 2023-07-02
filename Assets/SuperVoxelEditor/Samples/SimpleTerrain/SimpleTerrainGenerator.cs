@@ -13,8 +13,8 @@ namespace SemagGames.SuperVoxelEditor.Samples.SimpleTerrain
 
         [SerializeField] private int numChunks = 4;
         [SerializeField] private VoxelVolume volume;
-        [SerializeField] private VoxelProperty grassVoxel;
-        [SerializeField] private VoxelProperty stoneVoxel;
+        [SerializeField] private VoxelAsset grassVoxel;
+        [SerializeField] private VoxelAsset stoneVoxel;
 
         private void Start()
         {
@@ -48,21 +48,20 @@ namespace SemagGames.SuperVoxelEditor.Samples.SimpleTerrain
 
                     for (int y = 0; y < Chunk.Height; y++)
                     {
-                        uint voxelPropertyId;
-                        Color32 color;
-
                         if (y <= height)
                         {
-                            voxelPropertyId = y == height ? grassVoxel.ID : stoneVoxel.ID;
-                            color = y == height ? volume.VoxelColor : Color.gray;
-                        }
-                        else
-                        {
-                            voxelPropertyId = VoxelProperty.AirId;
-                            color = default;
-                        }
+                            Vector3 pos = new Vector3(x, y, z);
+                            
+                            VoxelAsset voxelAsset = y == height ? grassVoxel : stoneVoxel;
+                            volume.SetVoxel(pos, voxelAsset);
 
-                        volume.SetVoxel(new Vector3(x, y, z), voxelPropertyId, color);
+                            if (voxelAsset == grassVoxel && Random.Range(0, 100) < 50)
+                            {
+                                // Add some random color variation to the grass
+                                Color color = grassVoxel.Color + new Color(0, Random.Range(0, 0.02f), 0);
+                                volume.SetVoxelColor(pos, color);
+                            }
+                        }
                     }
                 }
             }

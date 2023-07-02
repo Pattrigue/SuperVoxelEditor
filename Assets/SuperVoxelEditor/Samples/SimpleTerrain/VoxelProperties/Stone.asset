@@ -13,3 +13,6 @@ MonoBehaviour:
   m_Name: Stone
   m_EditorClassIdentifier: 
   <ID>k__BackingField: 2
+  <Color>k__BackingField:
+    serializedVersion: 2
+    rgba: 4286611584
