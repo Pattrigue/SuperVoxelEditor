@@ -26,6 +26,7 @@ namespace SemagGames.SuperVoxelEditor.Commands
             foreach (Vector3 worldPosition in worldPositions)
             {
                 Chunk chunk = volume.GetOrCreateChunk(worldPosition);
+                
                 SetVoxelCommand setVoxelCommand = new SetVoxelCommand(chunk, worldPosition, voxel);
                 setVoxelCommand.Execute();
                 setVoxelCommands.Add(setVoxelCommand);

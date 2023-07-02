@@ -41,6 +41,7 @@ namespace SemagGames.SuperVoxelEditor
         }
         
         public IEnumerable<Chunk> Chunks => chunks.Values;
+        public CommandManager Commands => commandManager;
 
         private readonly Dictionary<ChunkPosition, Chunk> chunks = new();
 

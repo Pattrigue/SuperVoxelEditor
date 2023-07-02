@@ -41,6 +41,8 @@ namespace SuperVoxelEditor.Editor
 
             if (Event.current.type == EventType.MouseDown && editor.Raycaster.IsValidVoxelPosition)
             {
+                editor.Volume.Commands.BeginCompositeCommand();
+                
                 if (editor.BuildTools.Inspector.SelectedTool is BuildTool.Picker)
                 {
                     if (VoxelPicker.PickVoxelAtPosition(editor.Volume, editor.VoxelPosition))
@@ -55,6 +57,7 @@ namespace SuperVoxelEditor.Editor
             else if (Event.current.type == EventType.MouseUp)
             {
                 editor.ActiveBuildMode.HandleMouseUp(editor);
+                editor.Volume.Commands.EndCompositeCommand();
             }
         }
     }
