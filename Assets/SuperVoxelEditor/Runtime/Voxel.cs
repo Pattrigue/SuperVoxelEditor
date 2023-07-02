@@ -7,11 +7,11 @@ namespace SemagGames.SuperVoxelEditor
     public struct Voxel
     {
         // Byte layout of voxel data:
-        // 0-7: Property ID
-        // 8-15: R
-        // 16-23: G
-        // 24-31: B
-        // 32: Unused
+        // 0-9:   VoxelAsset ID (0-1023)
+        // 10-16: R (0-127)
+        // 17-23: G (0-127)
+        // 24-30: B (0-127)
+        // 31: Unused
         
         public static readonly Voxel Air = new(VoxelAsset.AirId, default, default, default);
         public static readonly uint AirVoxelData = Air.ToVoxelData();
