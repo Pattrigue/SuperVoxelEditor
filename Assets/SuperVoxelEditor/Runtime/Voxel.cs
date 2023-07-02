@@ -93,12 +93,17 @@ namespace SemagGames.SuperVoxelEditor
         
         public uint ToVoxelData()
         {
-            uint voxelData = (id << 22) |
-                             ((uint)Math.Round(r / 255.0 * 127) << 15) |
-                             ((uint)Math.Round(g / 255.0 * 127) << 8) |
-                             ((uint)Math.Round(b / 255.0 * 127) << 1);
-
+            uint colorData = EncodeColor(new Color32(r, g, b, 255));
+            uint voxelData = (id << 22) | colorData;
+    
             return voxelData;
+        }
+        
+        public static uint EncodeColor(Color32 color)
+        {
+            return ((uint)Math.Round(color.r / 255.0 * 127) << 15) |
+                   ((uint)Math.Round(color.g / 255.0 * 127) << 8) |
+                   ((uint)Math.Round(color.b / 255.0 * 127) << 1);
         }
 
         public static Voxel FromVoxelData(uint voxelData)
@@ -124,6 +129,27 @@ namespace SemagGames.SuperVoxelEditor
             return redChannelA == redChannelB && greenChannelA == greenChannelB && blueChannelA == blueChannelB;
         }
 
+        public static bool IsSameColor(Voxel voxelA, Voxel voxelB)
+        {
+            return voxelA.r == voxelB.r && voxelA.g == voxelB.g && voxelA.b == voxelB.b;
+        }
+        
+        public static bool IsSameColor(Voxel voxel, uint voxelData)
+        {
+            uint redChannel = GetRedChannel(voxelData);
+            uint greenChannel = GetGreenChannel(voxelData);
+            uint blueChannel = GetBlueChannel(voxelData);
+
+            return voxel.r == redChannel && voxel.g == greenChannel && voxel.b == blueChannel;
+        }
+
+        public static bool IsSameColor(Voxel voxel, Color32 color)
+        {
+            uint voxelColor = EncodeColor(color);
+            
+            return IsSameColor(voxel, voxelColor);
+        }
+        
         public static bool IsAir(uint voxelData) => GetId(voxelData) == VoxelAsset.AirId;
 
         public static bool IsAirId(uint voxelId) => voxelId == VoxelAsset.AirId;
