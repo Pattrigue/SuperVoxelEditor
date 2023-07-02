@@ -67,7 +67,7 @@ namespace SemagGames.SuperVoxelEditor
                             }
 
                             // Determine the size of the quad to be added
-                            Vector3Int quadSize = CalculateQuadSize(startPos, primaryAxis, secondaryAxis, tertiaryAxis, isBackFace, hasMerged, borderVisibilityFlags);
+                            Vector3Int quadSize = CalculateQuadSize(startPos, primaryAxis, secondaryAxis, tertiaryAxis, isBackFace, borderVisibilityFlags);
 
                             // Add the quad to the mesh
                             AddQuadToMesh(startPos, quadSize, primaryAxis, secondaryAxis, tertiaryAxis, isBackFace, voxelColor);
@@ -85,22 +85,29 @@ namespace SemagGames.SuperVoxelEditor
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private Vector3Int CalculateQuadSize(in Vector3Int startPos,
             int primaryAxis, int secondaryAxis, int tertiaryAxis,
-            bool isBackFace, in bool[] hasMerged, BorderVisibilityFlags borderVisibilityFlags)
+            bool isBackFace, BorderVisibilityFlags borderVisibilityFlags)
         {
             Vector3Int quadSize = new Vector3Int();
             Vector3Int currentPos = startPos;
 
             // Calculate the width of the quad
             currentPos[tertiaryAxis]++;
-    
+
             while (currentPos[tertiaryAxis] < Dimensions[tertiaryAxis] 
                    && CompareStep(startPos, currentPos, primaryAxis, isBackFace, borderVisibilityFlags) 
                    && !hasMerged[currentPos[secondaryAxis] * Dimensions[tertiaryAxis] + currentPos[tertiaryAxis]]) 
             {
                 currentPos[tertiaryAxis]++;
             }
-    
+
             quadSize[tertiaryAxis] = currentPos[tertiaryAxis] - startPos[tertiaryAxis];
+
+            // If the quad size is 1, return early
+            if (quadSize[tertiaryAxis] == 1)
+            {
+                quadSize[secondaryAxis] = 1;
+                return quadSize;
+            }
 
             // Calculate the height of the quad
             currentPos = startPos;
