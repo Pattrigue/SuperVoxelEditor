@@ -2,7 +2,7 @@
 
 namespace SemagGames.SuperVoxelEditor
 {
-    [CreateAssetMenu(menuName = "VoxelAsset")]
+    [CreateAssetMenu(menuName = "Super Voxel Editor/VoxelAsset")]
     public sealed class VoxelAsset : ScriptableObject
     {
         public const int AirId = 0;
