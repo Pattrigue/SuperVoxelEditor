@@ -1,36 +1,55 @@
-﻿using System.Collections.Generic;
+﻿using System;
 
 namespace SemagGames.SuperVoxelEditor.Commands
 {
-    [System.Serializable]
+    [Serializable]
     public sealed class CommandManager
     {
-        private readonly Stack<IVoxelEditCommand> commandStack = new();
-        private readonly Stack<IVoxelEditCommand> redoStack = new();
+        private const int BufferSize = 64;
+        
+        private readonly IVoxelEditCommand[] commandBuffer = new IVoxelEditCommand[BufferSize];
+        private readonly IVoxelEditCommand[] redoBuffer = new IVoxelEditCommand[BufferSize];
+        
+        private int undoIndex = -1;
+        private int redoIndex = -1;
 
         public void Do(IVoxelEditCommand command)
         {
             command.Execute();
-            commandStack.Push(command);
-            redoStack.Clear();
+        
+            undoIndex = (undoIndex + 1) % BufferSize;
+            commandBuffer[undoIndex] = command;
+        
+            redoIndex = -1; // Invalidate the redo stack when we do a new action
+            Array.Clear(redoBuffer, 0, redoBuffer.Length); // Optional: Free up some memory
         }
 
         public void Undo()
         {
-            if (commandStack.Count <= 0) return;
-            
-            IVoxelEditCommand command = commandStack.Pop();
+            if (undoIndex == -1 || commandBuffer[undoIndex] == null) return; // Nothing to undo
+
+            IVoxelEditCommand command = commandBuffer[undoIndex];
             command.Undo();
-            redoStack.Push(command);
+
+            redoIndex = (redoIndex + 1) % BufferSize;
+            redoBuffer[redoIndex] = command;
+        
+            commandBuffer[undoIndex] = null;
+            undoIndex = (undoIndex - 1 + BufferSize) % BufferSize;
         }
 
         public void Redo()
         {
-            if (redoStack.Count <= 0) return;
-            
-            IVoxelEditCommand command = redoStack.Pop();
+            if (redoIndex == -1 || redoBuffer[redoIndex] == null) return; // Nothing to redo
+
+            IVoxelEditCommand command = redoBuffer[redoIndex];
             command.Execute();
-            commandStack.Push(command);
+
+            undoIndex = (undoIndex + 1) % BufferSize;
+            commandBuffer[undoIndex] = command;
+        
+            redoBuffer[redoIndex] = null;
+            redoIndex = (redoIndex - 1 + BufferSize) % BufferSize;
         }
     }
 }
